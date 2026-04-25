@@ -102,19 +102,28 @@ const Index = () => {
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
 
-  // 进入伪全屏 → 手机自动启用强制横屏旋转 + 显示提示
+  // 进入伪全屏 → 手机自动启用强制横屏旋转 + 显示提示 + 锁定 body 滚动
   useEffect(() => {
     if (!pseudoFullscreen) {
       setForceLandscape(false);
       setShowRotateHint(false);
+      // 还原 body 样式
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
       return;
     }
+    // 锁定 body 防止 iOS Safari 出现可滚动空白
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    document.body.style.height = "100%";
+
     const ua = navigator.userAgent || "";
     const isPhone =
       /iPhone|Android.*Mobile|Mobi/i.test(ua) ||
       (window.innerWidth < 768 && window.innerHeight > window.innerWidth + 100);
-    // iPad 不旋转：iPad 走 webkitRequestFullscreen，理论上不会进入伪全屏；
-    // 即便误判，屏幕足够大也无需旋转
     const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
     if (isPhone && !isIpad) {
       setForceLandscape(true);
