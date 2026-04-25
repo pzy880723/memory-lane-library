@@ -81,10 +81,8 @@ export const SLIDES: SlideMeta[] = [
   { id: "matrix2", title: "七大店型 [下]", chapter: "08", render: (p) => <Slide27Matrix2 {...p} /> },
   { id: "flywheel", title: "增长飞轮", chapter: "08", render: (p) => <Slide28Flywheel {...p} /> },
 
-  { id: "contact", title: "联系我们", chapter: "09", render: (p) => <Slide29Contact {...p} /> },
   { id: "stores", title: "门店地址", chapter: "09", render: (p) => <Slide30Stores {...p} /> },
-  { id: "slogan", title: "品牌金句", chapter: "09", render: (p) => <Slide31Slogan {...p} /> },
-  { id: "thanks", title: "致谢", chapter: "09", render: (p) => <Slide32Thanks {...p} /> },
+  { id: "contact", title: "联系我们", chapter: "09", render: (p) => <Slide29Contact {...p} /> },
 ];
 
 export function SlideRenderer({ index }: { index: number }) {
