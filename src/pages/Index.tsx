@@ -413,6 +413,123 @@ const Index = () => {
             </div>
           </div>
         )}
+
+        {/* 导出后对比预览：左=网页预览  右=导出成品 */}
+        {exportPreview && (
+          <div className="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[110] flex flex-col">
+            {/* 顶栏 */}
+            <div className="flex items-center justify-between px-6 py-3 bg-ink text-paper-cream border-b-4 border-boomer-red">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-6 h-6 text-boomer-red" />
+                <div>
+                  <div className="font-display text-xl font-black">
+                    {exportPreview.type} 导出成功 · 对比预览
+                  </div>
+                  <div className="font-condensed text-xs tracking-widest text-paper-cream/60">
+                    左侧为网页预览　·　右侧为导出文件实际效果（含圆角等所有样式）
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
+                onClick={() => setExportPreview(null)}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* 主体：左右对比 */}
+            <div className="flex-1 grid grid-cols-2 gap-4 p-4 overflow-hidden">
+              {/* 左：网页预览（实时渲染） */}
+              <div className="flex flex-col min-h-0">
+                <div className="text-paper-cream/80 font-display text-sm mb-2 px-2">
+                  📺 网页预览（实时 DOM）
+                </div>
+                <div className="flex-1 bg-ink rounded overflow-hidden border-2 border-paper-cream/20 flex items-center justify-center">
+                  <div className="w-full h-full" style={{ aspectRatio: "16/9" }}>
+                    <SlideRenderer index={exportPreview.activeIndex} />
+                  </div>
+                </div>
+              </div>
+              {/* 右：导出图片 */}
+              <div className="flex flex-col min-h-0">
+                <div className="text-paper-cream/80 font-display text-sm mb-2 px-2">
+                  📄 {exportPreview.type} 文件实际页面（栅格化成品）
+                </div>
+                <div className="flex-1 bg-ink rounded overflow-hidden border-2 border-boomer-red flex items-center justify-center">
+                  <img
+                    src={exportPreview.items[exportPreview.activeIndex]?.imageDataUrl}
+                    alt={`导出第 ${exportPreview.activeIndex + 1} 页`}
+                    className="w-full h-full object-contain"
+                    style={{ aspectRatio: "16/9" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 底栏：缩略图横向导航 */}
+            <div className="bg-ink border-t border-paper-cream/20 px-4 py-3 flex items-center gap-3">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream flex-shrink-0"
+                onClick={() =>
+                  setExportPreview((p) =>
+                    p ? { ...p, activeIndex: Math.max(0, p.activeIndex - 1) } : p,
+                  )
+                }
+                disabled={exportPreview.activeIndex === 0}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div className="flex-1 overflow-x-auto">
+                <div className="flex gap-2">
+                  {exportPreview.items.map((it) => (
+                    <button
+                      key={it.index}
+                      onClick={() =>
+                        setExportPreview((p) => (p ? { ...p, activeIndex: it.index } : p))
+                      }
+                      className={`relative flex-shrink-0 w-28 aspect-video rounded overflow-hidden border-2 transition-all ${
+                        it.index === exportPreview.activeIndex
+                          ? "border-boomer-red ring-2 ring-boomer-red/40"
+                          : "border-paper-cream/20 hover:border-boomer-red/60"
+                      }`}
+                    >
+                      <img src={it.imageDataUrl} alt={it.title} className="w-full h-full object-cover" />
+                      <span className="absolute bottom-0 left-0 right-0 bg-ink/80 text-paper-cream text-[10px] font-en text-center py-0.5">
+                        {String(it.index + 1).padStart(2, "0")}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream flex-shrink-0"
+                onClick={() =>
+                  setExportPreview((p) =>
+                    p
+                      ? { ...p, activeIndex: Math.min(p.items.length - 1, p.activeIndex + 1) }
+                      : p,
+                  )
+                }
+                disabled={exportPreview.activeIndex === exportPreview.items.length - 1}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+              <div className="flex-shrink-0 font-en text-paper-cream text-lg pl-4 border-l border-paper-cream/20">
+                <span className="text-boomer-red">
+                  {String(exportPreview.activeIndex + 1).padStart(2, "0")}
+                </span>
+                <span className="text-paper-cream/50"> / {String(exportPreview.items.length).padStart(2, "0")}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
