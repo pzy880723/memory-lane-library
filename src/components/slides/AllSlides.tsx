@@ -375,59 +375,63 @@ export function Slide07Keywords({ pageNumber, totalPages }: { pageNumber: number
 }
 
 /* ============================================================
- * 第 8 页 — 内容生产机器（去黑色，改红+米黄）
+ * 第 8 页 — 内容生产机器（数字戏剧化）
  * ============================================================ */
 export function Slide08Engine({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="warm" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-28 pt-36 pb-24 flex flex-col">
+      <div className="absolute inset-0 px-24 pt-36 pb-24 flex flex-col">
         <span className="font-handwrite text-4xl text-boomer-red mb-3">A Free Marketing Engine</span>
-        <h1 className="font-display text-7xl font-black mb-10 leading-tight">
-          一台永不停歇的<br/><span className="text-boomer-red highlight-yellow">免费曝光引擎</span>
+        <h1 className="font-display text-7xl font-black mb-8 leading-tight">
+          一台永不停歇的<span className="text-boomer-red highlight-yellow">免费曝光引擎</span>
         </h1>
 
-        <div className="grid grid-cols-2 gap-12 flex-1">
-          <div className="flex flex-col justify-center">
-            <p className="font-body text-3xl text-ink/85 leading-relaxed mb-8">
-              "国内首家标准化中古店"、"100+ 平价筐寻宝"、"巨型 Gameboy"、"佐藤象打卡"等标签，
-              <span className="font-black highlight-red">自带极强的话题性和出片率</span>。
-            </p>
-            <p className="font-body text-3xl text-ink/85 leading-relaxed">
-              中信泰富首店已用数据证明 ——
-              全部曝光均为用户自发传播，<span className="text-boomer-red font-black">零付费推广</span>。
-            </p>
+        <div className="grid grid-cols-12 gap-6 flex-1">
+          {/* 左侧主数字 — 撑满 */}
+          <div className="col-span-7 vintage-border bg-boomer-red text-paper-cream p-10 flex flex-col justify-between relative overflow-hidden rotate-[-0.5deg]">
+            <div className="absolute -top-20 -right-20 w-[500px] h-[500px] dots-pattern-cream opacity-25" />
+            <div className="relative">
+              <TrendingUp className="w-20 h-20 mb-4" strokeWidth={2.5} />
+              <div className="font-display text-3xl font-bold mb-3">全网曝光量</div>
+            </div>
+            <div className="relative">
+              <div className="mega-number text-[16rem] leading-none">300<span className="text-7xl ml-3">万+</span></div>
+              <div className="font-display text-3xl mt-4 text-paper-cream/90">零付费 · 自然爆发</div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-5">
-            <div className="vintage-border bg-paper-cream p-7 flex flex-col justify-between rotate-[-1deg]">
-              <TrendingUp className="w-14 h-14 text-boomer-red" strokeWidth={2.5} />
+          {/* 右侧 3 个副数字 */}
+          <div className="col-span-5 grid grid-rows-3 gap-5">
+            <div className="vintage-border bg-paper-cream p-7 flex items-center justify-between rotate-[1deg]">
               <div>
-                <div className="mega-number text-7xl text-boomer-red">300<span className="text-3xl">万+</span></div>
-                <div className="font-body text-2xl mt-2 font-bold">全网曝光</div>
+                <Users className="w-12 h-12 text-boomer-red mb-1" strokeWidth={2.5} />
+                <div className="font-body text-2xl font-bold">定向客流</div>
               </div>
+              <div className="mega-number text-[7rem] leading-none text-boomer-red">10<span className="text-3xl">万+</span></div>
             </div>
-            <div className="vintage-border bg-boomer-red text-paper-cream p-7 flex flex-col justify-between rotate-[1deg]">
-              <Users className="w-14 h-14" strokeWidth={2.5} />
+            <div className="vintage-border bg-vintage-gold p-7 flex items-center justify-between rotate-[-1deg]">
               <div>
-                <div className="mega-number text-7xl">10<span className="text-3xl">万+</span></div>
-                <div className="font-body text-2xl mt-2 font-bold">定向客流</div>
+                <Star className="w-12 h-12 text-boomer-red mb-1" strokeWidth={2.5} />
+                <div className="font-body text-2xl font-bold">商圈排名</div>
               </div>
+              <div className="mega-number text-[7rem] leading-none text-boomer-red">No.1</div>
             </div>
-            <div className="vintage-border bg-vintage-gold p-7 flex flex-col justify-between rotate-[1deg]">
-              <Star className="w-14 h-14" strokeWidth={2.5} />
+            <div className="vintage-border bg-paper-cream p-7 flex items-center justify-between rotate-[1deg]">
               <div>
-                <div className="mega-number text-7xl">No.1</div>
-                <div className="font-body text-2xl mt-2 font-bold">商圈排名</div>
+                <Heart className="w-12 h-12 text-boomer-red mb-1" strokeWidth={2.5} />
+                <div className="font-body text-2xl font-bold">月均打卡</div>
               </div>
-            </div>
-            <div className="vintage-border bg-paper-cream p-7 flex flex-col justify-between rotate-[-1deg]">
-              <Heart className="w-14 h-14 text-boomer-red" strokeWidth={2.5} />
-              <div>
-                <div className="mega-number text-7xl text-boomer-red">1K<span className="text-3xl">+</span></div>
-                <div className="font-body text-2xl mt-2 font-bold">月均打卡</div>
-              </div>
+              <div className="mega-number text-[7rem] leading-none text-boomer-red">1K<span className="text-3xl">+</span></div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-6 bg-paper-cream vintage-border-red px-10 py-5">
+          <p className="font-display text-3xl">
+            <Quote className="inline w-9 h-9 text-boomer-red mr-3" />
+            "100+ 平价筐"、"巨型 Gameboy"、"佐藤象打卡" — 标签<span className="font-black highlight-red">自带话题性</span>，
+            <span className="text-boomer-red font-black">零付费推广</span>持续传播
+          </p>
         </div>
       </div>
     </SlideShell>
