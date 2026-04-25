@@ -362,6 +362,21 @@ const Index = () => {
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
+
+              {/* 强制横屏提示 — 3 秒后淡出 */}
+              {forceLandscape && (
+                <div
+                  className={`absolute inset-0 z-40 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
+                    showRotateHint ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <div className="bg-ink/85 backdrop-blur-md text-paper-cream px-8 py-6 rounded-2xl border-2 border-boomer-red shadow-2xl flex flex-col items-center gap-3">
+                    <div className="text-5xl animate-pulse">📱↻</div>
+                    <div className="font-display text-xl font-black tracking-wide">请将手机横过来观看</div>
+                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE</div>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
