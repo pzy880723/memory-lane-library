@@ -776,74 +776,109 @@ export function Slide14Japan({ pageNumber, totalPages }: { pageNumber: number; t
 export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-28 pt-36 pb-24">
-        <div className="flex items-end justify-between mb-8">
+      <div className="absolute inset-0 px-24 pt-32 pb-20">
+        {/* 标题 + 总 SKU 数据 */}
+        <div className="flex items-end justify-between mb-6">
           <div>
             <span className="font-handwrite text-4xl text-boomer-red">Space Concept</span>
-            <h1 className="font-display text-7xl font-black mt-2">
+            <h1 className="font-display text-7xl font-black mt-2 leading-none">
               超高密度 × <span className="text-boomer-red">寻宝体验</span>
             </h1>
           </div>
           <div className="text-right">
-            <div className="mega-number text-8xl text-boomer-red">10,000<span className="text-3xl">+</span></div>
-            <div className="font-body text-2xl text-ink/65">SKU / 80-100㎡ 单店</div>
+            <div className="mega-number text-8xl text-boomer-red leading-none">10,000<span className="text-4xl">+</span></div>
+            <div className="font-body text-2xl text-ink/65 mt-1">SKU / 80-100㎡ 单店</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* 上层精品 - 实拍 */}
-          <div className="col-span-7 vintage-border bg-paper-cream overflow-hidden">
-            <div className="grid grid-cols-5">
-              <div className="col-span-2 bg-boomer-red text-paper-cream p-7 flex flex-col justify-center">
-                <div className="font-handwrite text-2xl text-paper-cream/85 mb-2">Upper Floor</div>
-                <div className="font-display text-4xl font-black mb-2">上层<br/>精品区</div>
-                <div className="font-body text-lg text-paper-cream/85 mt-2">视线及以上</div>
+        {/* 楼层结构示意 — 上下分层呼应空间含义 */}
+        <div className="relative">
+          {/* 左侧楼层标尺 */}
+          <div className="absolute -left-16 top-0 bottom-0 flex flex-col items-center justify-between py-4 z-10">
+            <div className="flex flex-col items-center">
+              <div className="w-3 h-3 bg-boomer-red rounded-full" />
+              <div className="font-en text-3xl text-boomer-red mt-1">UP</div>
+            </div>
+            <div className="w-[2px] flex-1 bg-ink/30 my-2" />
+            <div className="flex flex-col items-center">
+              <div className="font-en text-3xl text-vintage-gold mb-1">DOWN</div>
+              <div className="w-3 h-3 bg-vintage-gold rounded-full" />
+            </div>
+          </div>
+
+          {/* 上层 — 精品区（红色调，置于上方） */}
+          <div className="vintage-border bg-paper-cream overflow-hidden">
+            <div className="grid grid-cols-12 items-stretch">
+              <div className="col-span-4 bg-boomer-red text-paper-cream p-7 flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-en text-5xl text-paper-cream/90">01</span>
+                  <span className="font-handwrite text-2xl text-paper-cream/85">Upper Floor</span>
+                </div>
+                <div className="font-display text-5xl font-black leading-tight">上层 · 精品区</div>
+                <div className="font-body text-xl text-paper-cream/85 mt-3">视线及以上 · 高价值精选</div>
               </div>
               <img
                 src={photoCeramics}
                 alt="精品瓷器"
-                className="col-span-3 w-full h-[260px] object-cover"
+                className="col-span-4 w-full h-[230px] object-cover"
               />
-            </div>
-            <div className="p-7">
-              <div className="font-display text-2xl font-bold mb-4">高价值精选中古商品</div>
-              <div className="flex flex-wrap gap-2">
-                {["绝版手办", "复古相机 CCD", "品牌瓷器", "中古腕表", "黑胶唱片机", "经典毛绒"].map(t => (
-                  <span key={t} className="px-4 py-2 bg-boomer-red text-paper-cream font-display text-lg font-bold">{t}</span>
-                ))}
+              <div className="col-span-4 p-6 flex flex-col justify-center bg-paper-cream">
+                <div className="font-display text-2xl font-bold mb-3 text-ink">高价值中古商品</div>
+                <div className="flex flex-wrap gap-2">
+                  {["绝版手办", "复古相机", "品牌瓷器", "中古腕表", "黑胶机", "经典毛绒"].map(t => (
+                    <span key={t} className="px-3 py-1.5 bg-boomer-red text-paper-cream font-display text-base font-bold">{t}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 下层翻筐乐 */}
-          <div className="col-span-5 vintage-border-red bg-vintage-gold overflow-hidden flex flex-col">
-            <div className="p-7 flex-1">
-              <div className="font-handwrite text-2xl text-ink/65 mb-2">Lower Floor</div>
-              <div className="font-display text-4xl font-black mb-1">下层淘货区</div>
-              <div className="font-display text-3xl text-boomer-red mb-5">「翻 筐 乐」</div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <div className="mega-number text-5xl text-boomer-red">100<span className="text-2xl">+</span></div>
-                  <div className="font-body text-base text-ink/75">平价木筐</div>
+          {/* 中间分隔条 — 视觉上的"楼板" */}
+          <div className="relative h-3 my-3">
+            <div className="absolute inset-0 dots-pattern-red opacity-60" />
+            <div className="absolute inset-y-0 left-0 right-0 border-t-2 border-b-2 border-dashed border-ink/40" />
+          </div>
+
+          {/* 下层 — 翻筐乐区（金色调，置于下方） */}
+          <div className="vintage-border-red bg-vintage-gold overflow-hidden">
+            <div className="grid grid-cols-12 items-stretch">
+              <div className="col-span-4 p-7 flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-en text-5xl text-boomer-red">02</span>
+                  <span className="font-handwrite text-2xl text-ink/70">Lower Floor</span>
                 </div>
-                <div>
-                  <div className="mega-number text-5xl text-boomer-red">¥6.9</div>
-                  <div className="font-body text-base text-ink/75">起售价</div>
-                </div>
-                <div>
-                  <div className="mega-number text-5xl text-boomer-red">∞</div>
-                  <div className="font-body text-base text-ink/75">寻宝乐趣</div>
-                </div>
+                <div className="font-display text-5xl font-black leading-tight text-ink">下层 · 淘货区</div>
+                <div className="font-display text-3xl text-boomer-red mt-2">「翻 筐 乐」</div>
               </div>
-              <p className="font-body text-lg text-ink/75 mt-4 leading-snug">
-                海量小物件集中木筐自由翻找，"逛不完"驱动停留 45-90 分钟
-              </p>
+              <div className="col-span-5 p-6 flex flex-col justify-center bg-paper-cream/60">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <div className="mega-number text-5xl text-boomer-red leading-none">100<span className="text-2xl">+</span></div>
+                    <div className="font-body text-base text-ink/75 mt-1">平价木筐</div>
+                  </div>
+                  <div>
+                    <div className="mega-number text-5xl text-boomer-red leading-none">¥6.9</div>
+                    <div className="font-body text-base text-ink/75 mt-1">起售价</div>
+                  </div>
+                  <div>
+                    <div className="mega-number text-5xl text-boomer-red leading-none">∞</div>
+                    <div className="font-body text-base text-ink/75 mt-1">寻宝乐趣</div>
+                  </div>
+                </div>
+                <p className="font-body text-lg text-ink/80 mt-4 leading-snug">
+                  海量小物件集中木筐自由翻找，"逛不完"驱动停留 <span className="font-bold text-boomer-red">45-90 分钟</span>
+                </p>
+              </div>
+              <div className="col-span-3 bg-boomer-red text-paper-cream p-6 flex flex-col justify-center items-center text-center">
+                <div className="font-handwrite text-xl text-paper-cream/85 mb-1">Discovery</div>
+                <div className="font-display text-3xl font-black leading-tight">沉浸式<br/>寻宝体验</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <p className="font-body text-2xl text-ink/75 mt-6 text-center">
-          每一件皆为<span className="font-display font-black text-boomer-red">孤品</span> · 
+        <p className="font-body text-2xl text-ink/75 mt-5 text-center">
+          每一件皆为<span className="font-display font-black text-boomer-red">孤品</span> ·
           "每次来货都不一样"驱动极高复购率
         </p>
       </div>
