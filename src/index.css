@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BOOMER OFF Vintage 品牌手册 — 复古昭和 × 红黑撞色设计系统 */
+/* BOOMER OFF Vintage 品牌手册 — 复古昭和 × 红米暖色拼贴系统 */
 
 @layer base {
   :root {
@@ -13,50 +13,48 @@
     --boomer-red: 355 100% 45%;
     --boomer-red-deep: 355 90% 35%;
     --boomer-red-soft: 355 80% 92%;
+    --boomer-red-warm: 8 78% 58%;     /* 朱砂红 偏橘 */
 
-    /* 深炭黑 */
-    --ink-black: 0 0% 10%;
-    --ink-soft: 0 0% 25%;
+    /* 墨色 — 仅用作文字、细描边 */
+    --ink-black: 0 0% 12%;
+    --ink-soft: 0 0% 28%;
 
-    /* 昭和米黄底纸 #F5EFE0 */
+    /* 米黄 / 奶油 / 复古纸张多层次 */
     --paper: 42 50% 92%;
-    --paper-deep: 38 35% 85%;
+    --paper-deep: 38 45% 86%;          /* 加深的米色 */
     --paper-cream: 45 60% 96%;
+    --paper-warm: 32 55% 80%;          /* 暖卡其 */
+    --paper-sand: 35 40% 78%;          /* 沙土色 */
 
     /* 装饰辅助色 */
-    --vintage-gold: 38 65% 52%;
+    --vintage-gold: 38 75% 55%;        /* 昭和金 */
+    --vintage-gold-soft: 42 70% 80%;
+    --vintage-mustard: 42 80% 50%;     /* 芥末黄 */
     --vintage-moss: 88 25% 38%;
     --vintage-navy: 215 45% 25%;
+    --vintage-coral: 12 75% 65%;       /* 珊瑚色 */
+    --vintage-teal: 175 45% 35%;       /* 暗青 */
 
     /* ============ shadcn 语义令牌映射 ============ */
     --background: 42 50% 92%;
-    --foreground: 0 0% 10%;
-
+    --foreground: 0 0% 12%;
     --card: 45 60% 96%;
-    --card-foreground: 0 0% 10%;
-
+    --card-foreground: 0 0% 12%;
     --popover: 45 60% 96%;
-    --popover-foreground: 0 0% 10%;
-
+    --popover-foreground: 0 0% 12%;
     --primary: 355 100% 45%;
     --primary-foreground: 45 60% 96%;
-
     --secondary: 38 35% 85%;
-    --secondary-foreground: 0 0% 10%;
-
+    --secondary-foreground: 0 0% 12%;
     --muted: 42 30% 88%;
     --muted-foreground: 0 0% 35%;
-
-    --accent: 38 65% 52%;
-    --accent-foreground: 0 0% 10%;
-
+    --accent: 38 75% 55%;
+    --accent-foreground: 0 0% 12%;
     --destructive: 355 100% 45%;
     --destructive-foreground: 45 60% 96%;
-
-    --border: 0 0% 10% / 0.15;
+    --border: 0 0% 12% / 0.15;
     --input: 38 30% 80%;
     --ring: 355 100% 45%;
-
     --radius: 0.5rem;
 
     /* ============ 字体栈 ============ */
@@ -68,54 +66,51 @@
 
     /* ============ 渐变与阴影 ============ */
     --gradient-paper: linear-gradient(135deg, hsl(var(--paper-cream)) 0%, hsl(var(--paper)) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(var(--paper-cream)) 0%, hsl(var(--paper-warm)) 100%);
     --gradient-red: linear-gradient(135deg, hsl(var(--boomer-red)) 0%, hsl(var(--boomer-red-deep)) 100%);
     --shadow-stamp: 0 4px 0 hsl(var(--ink-black));
     --shadow-vintage: 0 8px 24px -8px hsl(var(--ink-black) / 0.25);
     --shadow-card: 0 6px 20px -4px hsl(var(--ink-black) / 0.18);
 
     --sidebar-background: 45 60% 96%;
-    --sidebar-foreground: 0 0% 10%;
+    --sidebar-foreground: 0 0% 12%;
     --sidebar-primary: 355 100% 45%;
     --sidebar-primary-foreground: 45 60% 96%;
     --sidebar-accent: 38 35% 85%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 0 0% 10% / 0.15;
+    --sidebar-accent-foreground: 0 0% 12%;
+    --sidebar-border: 0 0% 12% / 0.15;
     --sidebar-ring: 355 100% 45%;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 45 60% 96%;
-    --card: 0 0% 12%;
-    --card-foreground: 45 60% 96%;
-    --popover: 0 0% 12%;
-    --popover-foreground: 45 60% 96%;
-    --primary: 355 100% 55%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 0 0% 18%;
-    --secondary-foreground: 45 60% 96%;
-    --muted: 0 0% 18%;
-    --muted-foreground: 45 20% 75%;
-    --accent: 38 65% 52%;
-    --accent-foreground: 0 0% 8%;
-    --border: 45 30% 96% / 0.15;
-    --input: 0 0% 18%;
-    --ring: 355 100% 55%;
+    --background: 42 50% 92%;
+    --foreground: 0 0% 12%;
+    --card: 45 60% 96%;
+    --card-foreground: 0 0% 12%;
+    --popover: 45 60% 96%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 355 100% 45%;
+    --primary-foreground: 45 60% 96%;
+    --secondary: 38 35% 85%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 42 30% 88%;
+    --muted-foreground: 0 0% 35%;
+    --accent: 38 75% 55%;
+    --accent-foreground: 0 0% 12%;
+    --border: 0 0% 12% / 0.15;
+    --input: 38 30% 80%;
+    --ring: 355 100% 45%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
-    font-family: var(--font-display);
-  }
+  h1, h2, h3, h4 { font-family: var(--font-display); }
 }
 
 @layer utilities {
@@ -134,105 +129,166 @@
       radial-gradient(circle at 50% 50%, hsl(var(--vintage-gold) / 0.04) 2px, transparent 2px);
     background-size: 40px 40px, 60px 60px, 80px 80px;
   }
-
   .paper-cream {
     background-color: hsl(var(--paper-cream));
-    background-image:
-      radial-gradient(circle at 20% 30%, hsl(var(--ink-black) / 0.02) 1px, transparent 1px);
+    background-image: radial-gradient(circle at 20% 30%, hsl(var(--ink-black) / 0.02) 1px, transparent 1px);
     background-size: 50px 50px;
+  }
+  .paper-warm-bg {
+    background: linear-gradient(135deg, hsl(var(--paper-cream)) 0%, hsl(var(--paper-warm)) 100%);
+  }
+  .paper-sand-bg {
+    background-color: hsl(var(--paper-sand));
+    background-image:
+      repeating-linear-gradient(45deg, hsl(var(--ink-black) / 0.03) 0 2px, transparent 2px 14px);
   }
 
   /* 网点底纹（昭和波点） */
   .dots-pattern {
-    background-image: radial-gradient(circle, hsl(var(--ink-black) / 0.15) 1.5px, transparent 1.5px);
-    background-size: 20px 20px;
+    background-image: radial-gradient(circle, hsl(var(--ink-black) / 0.18) 1.8px, transparent 1.8px);
+    background-size: 22px 22px;
   }
   .dots-pattern-red {
-    background-image: radial-gradient(circle, hsl(var(--boomer-red) / 0.2) 1.5px, transparent 1.5px);
-    background-size: 16px 16px;
+    background-image: radial-gradient(circle, hsl(var(--boomer-red) / 0.32) 2px, transparent 2px);
+    background-size: 18px 18px;
+  }
+  .dots-pattern-cream {
+    background-image: radial-gradient(circle, hsl(var(--paper-cream) / 0.35) 2px, transparent 2px);
+    background-size: 22px 22px;
+  }
+  .dots-pattern-gold {
+    background-image: radial-gradient(circle, hsl(var(--vintage-gold) / 0.45) 2px, transparent 2px);
+    background-size: 24px 24px;
   }
 
-  /* 复古横纹 */
+  /* 复古横纹 / 斜纹 */
   .lines-pattern {
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      hsl(var(--ink-black) / 0.04) 8px,
-      hsl(var(--ink-black) / 0.04) 9px
-    );
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, hsl(var(--ink-black) / 0.05) 8px, hsl(var(--ink-black) / 0.05) 9px);
+  }
+  .lines-red {
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 12px, hsl(var(--boomer-red) / 0.15) 12px, hsl(var(--boomer-red) / 0.15) 14px);
   }
 
   /* 红色印章 */
   .stamp-red {
-    border: 4px solid hsl(var(--boomer-red));
+    border: 5px solid hsl(var(--boomer-red));
     color: hsl(var(--boomer-red));
-    padding: 0.5rem 1.5rem;
-    transform: rotate(-3deg);
+    padding: 0.6rem 1.8rem;
+    transform: rotate(-4deg);
     font-family: var(--font-display);
     font-weight: 900;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
+    background: hsl(var(--paper-cream) / 0.6);
   }
 
-  /* 红色高亮笔涂抹 */
+  /* 高亮笔涂抹 */
   .highlight-red {
-    background: linear-gradient(180deg, transparent 60%, hsl(var(--boomer-red) / 0.35) 60%);
-    padding: 0 0.15em;
+    background: linear-gradient(180deg, transparent 55%, hsl(var(--boomer-red) / 0.4) 55%);
+    padding: 0 0.18em;
   }
   .highlight-yellow {
-    background: linear-gradient(180deg, transparent 60%, hsl(var(--vintage-gold) / 0.45) 60%);
-    padding: 0 0.15em;
+    background: linear-gradient(180deg, transparent 55%, hsl(var(--vintage-gold) / 0.55) 55%);
+    padding: 0 0.18em;
+  }
+  .highlight-coral {
+    background: linear-gradient(180deg, transparent 55%, hsl(var(--vintage-coral) / 0.45) 55%);
+    padding: 0 0.18em;
   }
 
-  /* 胶带贴纸 */
-  .tape {
-    position: relative;
-  }
-  .tape::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-2deg);
-    width: 80px;
-    height: 22px;
-    background: hsl(var(--vintage-gold) / 0.6);
-    border-left: 1px dashed hsl(var(--ink-black) / 0.2);
-    border-right: 1px dashed hsl(var(--ink-black) / 0.2);
-  }
-
-  /* 红黑撞色边框 */
+  /* 红黑撞色边框（保留黑作为细线） */
   .vintage-border {
-    border: 3px solid hsl(var(--ink-black));
-    box-shadow: 6px 6px 0 hsl(var(--boomer-red));
+    border: 4px solid hsl(var(--ink-black));
+    box-shadow: 8px 8px 0 hsl(var(--boomer-red));
   }
   .vintage-border-red {
-    border: 3px solid hsl(var(--boomer-red));
-    box-shadow: 6px 6px 0 hsl(var(--ink-black));
+    border: 4px solid hsl(var(--boomer-red));
+    box-shadow: 8px 8px 0 hsl(var(--ink-black));
+  }
+  .vintage-border-gold {
+    border: 4px solid hsl(var(--vintage-gold));
+    box-shadow: 8px 8px 0 hsl(var(--boomer-red));
+  }
+  .vintage-border-soft {
+    border: 3px solid hsl(var(--ink-black) / 0.85);
+    box-shadow: 6px 6px 0 hsl(var(--ink-black) / 0.15);
   }
 
   /* 数字大字 */
   .big-number {
     font-family: var(--font-en-display);
     font-weight: 400;
-    line-height: 0.9;
+    line-height: 0.85;
     letter-spacing: -0.02em;
+  }
+  .mega-number {
+    font-family: var(--font-en-display);
+    font-weight: 400;
+    line-height: 0.78;
+    letter-spacing: -0.04em;
   }
 
   /* 章节大编号 */
   .chapter-num {
     font-family: var(--font-en-display);
-    font-size: 24rem;
-    line-height: 0.8;
-    color: hsl(var(--boomer-red) / 0.12);
+    font-size: 28rem;
+    line-height: 0.78;
+    color: hsl(var(--paper-cream) / 0.18);
     font-weight: 400;
+  }
+
+  /* 镂空大字（描边白字） */
+  .text-stroke-cream {
+    -webkit-text-stroke: 4px hsl(var(--paper-cream));
+    color: transparent;
+  }
+  .text-stroke-red {
+    -webkit-text-stroke: 4px hsl(var(--boomer-red));
+    color: transparent;
+  }
+  .text-stroke-ink {
+    -webkit-text-stroke: 3px hsl(var(--ink-black));
+    color: transparent;
+  }
+
+  /* 拼贴胶带 */
+  .tape-gold {
+    position: absolute;
+    width: 140px;
+    height: 32px;
+    background: hsl(var(--vintage-gold) / 0.7);
+    border-left: 1px dashed hsl(var(--ink-black) / 0.3);
+    border-right: 1px dashed hsl(var(--ink-black) / 0.3);
+    box-shadow: 0 2px 8px hsl(var(--ink-black) / 0.15);
+  }
+  .tape-red {
+    position: absolute;
+    width: 140px;
+    height: 32px;
+    background: hsl(var(--boomer-red) / 0.85);
+    border-left: 1px dashed hsl(var(--paper-cream) / 0.4);
+    border-right: 1px dashed hsl(var(--paper-cream) / 0.4);
+    box-shadow: 0 2px 8px hsl(var(--ink-black) / 0.15);
+  }
+
+  /* 实拍照片 — 昭和印刷质感 */
+  .photo-vintage {
+    filter: saturate(0.92) contrast(1.05);
+    border: 6px solid hsl(var(--paper-cream));
+    box-shadow: 0 12px 30px -8px hsl(var(--ink-black) / 0.35);
+  }
+  .photo-tinted-red {
+    filter: saturate(0.5) contrast(1.1) sepia(0.2);
+  }
+  .photo-polaroid {
+    background: hsl(var(--paper-cream));
+    padding: 14px 14px 50px;
+    box-shadow: 0 14px 30px -10px hsl(var(--ink-black) / 0.4);
   }
 
   /* 隐藏滚动条 */
   .hide-scrollbar::-webkit-scrollbar { display: none; }
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* slide 字体在缩放容器内放大 */
   .slide-content { font-family: var(--font-body); }
 }
 
