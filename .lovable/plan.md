@@ -1,105 +1,94 @@
-## 目标
+## 问题诊断
 
-手机用户点击「全屏」按钮时，**自动将幻灯片画面用 CSS 旋转 90° 变成横版**，无需依赖陀螺仪 / 设备旋转 / Screen Orientation API（iOS 不支持）。
+从你上传的截图可以清楚看到：**幻灯片确实旋转了 90°，但只显示在屏幕中间一个小方框里，远没有铺满整个手机屏幕**。
 
-用户只需把手机横过来看，即可获得满屏 16:9 的沉浸体验。
+### 根本原因（三层问题叠加）
 
----
+**① 内层 `aspectRatio: 16/9` + `p-4` 包装把舞台压成小盒子**
 
-## 核心原理
-
-**iOS Safari 不支持 `screen.orientation.lock()`**，因此只能用 **CSS Transform 旋转大法**：
-
-```
-检测到「手机 + 伪全屏激活」
-   ↓
-把整个幻灯片舞台 transform: rotate(90deg)
-宽 = 视口高度（100dvh）
-高 = 视口宽度（100dvw）
-   ↓
-用户横过手机 = 完美横版全屏
+`src/pages/Index.tsx` 第 276-280 行：
+```tsx
+<div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
+  <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
+    <SlideRenderer index={current} />
+  </div>
+</div>
 ```
 
-此方案在 **iOS Safari、安卓 Chrome、微信内置浏览器** 全部生效。
+这层 wrapper 在桌面端是为了「让 16:9 幻灯片在任意容器里居中并保持比例」，但**旋转后的舞台本身就已经是 16:9 比例的横版**（宽 = 100dvh ≈ 844px，高 = 100dvw ≈ 390px），再套一层 `aspectRatio: 16/9` + `p-4 / md:p-8` 内边距，就会把内容再次缩成一个小框 → 这就是你看到的"小卡片飘在中间"的根因。
+
+**② iOS Safari 的 `100dvh` 和地址栏会动态变化**
+
+虽然 `100dvh` 应该是「动态视口高度」，但在 iOS Safari 进入页面后地址栏的展开/收起会让数值跳变，导致旋转后的尺寸不稳定。
+
+**③ `transform-origin: top left` + `left: 100dvw` 的布局**
+
+当前用 `left: 100dvw` 把元素推到屏幕右边、再 `rotate(90deg)` 转回来，这种写法依赖 `100dvw` 精确等于视口宽度，在某些 Safari 状态下会有 1-2px 误差导致出现滚动条/黑边。
 
 ---
 
-## 改动详情
+## 修复方案
 
-### 1. `src/pages/Index.tsx`
+### 改动 1：旋转模式下移除内层 wrapper 的 padding 和 aspectRatio
 
-**新增状态**：
-- `forceLandscape: boolean` — 当前是否启用强制横屏旋转
+在 `src/pages/Index.tsx` 第 276-280 行，把那层 wrapper 改为**条件渲染**：
+- `forceLandscape = false` 时：保持原样（`p-4 md:p-8` + `aspectRatio: 16/9`）—— 桌面/iPad 体验不变
+- `forceLandscape = true` 时：直接 `<div className="absolute inset-0">` 铺满，让 `SlideRenderer` 内部的 `ScaledSlide` 自己根据父容器 100% × 100% 去算 scale —— 这样旋转后的整个 844×390 区域全部用来显示幻灯片，按 16:9 自动 fit 到最大尺寸
 
-**新增逻辑**：
-- 进入伪全屏 (`pseudoFullscreen === true`) **且** 检测到是手机设备 (`window.innerWidth < 768` 或 `navigator.userAgent` 匹配 `Mobi`) → 自动设置 `forceLandscape = true`
-- 退出伪全屏 → 自动复位 `forceLandscape = false`
-- 监听 `window.resize` 事件，避免设备类型判断失误
+### 改动 2：用更稳的旋转 transform 写法
 
-**新增 CSS 样式**（通过条件 className）：
-当 `forceLandscape === true` 时，给舞台容器添加：
-```css
-position: fixed;
-top: 0;
-left: 0;
-width: 100dvh;        /* 宽度 = 视口高度 */
-height: 100dvw;       /* 高度 = 视口宽度 */
-transform: rotate(90deg) translateY(-100dvw);
-transform-origin: top left;
+把第 261-274 行的旋转样式从：
+```js
+{ left: "100dvw", transform: "rotate(90deg)", transformOrigin: "top left", width: "100dvh", height: "100dvw" }
 ```
+改为更稳定的「中心旋转」写法：
+```js
+{
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  width: "100dvh",
+  height: "100dvw",
+  transform: "translate(-50%, -50%) rotate(90deg)",
+  transformOrigin: "center center",
+  zIndex: 9999,
+}
+```
+中心旋转避免了 `top-left` 模式下对 `100dvw` 像素级精度的依赖，在 iOS Safari 地址栏伸缩时也不会出现黑边/滚动条。
 
-**手势映射修正**：
-- 旋转后用户视觉上的「左右滑」实际是「上下滑」
-- 需要调整 `onTouchStart/onTouchMove` 的方向判断逻辑：当 `forceLandscape === true` 时，把 `deltaY` 当作 `deltaX` 来判断翻页
+### 改动 3：进入伪全屏时锁定 body 滚动 + 隐藏溢出
 
-**退出按钮位置修正**：
-- 旋转后视觉上的「右上角」实际是 DOM 的「右下角」
-- 退出按钮在 `forceLandscape` 时改用 `bottom-4 right-4` 但配合反向旋转保持视觉正确
+在 `pseudoFullscreen` 的 useEffect 里给 `document.body` 加：
+```js
+document.body.style.overflow = "hidden";
+document.body.style.position = "fixed";
+document.body.style.width = "100%";
+```
+退出时还原。这样可以防止 iOS Safari 出现"被旋转元素撑出页面边界 → 出现可滚动的灰色空白"的现象（你截图里幻灯片上下都是大块黑色其实就是这个）。
 
-**横屏提示组件**：
-- 进入强制横屏时显示居中浮层：「📱 请将手机横过来观看」
-- 3 秒后通过 `setTimeout + opacity 过渡` 自动淡出
-- 使用 `useState` 控制显隐 + Tailwind `transition-opacity duration-700`
+### 改动 4：横屏提示组件也跟随旋转
 
----
-
-### 2. 兼容性处理
-
-| 设备 / 场景 | 行为 |
-|------------|------|
-| 桌面浏览器点击全屏 | 真原生全屏，**不旋转** |
-| 安卓 Chrome 点击全屏 | 真原生全屏，**不旋转** |
-| iPhone Safari 点击全屏 | 伪全屏 + **CSS 旋转 90°** |
-| iPad Safari 点击全屏 | 伪全屏 + **不旋转**（屏幕足够大） |
-| 已经横屏的手机 | 仍然旋转（按用户选择「所有手机点全屏都旋转」执行）|
-| 退出全屏 | 旋转自动还原 |
-
----
-
-### 3. 不会改动的部分
-
-- ✅ 所有幻灯片内容文件（`AllSlides.tsx`、`SlideShell.tsx` 等）零改动
-- ✅ 导出 PDF / PPT 逻辑不受影响（导出走 `SlideStaticRenderer`，不经过旋转）
-- ✅ 桌面端体验完全不变
+第 367-379 行的"请把手机横过来"提示当前在旋转后的舞台**内部**，所以会跟着一起转——这是对的，用户看时已经是横版方向。**保留现状不动**，只是确认它视觉上正确。
 
 ---
 
 ## 涉及文件
 
-| 文件 | 改动类型 |
-|------|---------|
-| `src/pages/Index.tsx` | 新增 `forceLandscape` 状态、CSS 旋转样式、手势映射修正、横屏提示组件 |
+| 文件 | 改动 |
+|------|------|
+| `src/pages/Index.tsx` | ① 第 276-280 行内层 wrapper 改为条件渲染；② 第 261-274 行 stage 旋转 transform 改成中心旋转写法；③ 第 106-125 行 useEffect 增加 body overflow 锁定与还原 |
 
-仅改一个文件，零风险。
+**仅改这一个文件，不影响：**
+- 桌面端 / iPad 体验（`forceLandscape = false` 分支完全不变）
+- PDF / PPT 导出（走 `SlideStaticRenderer`，跟伪全屏完全无关）
+- 所有幻灯片内容文件
 
 ---
 
 ## 验收标准
 
-- ✅ **iPhone Safari**：点击全屏 → 画面瞬间旋转成横版铺满屏幕，把手机横过来看 = 完美 16:9 体验
-- ✅ **安卓手机**：同上效果
-- ✅ **横屏滑动翻页方向正确**（视觉上的左右滑 = 翻页）
-- ✅ **「请把手机横过来」提示** 3 秒后自动淡出
-- ✅ **退出按钮**位置在视觉右上角，可正常点击退出
-- ✅ **桌面/iPad** 行为不变
-- ✅ **导出 PDF/PPT** 不受影响
+- ✅ iPhone Safari 点击全屏 → 幻灯片旋转后**完全铺满整个手机屏幕**（横过来看就是真正的全屏 16:9）
+- ✅ 上下黑边消失，左右无滚动条
+- ✅ 横屏提示"请把手机横过来"3 秒后淡出
+- ✅ 退出按钮在视觉右上角可正常点击退出
+- ✅ 退出后页面恢复正常滚动，体验无任何残留
