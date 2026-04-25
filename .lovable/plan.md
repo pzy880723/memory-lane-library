@@ -1,161 +1,86 @@
-## 修改计划 — 第二轮排版优化
+## 目标
 
-按照您列出的 8 项反馈，逐页精修。所有修改集中在 `src/components/slides/AllSlides.tsx`，并配合复制您上传的微信二维码到 `src/assets/wechat-qr.png`。
-
-> **页码对照说明**：本计划中的"第 X 页"严格按照您看到的实际页码（即浏览器中 `#slide-X` 的编号），与 registry 顺序一致。
+让 **iPhone / iPad Safari** 用户点击「全屏」按钮后，也能获得接近原生全屏的沉浸式幻灯片体验 —— 解决目前 iOS 上点击全屏「无反应」的问题。
 
 ---
 
-### 1. 全局正文字号统一上调
+## 方案概述：三级降级策略
 
-**问题**：很多卡片说明、列表项、案例文字仍停留在 `text-base / text-lg / text-xl`，在 1920×1080 缩放后阅读体验偏小。
+```
+点击全屏按钮
+    │
+    ├─ 1️⃣ 标准 Fullscreen API        → 桌面浏览器、安卓 Chrome
+    │      ↓ 不支持
+    ├─ 2️⃣ webkitRequestFullscreen   → 老版本 Safari、部分 WebView
+    │      ↓ 不支持
+    └─ 3️⃣ CSS 伪全屏（fixed 铺满）   → iOS Safari ✅
+```
 
-**调整规则**（全局批量）：
-| 原字号 | 新字号 | 用途 |
-|---|---|---|
-| `text-base` (16px) | `text-xl` (20px) | 极次级说明 |
-| `text-lg` (18px) | `text-2xl` (24px) | 卡片描述 |
-| `text-xl` (20px) | `text-2xl / text-3xl` | 列表正文 |
-
-重点页面（P5、P7、P10、P12、P17、P18、P19、P20、P30 等）的卡片内 `font-body text-lg / text-base` 全部上调，同时增加 `leading-relaxed` 行高。
-
----
-
-### 2. P32 致谢页 — 加入微信二维码
-
-**操作**：
-- 复制您上传的 `image.png`（微信二维码）→ `src/assets/wechat-qr.png`
-- 改造 P32 布局：左侧保留「THANK YOU + 联系信息 + Logo」，**右侧加一块红色背景卡片**，内含：
-  - 二维码图片用 CSS `filter: invert(1)` 反相为白色
-  - 红色 `#E60012` 背景 + 米黄边框 + 轻微旋转 `rotate-[2deg]`
-  - 上方手写体 "Scan to Connect / 扫码联系我们"
-  - 下方 "微信咨询 · 招商加盟"
-- 整体改为 grid-cols-12（左 7 / 右 5）布局
+无论什么设备，按钮都「有反应」，体验一致。
 
 ---
 
-### 3. P5 自然流量奇迹 — 数字冲击力升级
+## 具体改动
 
-**当前**：8 个卡片均匀分布，数字用 `text-3xl / text-4xl`，缺乏焦点。
+### 1. 修改 `src/pages/Index.tsx`
 
-**改造**：
-- 顶部新增**两个超大数据 hero 卡**横跨整行：
-  - **「全网曝光 300 万+」** — 数字用 `text-[12rem]` 红色镂空 + 描边
-  - **「定向客流 10 万+」** — 数字用 `text-[12rem]` 黄底黑字
-- 下方 6 个次级卡片（点评排名、小红书、KOL、月均收藏）改为 3×2 网格，数字 `text-5xl`
-- 移除原"内容生产机器"金句（避免与 P8 重复）
+**新增状态**：
+- `pseudoFullscreen: boolean` — 标记当前是否处于「伪全屏」模式
 
----
+**重写 `toggleFullscreen` 函数**：
+- 优先尝试 `requestFullscreen()`
+- 失败则尝试 `webkitRequestFullscreen()`（带 `any` 类型断言）
+- 都不支持时，切换 `pseudoFullscreen` 状态启用 CSS 伪全屏
+- 退出时同样按顺序处理：`exitFullscreen` → `webkitExitFullscreen` → 关闭伪全屏
 
-### 4. P8 内容生产机器 — 数字戏剧化
+**伪全屏视觉效果**（通过条件 className 实现）：
+- 当 `pseudoFullscreen === true` 时：
+  - 整个 `<div className="fixed inset-0">` 容器变为 `z-[9999]`
+  - **隐藏顶部黑色工具栏**（`<header>`）
+  - **隐藏底部页码控制条**和**顶部进度条**
+  - 幻灯片舞台扩展到整个视口
+  - 显示一个**浮动的「退出全屏」小按钮**（右上角，半透明，方便 iOS 用户退出）
+- 使用 `100dvh`（动态视口高度）确保 Safari 地址栏收起后内容自动撑满
 
-**当前**：4 个数字卡用 `text-7xl`，已不错但可更猛。
-
-**改造**：
-- 把 `300万+ / 10万+ / No.1 / 1K+` 升级为：
-  - 数字使用 `text-[10rem]` 甚至 `text-[11rem]`，行高 0.85 紧贴
-  - 主数字（300万+）独占大半个版面（col-span-7），副数字（10万+ / No.1 / 1K+）右侧 3 个小卡
-  - 红色描边 + 米黄背景 + 黑色阴影做"印刷错位"复古效果
-- 左侧文字解释保持但缩窄
-
----
-
-### 5. P10 解决问题 — 用图二式三栏卡片替代表格
-
-**当前**：12 列表格 5 行，文字小、密度高。
-
-**改造**（参考您附图 image-2.png）：
-- **顶部居中标题**："标准化 × 氛围感" + 副标题"双基因融合模式"
-- 下方**三大卡片**横向展开：
-  - **左卡**：白底 — 标题"日本标准化中古店 (如 Book Off)"，✓ 优点 3 项 / ✗ 缺点 2 项
-  - **中卡（高亮主推）**：红底白字 — 标题"BOOMER OFF 融合模式"，✓ 6 项核心优势，比左右两卡略高出 20px
-  - **右卡**：白底 — 标题"街边设计师中古店"，✓ 优点 2 项 / ✗ 缺点 2 项
-- 每条用红色 ✓ / 灰色 ✗ 图标（lucide `Check` / `X`），文字 `text-2xl`
-- 底部金句保留"核心创新"段落，字号上调到 `text-3xl`
+**键盘 ESC 兼容**：
+- 监听 ESC 键，若处于伪全屏模式则退出
 
 ---
 
-### 6. P12 用户画像 — 统一卡片底色
+### 2. 修改 `index.html`
 
-**当前**：青少年（金色）、中年（红色）背景与其他不同，画面不统一。
-
-**改造**：
-- 5 个画像卡**全部统一为白色**（`bg-paper-cream`）
-- 通过**红色边框 + 红色 age 标签 + 表情 emoji**保持视觉节奏，而非彩色块
-- 描述文字字号上调到 `text-xl / text-2xl`
+新增 PWA / iOS 优化 meta 标签：
+- `<meta name="apple-mobile-web-app-capable" content="yes">` — 允许「添加到主屏幕」后无浏览器 UI
+- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` — 状态栏透明
+- 更新 viewport：`<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">` — 支持刘海屏 / 灵动岛
 
 ---
 
-### 7. P15 对标日本 — 数字撑满有冲击力
+### 3. （可选小增强）横屏提示
 
-**当前**：3 个数据卡 `text-8xl`，相对页面比例偏小。
-
-**改造**：
-- 取消 3 等分布局，改为**焦点 + 双辅助**：
-  - **大焦点**：3.5 万亿日元 — 占 col-span-7，数字用 `text-[14rem]` 撑满
-  - **右上**：15 年持续增长 — `text-[8rem]`
-  - **右下**：44.1% 国民购买 — `text-[8rem]` 红底
-- 数字使用 `font-display + font-black`，行高 0.8 极致紧凑
-- 底部金句保留
+在伪全屏模式下，若检测到手机**竖屏**，在角落显示一个小提示：「💡 横屏观看体验更佳」，几秒后自动淡出。
 
 ---
 
-### 8. P17 空间体验 — 文字放大
+## 涉及文件
 
-**当前**：4 个卡片说明用 `text-xl`，En 标签 `text-base`，标题 `text-3xl`。
+| 文件 | 改动类型 |
+|------|---------|
+| `src/pages/Index.tsx` | 重构全屏逻辑 + 新增伪全屏样式条件 + 退出按钮 |
+| `index.html` | 增加 iOS PWA meta 标签 |
 
-**改造**：
-- 卡片说明：`text-xl` → **`text-2xl`** + `leading-relaxed`
-- 卡片标题：`text-3xl` → **`text-4xl`**
-- En 小标：`text-base` → **`text-xl`**
-- 顶部主标题：`text-6xl` → **`text-7xl`**
-- 卡片内距 `p-6` → `p-8`，图片宽度 200 → 240px
-- 整体降低密度（调整顶部 padding），保证四个卡片字号放大后不溢出
+**不会改动** `SlideShell` / `ScaledSlide` / `AllSlides` 等幻灯片内容文件，纯外壳层调整，零风险。
 
 ---
 
-### 9. P17 翻筐乐区域
+## 验收标准
 
-> 注：您原话提到的"翻筐乐"实际位于 **P20**（Slide19FlipperFun）。会在 P20 同步执行：
-- "翻 筐 乐" 主标题保持 `text-9xl`
-- 三个数据卡（¥6.9 / 45-90 / ∞）的数字 `text-7xl` → **`text-8xl`**
-- 标签字号、说明字 `text-base` → **`text-xl`**
-- 右侧实拍图：保留 `photoCups` + `photoPikachu`，并多加一张 `photoUltraman` 形成 3 张拼贴
-- 底部金句字号 `text-2xl` → **`text-3xl`**
-
----
-
-### 10. P19 四大核心品类（实际是 Slide18Categories）
-
-**改造**：
-- 卡片高度增加：图片由 `h-[200px]` 长方形 → **正方形 `aspect-square`（约 280×280）**
-- 图片下方内容区增加 padding 和高度，整卡更挺拔
-- 列表项 `text-lg` → **`text-2xl`**
-- 品类名 `text-3xl` → **`text-4xl`**
-- En 副标 `text-base` → **`text-xl`**
-- 卡片整体最小高度提升到约 720px，看起来更"敦实"有分量
+- ✅ **桌面 Chrome / Edge**：点击全屏 = 真原生全屏（行为不变）
+- ✅ **安卓 Chrome**：点击全屏 = 真原生全屏
+- ✅ **iOS Safari（iPhone）**：点击全屏 = 幻灯片铺满整个屏幕，工具栏全部隐藏，右上角有退出按钮
+- ✅ **iPad Safari**：同上
+- ✅ ESC 键 / 退出按钮可正常退出
 
 ---
 
-### 涉及文件清单
-
-| 文件 | 操作 |
-|---|---|
-| `src/assets/wechat-qr.png` | 🆕 新增 — 复制自上传图 |
-| `src/components/slides/AllSlides.tsx` | ✏️ 重点修改 P5 / P8 / P10 / P12 / P14(原14日本=显示P15) / P17 / P18 / P19 / P32 |
-
----
-
-### 不会动的部分
-- 配色体系、SlideShell、index.css、tailwind config 保持不变
-- 其他未提及页面（P1-4、P6-7、P11、P13、P16、P21-31）保持现状
-- 导出 PDF/PPTX 的逻辑不变
-
----
-
-### 预期效果
-- **可读性**：所有正文 ≥ 24px（缩放至 1080p 投影下清晰）
-- **数字冲击力**：P5 / P8 / P15 三个核心数据页都有"撑满版面"的巨型数字
-- **P10 对比页**：从死板表格 → 杂志式三卡布局，主推卡突出
-- **P19 品类卡**：正方形图 + 加高卡，更稳重耐看
-- **P32**：增加二维码，大幅提升落地转化能力（扫码即加微信）
+确认后我会切换到执行模式实施这些改动 🚀
