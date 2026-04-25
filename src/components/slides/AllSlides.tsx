@@ -808,8 +808,8 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
 
           {/* 上层 — 精品区（红色调，置于上方） */}
           <div className="vintage-border bg-paper-cream overflow-hidden">
-            <div className="grid grid-cols-12 items-stretch">
-              <div className="col-span-4 bg-boomer-red text-paper-cream p-7 flex flex-col justify-center">
+            <div className="grid grid-cols-12 items-stretch min-h-[280px]">
+              <div className="col-span-4 bg-boomer-red text-paper-cream p-8 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-en text-5xl text-paper-cream/90">01</span>
                   <span className="font-handwrite text-2xl text-paper-cream/85">Upper Floor</span>
