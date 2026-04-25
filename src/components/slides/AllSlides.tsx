@@ -1344,11 +1344,11 @@ export function Slide27Matrix2({ pageNumber, totalPages }: { pageNumber: number;
           {stores.map((s, i) => (
             <div key={s.name} className={`vintage-border p-8 ${s.color} flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
               <s.icon className="w-14 h-14 mb-4" strokeWidth={2.5} />
-              <div className="font-condensed text-base tracking-widest opacity-60 mb-1">BOOMER OFF</div>
+              <div className="font-condensed text-xl tracking-widest opacity-60 mb-1">BOOMER OFF</div>
               <div className="font-en text-6xl mb-2 leading-none">{s.name}</div>
-              <div className="font-display text-2xl font-bold mb-2 opacity-85">{s.tag}</div>
-              <div className="font-body text-lg mb-3 font-bold opacity-80">面积 · {s.area}</div>
-              <div className="font-body text-lg leading-snug opacity-80 flex-1">{s.desc}</div>
+              <div className="font-display text-4xl font-bold mb-2 opacity-85">{s.tag}</div>
+              <div className="font-body text-2xl mb-3 font-bold opacity-80">面积 · {s.area}</div>
+              <div className="font-body text-2xl leading-snug opacity-80 flex-1">{s.desc}</div>
             </div>
           ))}
         </div>
