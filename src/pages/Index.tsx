@@ -121,9 +121,14 @@ const Index = () => {
     document.body.style.height = "100%";
 
     const ua = navigator.userAgent || "";
+    // 三重判断：UA 包含手机标识 / 触摸设备 + 窄屏 / 单纯窄竖屏
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const isNarrowPortrait =
+      window.innerWidth < 768 && window.innerHeight > window.innerWidth;
     const isPhone =
       /iPhone|Android.*Mobile|Mobi/i.test(ua) ||
-      (window.innerWidth < 768 && window.innerHeight > window.innerWidth + 100);
+      (hasTouch && isNarrowPortrait) ||
+      isNarrowPortrait;
     const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
     if (isPhone && !isIpad) {
       setForceLandscape(true);
