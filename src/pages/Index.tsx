@@ -222,6 +222,7 @@ const Index = () => {
             </Button>
           </div>
         </header>
+        )}
 
         {/* 幻灯片舞台 */}
         <div ref={stageRef} className="flex-1 relative bg-ink overflow-hidden">
@@ -249,7 +250,8 @@ const Index = () => {
             <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
           </button>
 
-          {/* 底部页码控制 */}
+          {/* 底部页码控制（伪全屏时隐藏） */}
+          {!pseudoFullscreen && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/80 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20">
             <Button
               variant="ghost" size="icon"
@@ -270,14 +272,51 @@ const Index = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
+          )}
 
-          {/* 顶部进度条 */}
+          {/* 顶部进度条（伪全屏时隐藏） */}
+          {!pseudoFullscreen && (
           <div className="absolute top-0 left-0 right-0 h-1 bg-paper-cream/10 z-20">
             <div
               className="h-full bg-boomer-red transition-all"
               style={{ width: `${((current + 1) / total) * 100}%` }}
             />
           </div>
+          )}
+
+          {/* 伪全屏专属：浮动退出按钮 + 简易翻页 */}
+          {pseudoFullscreen && (
+            <>
+              <Button
+                size="icon"
+                className="absolute top-4 right-4 z-30 h-12 w-12 rounded-full bg-ink/70 text-paper-cream hover:bg-ink/90 backdrop-blur border border-paper-cream/30"
+                onClick={() => setPseudoFullscreen(false)}
+                aria-label="退出全屏"
+              >
+                <Minimize2 className="w-5 h-5" />
+              </Button>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/70 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20">
+                <Button
+                  variant="ghost" size="icon"
+                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
+                  onClick={() => go(current - 1)} disabled={current === 0}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="font-en text-lg tracking-wider min-w-[70px] text-center">
+                  <span className="text-boomer-red">{String(current + 1).padStart(2, "0")}</span>
+                  <span className="text-paper-cream/50"> / {String(total).padStart(2, "0")}</span>
+                </span>
+                <Button
+                  variant="ghost" size="icon"
+                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
+                  onClick={() => go(current + 1)} disabled={current === total - 1}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 缩略图抽屉 */}
