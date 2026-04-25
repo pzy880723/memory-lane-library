@@ -295,7 +295,9 @@ const Index = () => {
             }
           >
             {forceLandscape ? (
-              <SlideRenderer index={current} />
+              <div className="w-full h-full">
+                <SlideRenderer index={current} />
+              </div>
             ) : (
               <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
                 <SlideRenderer index={current} />
