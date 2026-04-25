@@ -980,35 +980,36 @@ export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: numb
           <div className="font-en text-6xl text-paper-cream/75 mb-10">FLIPPER FUN</div>
 
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-paper-cream text-ink vintage-border-soft p-6 text-center rotate-[-1deg]">
-              <div className="font-handwrite text-xl text-boomer-red mb-1">起售价</div>
-              <div className="mega-number text-7xl text-boomer-red">¥6.9</div>
-              <div className="font-body text-base mt-2">极致低门槛</div>
+            <div className="bg-paper-cream text-ink vintage-border-soft p-7 text-center rotate-[-1deg]">
+              <div className="font-handwrite text-2xl text-boomer-red mb-2">起售价</div>
+              <div className="mega-number text-8xl text-boomer-red">¥6.9</div>
+              <div className="font-body text-xl mt-3 font-bold">极致低门槛</div>
             </div>
-            <div className="bg-vintage-gold text-ink vintage-border-soft p-6 text-center rotate-[1deg]">
-              <div className="font-handwrite text-xl text-boomer-red mb-1">停留时长</div>
-              <div className="mega-number text-7xl text-boomer-red">45<span className="text-3xl">-90</span></div>
-              <div className="font-body text-base mt-2">分钟 / 人次</div>
+            <div className="bg-vintage-gold text-ink vintage-border-soft p-7 text-center rotate-[1deg]">
+              <div className="font-handwrite text-2xl text-boomer-red mb-2">停留时长</div>
+              <div className="mega-number text-8xl text-boomer-red">45<span className="text-4xl">-90</span></div>
+              <div className="font-body text-xl mt-3 font-bold">分钟 / 人次</div>
             </div>
-            <div className="bg-paper-cream text-ink vintage-border-soft p-6 text-center rotate-[-1deg]">
-              <div className="font-handwrite text-xl text-boomer-red mb-1">UGC 内容</div>
-              <div className="mega-number text-7xl text-boomer-red">∞</div>
-              <div className="font-body text-base mt-2">最具传播力</div>
+            <div className="bg-paper-cream text-ink vintage-border-soft p-7 text-center rotate-[-1deg]">
+              <div className="font-handwrite text-2xl text-boomer-red mb-2">UGC 内容</div>
+              <div className="mega-number text-8xl text-boomer-red">∞</div>
+              <div className="font-body text-xl mt-3 font-bold">最具传播力</div>
             </div>
           </div>
 
-          <div className="bg-paper-cream text-ink p-6 vintage-border-soft">
-            <p className="font-display text-2xl leading-relaxed">
-              <Quote className="inline w-7 h-7 text-boomer-red mr-2" />
+          <div className="bg-paper-cream text-ink p-7 vintage-border-soft">
+            <p className="font-display text-3xl leading-relaxed">
+              <Quote className="inline w-8 h-8 text-boomer-red mr-2" />
               统一低价 + 木筐自由翻找 — 大量用户在小红书、抖音
               <span className="text-boomer-red font-black highlight-yellow">自发发布翻筐视频</span>
             </p>
           </div>
         </div>
 
-        <div className="col-span-5 flex flex-col gap-5 justify-center">
-          <img src={photoCups} alt="翻筐乐" className="w-full h-[280px] object-cover photo-vintage rotate-[2deg]" />
-          <img src={photoPikachu} alt="翻筐乐" className="w-full h-[280px] object-cover photo-vintage rotate-[-2deg]" />
+        <div className="col-span-5 flex flex-col gap-4 justify-center">
+          <img src={photoCups} alt="翻筐乐" className="w-full h-[260px] object-cover photo-vintage rotate-[2deg]" />
+          <img src={photoPikachu} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[-2deg]" />
+          <img src={photoUltraman} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[1deg]" />
         </div>
       </div>
     </SlideShell>
