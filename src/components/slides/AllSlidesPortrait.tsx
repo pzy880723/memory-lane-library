@@ -180,19 +180,19 @@ export function P_TOC({ pageNumber, totalPages }: { pageNumber: number; totalPag
 /* ============ 3. 核心摘要 — 满版照片 + 数据条 ============ */
 export function P_Executive({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="EXECUTIVE">
-      {/* 上半 满版图 */}
-      <div className="absolute top-0 left-0 right-0 h-[920px] overflow-hidden">
+    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="EXECUTIVE" flex>
+      {/* 上半 满版图 — 50% */}
+      <div className="relative basis-1/2 grow-0 shrink-0 overflow-hidden">
         <img src={photoCeramics} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/20 to-ink/85" />
 
         <div className="absolute top-12 left-12 right-12 z-10">
-          <div className="font-handwrite text-3xl text-vintage-gold mb-2">Executive Summary</div>
-          <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/80">摘 · 要</div>
+          <div className="font-handwrite text-4xl text-vintage-gold mb-2">Executive Summary</div>
+          <div className="font-condensed text-2xl tracking-[0.3em] text-paper-cream/80">摘 · 要</div>
         </div>
 
-        <div className="absolute bottom-12 left-12 right-12 z-10">
-          <h1 className="font-display text-paper-cream text-[88px] font-black leading-[0.95]">
+        <div className="absolute bottom-10 left-12 right-12 z-10">
+          <h1 className="font-display text-paper-cream text-[92px] font-black leading-[0.95]">
             一 个<br/>
             <span className="text-boomer-red bg-paper-cream px-4 py-1 inline-block mt-2">现 象 级</span><br/>
             <span className="mt-2 inline-block">零售新物种</span>
@@ -200,28 +200,38 @@ export function P_Executive({ pageNumber, totalPages }: { pageNumber: number; to
         </div>
       </div>
 
-      {/* 下半 数据条 — 满宽红色 */}
-      <div className="absolute top-[920px] left-0 right-0 bottom-14 bg-boomer-red text-paper-cream px-12 pt-10">
-        <div className="font-handwrite text-3xl text-vintage-gold mb-4">— 开业首店 · 实绩 —</div>
+      {/* 下半 红色块自适应 — 数据 + 双基因 */}
+      <div className="relative grow flex flex-col bg-boomer-red text-paper-cream px-12 pt-10 pb-20">
+        <div className="font-handwrite text-4xl text-vintage-gold mb-6">— 开业首店 · 实绩 —</div>
 
-        <div className="grid grid-cols-3 gap-6 mb-6">
-          <div>
-            <div className="mega-number text-[110px] leading-none">300<span className="text-3xl ml-1">万+</span></div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">全网曝光</div>
-          </div>
-          <div>
-            <div className="mega-number text-[110px] leading-none">10<span className="text-3xl ml-1">万+</span></div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">定向客流</div>
-          </div>
-          <div>
-            <div className="mega-number text-[110px] leading-none">No.1</div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">大众点评</div>
-          </div>
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          {[
+            { v: "300", u: "万+", l: "全网曝光" },
+            { v: "10",  u: "万+", l: "定向客流" },
+            { v: "No.1", u: "",   l: "大众点评" },
+          ].map((d) => (
+            <div key={d.l}>
+              <div className="mega-number text-[120px] leading-none">{d.v}<span className="text-4xl ml-1">{d.u}</span></div>
+              <div className="font-display text-2xl font-bold mt-3 border-t-2 border-paper-cream/60 pt-3">{d.l}</div>
+            </div>
+          ))}
         </div>
 
-        <p className="font-display text-3xl leading-snug font-bold mt-4">
-          首创 <span className="bg-vintage-gold text-ink px-3 py-0.5">「标准化 × 氛围感」</span> 双基因
-        </p>
+        {/* 自适应填充：双基因卡片 */}
+        <div className="grow flex flex-col justify-end">
+          <div className="bg-paper-cream text-ink p-7 vintage-border-red">
+            <div className="font-handwrite text-3xl text-boomer-red mb-2">Double DNA</div>
+            <p className="font-display text-4xl font-black leading-tight">
+              首创 <span className="bg-vintage-gold px-3 py-0.5">「标准化 × 氛围感」</span>
+            </p>
+            <p className="font-display text-4xl font-black leading-tight mt-2">双基因融合模式</p>
+            <div className="grid grid-cols-3 gap-3 mt-5">
+              {["可复制", "高粘性", "强口碑"].map((t) => (
+                <div key={t} className="bg-ink text-paper-cream font-display text-xl font-bold py-2 text-center">{t}</div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Frame>
   );
