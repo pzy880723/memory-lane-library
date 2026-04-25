@@ -878,23 +878,23 @@ export function Slide17Experience({ pageNumber, totalPages }: { pageNumber: numb
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-24 pt-36 pb-24">
+      <div className="absolute inset-0 px-24 pt-32 pb-24">
         <div className="mb-6">
           <span className="font-handwrite text-4xl text-boomer-red">Experience Design</span>
-          <h1 className="font-display text-6xl font-black mt-1">让每个角落都<span className="text-boomer-red">值得停留</span></h1>
+          <h1 className="font-display text-7xl font-black mt-1">让每个角落都<span className="text-boomer-red">值得停留</span></h1>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-7">
           {items.map((it) => (
             <div key={it.title} className={`vintage-border ${it.color} ${it.rotate} overflow-hidden flex`}>
-              <img src={it.photo} alt={it.title} className="w-[200px] h-[260px] object-cover flex-shrink-0" />
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-center gap-3 mb-2">
-                  <it.icon className="w-10 h-10" strokeWidth={2.5} />
-                  <div className="font-condensed text-base tracking-widest opacity-65">{it.en}</div>
+              <img src={it.photo} alt={it.title} className="w-[260px] h-[320px] object-cover flex-shrink-0" />
+              <div className="p-7 flex-1 flex flex-col">
+                <div className="flex items-center gap-3 mb-3">
+                  <it.icon className="w-12 h-12" strokeWidth={2.5} />
+                  <div className="font-condensed text-xl tracking-widest opacity-70">{it.en}</div>
                 </div>
-                <div className="font-display text-3xl font-black mb-3 leading-tight">{it.title}</div>
-                <div className="font-body text-xl leading-relaxed opacity-90">{it.desc}</div>
+                <div className="font-display text-4xl font-black mb-4 leading-tight">{it.title}</div>
+                <div className="font-body text-2xl leading-relaxed opacity-90">{it.desc}</div>
               </div>
             </div>
           ))}
