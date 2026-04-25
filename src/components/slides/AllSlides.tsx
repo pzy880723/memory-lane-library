@@ -701,45 +701,67 @@ export function Slide13Market({ pageNumber, totalPages }: { pageNumber: number; 
 export function Slide14Japan({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="03 · 市场机遇与赛道">
-      <div className="absolute inset-0 px-28 pt-36 pb-24">
-        <span className="font-handwrite text-4xl text-boomer-red">Benchmark: Japan</span>
-        <h1 className="font-display text-7xl font-black mt-2 mb-12 leading-tight">
-          对标<span className="text-boomer-red">日本 Reuse 市场</span>
-        </h1>
+      <div className="absolute inset-0 px-24 pt-32 pb-24 flex flex-col">
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <span className="font-handwrite text-4xl text-boomer-red">Benchmark: Japan</span>
+            <h1 className="font-display text-7xl font-black mt-2 leading-tight">
+              对标<span className="text-boomer-red">日本 Reuse 市场</span>
+            </h1>
+          </div>
+          <div className="font-handwrite text-3xl text-ink/65 rotate-[-2deg]">成熟模式 · 本土化升级</div>
+        </div>
 
-        <div className="grid grid-cols-3 gap-7">
-          <div className="bg-paper-cream vintage-border p-10 flex flex-col rotate-[-1deg]">
-            <Recycle className="w-16 h-16 text-boomer-red mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-3xl text-ink/65 mb-2">市场规模</div>
-            <div className="mega-number text-8xl text-ink mb-1">3.5<span className="text-4xl">万亿</span></div>
-            <div className="font-display text-3xl text-ink/75 font-bold">日元</div>
-            <div className="font-body text-xl text-ink/65 mt-3">约 1,700 亿人民币</div>
+        {/* 焦点 + 双辅助 */}
+        <div className="grid grid-cols-12 gap-6 flex-1">
+          {/* 大焦点 — 3.5 万亿 */}
+          <div className="col-span-7 vintage-border bg-paper-cream p-10 flex flex-col justify-between relative overflow-hidden rotate-[-0.5deg]">
+            <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] dots-pattern-red opacity-25" />
+            <div className="relative">
+              <Recycle className="w-20 h-20 text-boomer-red mb-3" strokeWidth={2.5} />
+              <div className="font-handwrite text-3xl text-ink/65">日本 Reuse 市场规模</div>
+            </div>
+            <div className="relative">
+              <div className="mega-number text-[16rem] leading-none text-boomer-red">3.5<span className="text-7xl ml-3">万亿</span></div>
+              <div className="font-display text-4xl font-black mt-3">日 元</div>
+              <div className="font-body text-2xl text-ink/65 mt-2">≈ 1,700 亿人民币</div>
+            </div>
           </div>
 
-          <div className="bg-vintage-gold vintage-border p-10 flex flex-col">
-            <TrendingUp className="w-16 h-16 text-boomer-red mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-3xl text-ink/65 mb-2">增长态势</div>
-            <div className="mega-number text-8xl text-boomer-red mb-1">15<span className="text-4xl">年</span></div>
-            <div className="font-display text-3xl text-ink/85 font-bold">持续增长</div>
-            <div className="font-body text-xl text-ink/65 mt-3">连续 15 年正增长</div>
-          </div>
+          {/* 右侧两个辅助 */}
+          <div className="col-span-5 grid grid-rows-2 gap-5">
+            <div className="vintage-border bg-vintage-gold p-8 flex items-center justify-between rotate-[1deg]">
+              <div>
+                <TrendingUp className="w-14 h-14 text-boomer-red mb-2" strokeWidth={2.5} />
+                <div className="font-handwrite text-2xl text-ink/65">增长态势</div>
+                <div className="font-display text-3xl font-black mt-1">持续增长</div>
+              </div>
+              <div className="text-right">
+                <div className="mega-number text-[8rem] leading-none text-boomer-red">15</div>
+                <div className="font-display text-3xl font-bold">年</div>
+              </div>
+            </div>
 
-          <div className="bg-boomer-red text-paper-cream vintage-border p-10 flex flex-col rotate-[1deg]">
-            <Users className="w-16 h-16 text-paper-cream mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-3xl text-paper-cream/85 mb-2">国民渗透</div>
-            <div className="mega-number text-8xl mb-1">44.1<span className="text-4xl">%</span></div>
-            <div className="font-display text-3xl">日本国民</div>
-            <div className="font-body text-xl text-paper-cream/85 mt-3">过去一年购买过二手商品</div>
+            <div className="vintage-border bg-boomer-red text-paper-cream p-8 flex items-center justify-between rotate-[-1deg]">
+              <div>
+                <Users className="w-14 h-14 mb-2" strokeWidth={2.5} />
+                <div className="font-handwrite text-2xl text-paper-cream/85">国民渗透率</div>
+                <div className="font-display text-3xl font-black mt-1">日本国民</div>
+              </div>
+              <div className="text-right">
+                <div className="mega-number text-[8rem] leading-none">44.1<span className="text-4xl">%</span></div>
+                <div className="font-display text-2xl">购买过二手</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="mt-12 bg-paper-cream vintage-border p-10 rotate-[-0.5deg]">
+        <div className="mt-6 bg-paper-cream vintage-border-red px-10 py-5">
           <p className="font-display text-3xl leading-relaxed">
             <BadgeCheck className="inline w-12 h-12 text-boomer-red mr-3" />
-            BOOMER OFF 汲取日本中古行业核心优势 ——
-            <span className="highlight-red font-bold">严苛评级体系</span>与
-            <span className="highlight-yellow font-bold">极致陈列美学</span>，
-            针对中国市场信任痛点进行数字化升级。
+            BOOMER OFF 汲取日本核心优势 ——
+            <span className="highlight-red font-bold">严苛评级体系</span> +
+            <span className="highlight-yellow font-bold">极致陈列美学</span>，针对中国信任痛点数字化升级
           </p>
         </div>
       </div>
