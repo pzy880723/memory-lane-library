@@ -1,61 +1,86 @@
 import { SlideShell } from "./SlideShell";
 import logo from "@/assets/boomer-off-logo.png";
 import {
-  TrendingUp, MapPin, Users, Sparkles, Music, Gamepad2, Heart, Zap,
+  TrendingUp, MapPin, Users, Sparkles, Gamepad2, Heart, Zap,
   Shield, Award, Recycle, Building2, Phone, Star, Quote, ChevronRight,
-  Package, Coffee, Headphones, Camera, Gift, Store, Home as HomeIcon,
+  Package, Coffee, Headphones, Gift, Store, Home as HomeIcon,
   ShoppingBag, Smartphone, Warehouse, MessageCircle, BadgeCheck, Disc3,
 } from "lucide-react";
 
+// 店铺实拍图
+import photoVinyl from "@/assets/store/vinyl-player.jpeg";
+import photoCeramics from "@/assets/store/ceramics-shelf.jpeg";
+import photoDIY from "@/assets/store/diy-zone.jpeg";
+import photoSato from "@/assets/store/sato-elephant.jpeg";
+import photoSatoDetail from "@/assets/store/sato-detail.jpeg";
+import photoCups from "@/assets/store/cup-collection.jpeg";
+import photoUltraman from "@/assets/store/ultraman-toys.jpeg";
+import photoTeapot from "@/assets/store/iron-teapot.jpeg";
+import photoPikachu from "@/assets/store/pikachu-mug.jpeg";
+import photoDiatone from "@/assets/store/diatone-spinning.jpeg";
+
 /* ============================================================
- * 第 1 页 — 封面
+ * 第 1 页 — 封面（拼贴风 + 真实照片）
  * ============================================================ */
 export function Slide01Cover() {
   return (
     <SlideShell variant="paper" showHeader={false} noFooter>
-      {/* 红色斜带背景 */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[900px] h-[900px] rounded-full bg-boomer-red/10" />
-        <div className="absolute -bottom-60 -left-40 w-[700px] h-[700px] dots-pattern-red opacity-60" />
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-bl from-boomer-red/15 to-transparent" />
+        <div className="absolute -top-40 -right-40 w-[1100px] h-[1100px] rounded-full bg-boomer-red/15" />
+        <div className="absolute -bottom-60 -left-40 w-[800px] h-[800px] dots-pattern-red opacity-60" />
+        <div className="absolute top-1/3 right-0 w-1/2 h-1/3 lines-red opacity-40" />
       </div>
 
       {/* 顶部小标 */}
-      <div className="absolute top-16 left-16 right-16 flex items-center justify-between">
+      <div className="absolute top-16 left-16 right-16 flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
-          <div className="w-3 h-3 rounded-full bg-boomer-red" />
-          <span className="font-condensed text-2xl tracking-[0.3em] text-ink/70">
+          <div className="w-4 h-4 rounded-full bg-boomer-red" />
+          <span className="font-condensed text-3xl tracking-[0.4em] text-ink/70">
             BRAND BOOK · 2026
           </span>
         </div>
-        <span className="font-handwrite text-3xl text-boomer-red rotate-[-2deg]">
+        <span className="font-handwrite text-4xl text-boomer-red rotate-[-2deg]">
           since 2026 · Shanghai
         </span>
       </div>
 
-      {/* 中央 Logo 与文案 */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-32">
-        <img src={logo} alt="BOOMER OFF Vintage" className="w-[900px] mb-12 drop-shadow-2xl" />
+      {/* 实拍照片拼贴 */}
+      <img
+        src={photoSatoDetail}
+        alt="Sato"
+        className="absolute top-32 right-20 w-[340px] h-[460px] object-cover photo-vintage rotate-[6deg] z-[3]"
+      />
+      <img
+        src={photoVinyl}
+        alt="Vinyl"
+        className="absolute bottom-24 left-16 w-[320px] h-[420px] object-cover photo-vintage rotate-[-5deg] z-[3]"
+      />
+      <div className="tape-gold top-28 right-44 z-[4] rotate-[-8deg]" />
+      <div className="tape-red bottom-20 left-44 z-[4] rotate-[12deg]" />
 
-        <div className="vintage-border bg-paper-cream px-16 py-6 mb-12 rotate-[-1deg]">
-          <p className="font-display text-5xl font-black tracking-wider">
+      {/* 中央 Logo 与文案 */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-32 z-[6]">
+        <img src={logo} alt="BOOMER OFF Vintage" className="w-[1000px] mb-12 drop-shadow-2xl" />
+
+        <div className="vintage-border bg-paper-cream px-20 py-8 mb-10 rotate-[-1.5deg]">
+          <p className="font-display text-6xl font-black tracking-wider">
             虽古但新 · <span className="text-boomer-red">信任可见</span>
           </p>
         </div>
 
-        <p className="font-display text-3xl text-ink/80 tracking-wide text-center">
+        <p className="font-display text-4xl text-ink/85 tracking-wider text-center">
           国 内 首 家 标 准 化 中 古 连 锁 品 牌
         </p>
       </div>
 
       {/* 底部装饰 */}
-      <div className="absolute bottom-16 left-16 right-16 flex items-end justify-between">
+      <div className="absolute bottom-16 left-16 right-16 flex items-end justify-between z-10">
         <div>
-          <p className="font-condensed text-xl tracking-widest text-ink/50">A TINY BASEMENT SHOP</p>
-          <p className="font-condensed text-xl tracking-widest text-ink/50">FULL OF VINTAGE TREASURES</p>
+          <p className="font-condensed text-2xl tracking-[0.3em] text-ink/55">A TINY BASEMENT SHOP</p>
+          <p className="font-condensed text-2xl tracking-[0.3em] text-ink/55">FULL OF VINTAGE TREASURES</p>
         </div>
         <div className="text-right">
-          <p className="font-handwrite text-2xl text-ink/70">— SmartShanghai · 2026.03</p>
+          <p className="font-handwrite text-3xl text-ink/75">— SmartShanghai · 2026.03</p>
         </div>
       </div>
     </SlideShell>
@@ -79,17 +104,21 @@ export function Slide02TOC({ pageNumber, totalPages }: { pageNumber: number; tot
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream">
-      <div className="absolute inset-0 px-32 pt-36 pb-32">
-        <div className="flex items-baseline gap-6 mb-12">
-          <span className="font-en text-9xl text-boomer-red">CONTENTS</span>
-          <span className="font-display text-4xl">目 录</span>
+      <div className="absolute inset-0 px-32 pt-40 pb-32">
+        <div className="flex items-baseline gap-8 mb-14">
+          <span className="font-en text-[10rem] leading-none text-boomer-red">CONTENTS</span>
+          <span className="font-display text-5xl">目 录</span>
+          <div className="ml-auto stamp-red text-3xl">2026</div>
         </div>
-        <div className="grid grid-cols-3 gap-x-12 gap-y-8">
-          {items.map((it) => (
-            <div key={it.num} className="border-l-4 border-boomer-red pl-6 py-2">
-              <div className="font-en text-5xl text-ink/30 mb-2">{it.num}</div>
-              <div className="font-display text-3xl font-bold mb-1">{it.title}</div>
-              <div className="font-body text-xl text-ink/60">{it.desc}</div>
+        <div className="grid grid-cols-3 gap-x-14 gap-y-10">
+          {items.map((it, i) => (
+            <div
+              key={it.num}
+              className={`border-l-[6px] border-boomer-red pl-7 py-3 ${i % 2 === 0 ? "" : "rotate-[0.5deg]"}`}
+            >
+              <div className="font-en text-6xl text-ink/30 mb-2">{it.num}</div>
+              <div className="font-display text-4xl font-bold mb-2">{it.title}</div>
+              <div className="font-body text-2xl text-ink/65">{it.desc}</div>
             </div>
           ))}
         </div>
@@ -99,40 +128,55 @@ export function Slide02TOC({ pageNumber, totalPages }: { pageNumber: number; tot
 }
 
 /* ============================================================
- * 第 3 页 — 核心摘要
+ * 第 3 页 — 核心摘要（左文字右大图）
  * ============================================================ */
 export function Slide03Executive({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="EXECUTIVE SUMMARY">
-      <div className="absolute inset-0 px-32 pt-36 pb-28 flex flex-col">
-        <div className="mb-8">
-          <span className="font-handwrite text-3xl text-boomer-red">Executive Summary</span>
-          <h1 className="font-display text-7xl font-black mt-2">
-            一个<span className="text-boomer-red">现象级</span>线下零售新物种
-          </h1>
+      <div className="absolute inset-0 px-28 pt-36 pb-28 grid grid-cols-12 gap-10">
+        <div className="col-span-7 flex flex-col">
+          <div className="mb-6">
+            <span className="font-handwrite text-4xl text-boomer-red">Executive Summary</span>
+            <h1 className="font-display text-8xl font-black mt-3 leading-tight">
+              一个<span className="text-boomer-red">现象级</span><br />线下零售新物种
+            </h1>
+          </div>
+
+          <p className="font-body text-3xl leading-relaxed text-ink/85 mb-10">
+            BOOMER OFF Vintage 首创<span className="highlight-red font-bold">「标准化 × 氛围感」双基因融合模式</span>，
+            将日本 Book Off 式标准化体系与街边设计师店审美氛围结合，开业即成为现象级网红业态。
+          </p>
+
+          <div className="grid grid-cols-3 gap-5 mt-auto">
+            <div className="bg-paper-cream vintage-border p-7">
+              <div className="mega-number text-7xl text-boomer-red mb-2">300<span className="text-4xl">万+</span></div>
+              <div className="font-display text-2xl font-bold mb-1">全网曝光</div>
+              <div className="font-body text-base text-ink/60">零付费推广</div>
+            </div>
+            <div className="bg-vintage-gold vintage-border p-7">
+              <div className="mega-number text-7xl text-ink mb-2">10<span className="text-4xl">万+</span></div>
+              <div className="font-display text-2xl font-bold mb-1">定向客流</div>
+              <div className="font-body text-base text-ink/70">高粘性</div>
+            </div>
+            <div className="bg-boomer-red vintage-border p-7 text-paper-cream">
+              <div className="mega-number text-7xl mb-2">No.1</div>
+              <div className="font-display text-2xl font-bold mb-1">大众点评</div>
+              <div className="font-body text-base text-paper-cream/85">南京西路</div>
+            </div>
+          </div>
         </div>
 
-        <p className="font-body text-3xl leading-relaxed text-ink/85 max-w-[1500px] mb-12">
-          BOOMER OFF Vintage 首创<span className="highlight-red font-bold">「标准化 × 氛围感」双基因融合模式</span>，
-          将日本 Book Off 式标准化体系与街边设计师店审美氛围结合，打造既有信任感又有情绪价值的零售新物种。
-          首店入驻上海中信泰富广场 B1，开业即成为现象级网红业态。
-        </p>
-
-        <div className="grid grid-cols-3 gap-8 mt-auto">
-          <div className="bg-paper-cream vintage-border p-10">
-            <div className="big-number text-8xl text-boomer-red mb-2">300<span className="text-5xl">万+</span></div>
-            <div className="font-display text-2xl font-bold mb-1">全网曝光</div>
-            <div className="font-body text-lg text-ink/60">零付费推广 · 自然爆发</div>
-          </div>
-          <div className="bg-paper-cream vintage-border p-10">
-            <div className="big-number text-8xl text-boomer-red mb-2">10<span className="text-5xl">万+</span></div>
-            <div className="font-display text-2xl font-bold mb-1">定向客流</div>
-            <div className="font-body text-lg text-ink/60">高粘性 · 目的性消费</div>
-          </div>
-          <div className="bg-paper-cream vintage-border p-10">
-            <div className="big-number text-8xl text-boomer-red mb-2">No.<span className="text-9xl">1</span></div>
-            <div className="font-display text-2xl font-bold mb-1">大众点评</div>
-            <div className="font-body text-lg text-ink/60">南京西路商圈 · 静安区</div>
+        <div className="col-span-5 relative">
+          <img
+            src={photoCeramics}
+            alt="店铺陈列"
+            className="absolute inset-0 w-full h-full object-cover photo-vintage rotate-[2deg]"
+          />
+          <div className="absolute -top-4 -right-4 stamp-red text-2xl z-10">现 象 级</div>
+          <div className="absolute bottom-6 left-6 right-6 bg-paper-cream/95 backdrop-blur p-5 vintage-border-soft rotate-[-1deg]">
+            <p className="font-handwrite text-3xl text-boomer-red leading-tight">
+              "中信泰富首店<br/>开业即爆"
+            </p>
           </div>
         </div>
       </div>
@@ -141,23 +185,24 @@ export function Slide03Executive({ pageNumber, totalPages }: { pageNumber: numbe
 }
 
 /* ============================================================
- * 第 4 页 — 第一章扉页
+ * 章节扉页 — 红底镂空大字
  * ============================================================ */
 export function SlideChapter({
   num, title, en, desc, pageNumber, totalPages,
 }: { num: string; title: string; en: string; desc: string; pageNumber: number; totalPages: number }) {
   return (
-    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="ink" chapter={`CHAPTER ${num}`}>
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="red" chapter={`CHAPTER ${num}`}>
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -right-20 chapter-num text-boomer-red/20">{num}</div>
-        <div className="absolute bottom-20 right-32 w-96 h-96 dots-pattern opacity-20" />
+        <div className="absolute -top-32 -right-20 chapter-num">{num}</div>
+        <div className="absolute bottom-32 right-40 w-[420px] h-[420px] dots-pattern-cream opacity-30" />
+        <div className="absolute top-1/3 left-0 w-1/3 h-2/3 lines-pattern opacity-20" />
       </div>
       <div className="absolute inset-0 flex flex-col justify-center px-32">
-        <div className="font-handwrite text-4xl text-boomer-red mb-4">— Chapter {num} —</div>
-        <div className="font-en text-[10rem] leading-none text-paper-cream/95 mb-6">{en}</div>
-        <h1 className="font-display text-8xl font-black text-paper-cream mb-8">{title}</h1>
-        <div className="w-32 h-2 bg-boomer-red mb-8" />
-        <p className="font-body text-3xl text-paper-cream/70 max-w-[1200px] leading-relaxed">{desc}</p>
+        <div className="font-handwrite text-5xl text-paper-cream/90 mb-6">— Chapter {num} —</div>
+        <div className="font-en text-[11rem] leading-none text-paper-cream mb-8 drop-shadow-lg">{en}</div>
+        <h1 className="font-display text-9xl font-black text-paper-cream mb-10">{title}</h1>
+        <div className="w-40 h-2 bg-paper-cream mb-10" />
+        <p className="font-body text-4xl text-paper-cream/90 max-w-[1300px] leading-relaxed">{desc}</p>
       </div>
     </SlideShell>
   );
@@ -168,44 +213,46 @@ export function SlideChapter({
  * ============================================================ */
 export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const data = [
-    { label: "大众点评 · 南京西路商圈", value: "排名第 1", icon: Star, big: true },
-    { label: "大众点评 · 静安区", value: "排名第 1", icon: Star, big: true },
-    { label: "大众点评 · 全上海", value: "排名第 5", icon: Award },
-    { label: "小红书", value: "官方 AI 推荐", icon: Sparkles },
-    { label: "全网曝光量", value: "300 万+", icon: TrendingUp, big: true },
-    { label: "门店定向客流", value: "10 万+ 人次", icon: Users, big: true },
-    { label: "明星 / KOL 自发打卡", value: "多位头部网红", icon: Heart },
-    { label: "大众点评月均收藏", value: "1,000+", icon: BadgeCheck },
+    { label: "大众点评 · 南京西路商圈", value: "排名第 1", icon: Star, big: true, color: "bg-boomer-red text-paper-cream" },
+    { label: "大众点评 · 静安区", value: "排名第 1", icon: Star, big: true, color: "bg-vintage-gold" },
+    { label: "大众点评 · 全上海", value: "排名第 5", icon: Award, color: "bg-paper-cream" },
+    { label: "小红书", value: "官方 AI 推荐", icon: Sparkles, color: "bg-paper-cream" },
+    { label: "全网曝光量", value: "300 万+", icon: TrendingUp, big: true, color: "bg-boomer-red text-paper-cream" },
+    { label: "门店定向客流", value: "10 万+ 人次", icon: Users, big: true, color: "bg-vintage-gold" },
+    { label: "明星 / KOL 自发打卡", value: "多位头部网红", icon: Heart, color: "bg-paper-cream" },
+    { label: "大众点评月均收藏", value: "1,000+", icon: BadgeCheck, color: "bg-paper-cream" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-32 pt-36 pb-28">
-        <div className="flex items-baseline justify-between mb-2">
-          <h1 className="font-display text-6xl font-black">零投放的<span className="text-boomer-red">自然流量奇迹</span></h1>
-          <span className="font-handwrite text-3xl text-ink/60 rotate-[-1deg]">0 ¥ 推广费</span>
+      <div className="absolute inset-0 px-28 pt-36 pb-28">
+        <div className="flex items-end justify-between mb-3">
+          <h1 className="font-display text-7xl font-black leading-tight">
+            零投放的<br/><span className="text-boomer-red highlight-yellow">自然流量奇迹</span>
+          </h1>
+          <div className="stamp-red text-3xl">0 ¥ 推广费</div>
         </div>
-        <p className="font-body text-2xl text-ink/65 mb-10">未进行任何付费推广，凭借业态差异化与极高内容传播性，实现现象级自然爆发</p>
+        <p className="font-body text-3xl text-ink/70 mb-10">未进行任何付费推广，凭借业态差异化与极高内容传播性 · 现象级自然爆发</p>
 
-        <div className="grid grid-cols-4 gap-6">
-          {data.map((d) => (
+        <div className="grid grid-cols-4 gap-5">
+          {data.map((d, i) => (
             <div
               key={d.label}
-              className={`bg-paper-cream vintage-border p-8 ${d.big ? "row-span-1" : ""}`}
+              className={`vintage-border p-7 ${d.color} ${i % 3 === 1 ? "rotate-[-0.5deg]" : ""}`}
             >
-              <d.icon className="w-10 h-10 text-boomer-red mb-4" strokeWidth={2.5} />
-              <div className="font-body text-lg text-ink/60 mb-2 leading-snug">{d.label}</div>
-              <div className={`font-display font-black ${d.big ? "text-4xl text-boomer-red" : "text-3xl"}`}>
+              <d.icon className="w-12 h-12 mb-4" strokeWidth={2.5} />
+              <div className="font-body text-xl mb-3 leading-snug opacity-80">{d.label}</div>
+              <div className={`font-display font-black ${d.big ? "text-4xl" : "text-3xl"}`}>
                 {d.value}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 bg-ink text-paper-cream px-10 py-6 vintage-border-red">
+        <div className="mt-8 bg-paper-cream px-10 py-6 vintage-border-red">
           <p className="font-display text-3xl">
-            <Quote className="inline w-8 h-8 text-boomer-red mr-3" />
-            BOOMER OFF 不仅是一家零售店，更是一台<span className="text-boomer-red font-black">内容生产机器</span>
-            ——每一位到店顾客都是品牌的免费传播者。
+            <Quote className="inline w-9 h-9 text-boomer-red mr-3" />
+            BOOMER OFF 不仅是一家零售店，更是一台
+            <span className="text-boomer-red font-black highlight-yellow">内容生产机器</span>
           </p>
         </div>
       </div>
@@ -219,41 +266,50 @@ export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number;
 export function Slide06Media({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-32 pt-36 pb-28 grid grid-cols-12 gap-12">
+      <div className="absolute inset-0 px-28 pt-36 pb-28 grid grid-cols-12 gap-10">
         <div className="col-span-5 flex flex-col justify-center">
-          <div className="font-handwrite text-3xl text-boomer-red mb-2">— Featured by —</div>
-          <h1 className="font-display text-7xl font-black mb-6">SmartShanghai<br/>专题报道</h1>
-          <p className="font-body text-2xl text-ink/70 mb-8 leading-relaxed">
-            上海最具影响力的英文生活方式媒体，于 2026 年 3 月对 BOOMER OFF 进行专题报道
+          <div className="font-handwrite text-4xl text-boomer-red mb-3">— Featured by —</div>
+          <h1 className="font-display text-7xl font-black mb-8 leading-tight">
+            SmartShanghai<br/>
+            <span className="text-boomer-red">专题报道</span>
+          </h1>
+          <p className="font-body text-3xl text-ink/75 mb-8 leading-relaxed">
+            上海最具影响力的英文生活方式媒体，于 <span className="font-bold text-boomer-red">2026 年 3 月</span>对 BOOMER OFF 进行专题报道
           </p>
-          <div className="bg-boomer-red text-paper-cream px-8 py-4 inline-block w-fit vintage-border">
-            <p className="font-en text-3xl tracking-wide">A Tiny Basement Shop</p>
-            <p className="font-en text-3xl tracking-wide">Full of Old Japanese Toys</p>
+          <div className="bg-boomer-red text-paper-cream px-10 py-6 inline-block w-fit vintage-border rotate-[-2deg]">
+            <p className="font-en text-4xl tracking-wide">A Tiny Basement Shop</p>
+            <p className="font-en text-4xl tracking-wide">Full of Old Japanese Toys</p>
           </div>
-          <p className="font-handwrite text-2xl text-ink/60 mt-4">— 2026.03 · SmartShanghai</p>
+          <p className="font-handwrite text-3xl text-ink/65 mt-6">— 2026.03 · SmartShanghai</p>
         </div>
 
         <div className="col-span-7 flex flex-col justify-center gap-8">
-          <div className="bg-paper-cream vintage-border p-10 relative">
-            <Quote className="absolute -top-6 -left-6 w-16 h-16 text-boomer-red bg-paper-cream rounded-full p-3" />
+          {/* 实拍图 */}
+          <div className="relative">
+            <img
+              src={photoDiatone}
+              alt="Diatone 唱片机"
+              className="w-full h-[280px] object-cover photo-vintage"
+            />
+            <div className="tape-gold -top-4 left-12 z-10 rotate-[-3deg]" />
+          </div>
+
+          <div className="bg-paper-cream vintage-border p-8 relative rotate-[1deg]">
+            <Quote className="absolute -top-7 -left-7 w-16 h-16 text-boomer-red bg-paper-cream rounded-full p-3" />
             <p className="font-display text-3xl leading-relaxed mb-3">
               "It's not the kind of place you walk through in five minutes.
               You have to take your time and dig a little."
             </p>
-            <p className="font-body text-xl text-ink/60">这不是那种五分钟就能逛完的店。你需要慢下来，仔细翻找。</p>
+            <p className="font-body text-2xl text-ink/65">这不是那种五分钟就能逛完的店。你需要慢下来，仔细翻找。</p>
           </div>
 
-          <div className="bg-ink text-paper-cream vintage-border-red p-10 relative">
-            <Quote className="absolute -top-6 -left-6 w-16 h-16 text-paper-cream bg-ink rounded-full p-3" />
+          <div className="bg-vintage-gold vintage-border-red p-8 relative rotate-[-1deg]">
+            <Quote className="absolute -top-7 -left-7 w-16 h-16 text-boomer-red bg-vintage-gold rounded-full p-3" />
             <p className="font-display text-3xl leading-relaxed mb-3">
               "Easy to stop by, and easy to end up staying longer than planned."
             </p>
-            <p className="font-body text-xl text-paper-cream/60">很容易路过就走进去，也很容易待得比计划中久得多。</p>
+            <p className="font-body text-2xl text-ink/75">很容易路过就走进去，也很容易待得比计划中久得多。</p>
           </div>
-
-          <p className="font-body text-xl text-ink/65 leading-relaxed">
-            编辑评价指出，店内选品覆盖三丽鸥、奥特曼、龙珠、灌篮高手、不二家等广泛 IP，同时涵盖复古杯具、瓷器人偶、钥匙扣、黑胶唱片，甚至复古音频设备。价格从几十元到几百元不等，"非常适合慢慢逛"。
-          </p>
         </div>
       </div>
     </SlideShell>
@@ -265,32 +321,34 @@ export function Slide06Media({ pageNumber, totalPages }: { pageNumber: number; t
  * ============================================================ */
 export function Slide07Keywords({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const groups = [
-    { cat: "稀缺性认知", quotes: ["上海少见的日本中古杂货铺", "国内第一家这种店"], color: "bg-boomer-red text-paper-cream" },
-    { cat: "沉浸式体验", quotes: ["可以逛一下午", "每次去都有新东西", "翻筐停不下来"], color: "bg-paper-cream text-ink" },
-    { cat: "情绪价值", quotes: ["治愈", "有温度", "回忆杀", "像走进了日本中古店"], color: "bg-vintage-gold text-ink" },
-    { cat: "性价比", quotes: ["几块钱就能淘到好东西", "比日本代购便宜"], color: "bg-paper-cream text-ink" },
-    { cat: "社交传播", quotes: ["拍照超好看", "朋友圈素材库", "必须带闺蜜来"], color: "bg-vintage-moss text-paper-cream" },
-    { cat: "商业口碑", quotes: ["招商终于有品位了", "商场终于有了有趣的店"], color: "bg-ink text-paper-cream" },
+    { cat: "稀缺性认知", quotes: ["上海少见的日本中古杂货铺", "国内第一家这种店"], color: "bg-boomer-red text-paper-cream", rotate: "rotate-[-1deg]" },
+    { cat: "沉浸式体验", quotes: ["可以逛一下午", "每次去都有新东西", "翻筐停不下来"], color: "bg-paper-cream", rotate: "rotate-[1deg]" },
+    { cat: "情绪价值", quotes: ["治愈", "有温度", "回忆杀", "像走进了日本中古店"], color: "bg-vintage-gold", rotate: "rotate-[-0.5deg]" },
+    { cat: "性价比", quotes: ["几块钱就能淘到好东西", "比日本代购便宜"], color: "bg-paper-warm", rotate: "rotate-[0.5deg]" },
+    { cat: "社交传播", quotes: ["拍照超好看", "朋友圈素材库", "必须带闺蜜来"], color: "bg-vintage-coral text-paper-cream", rotate: "rotate-[1deg]" },
+    { cat: "商业口碑", quotes: ["招商终于有品位了", "商场终于有了有趣的店"], color: "bg-boomer-red text-paper-cream", rotate: "rotate-[-1deg]" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-32 pt-36 pb-28">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="mb-8">
-          <span className="font-handwrite text-3xl text-boomer-red">Voice of Customers</span>
-          <h1 className="font-display text-6xl font-black mt-2">用户评价<span className="text-boomer-red">高频关键词</span></h1>
-          <p className="font-body text-xl text-ink/60 mt-3">小红书 · 大众点评 · 抖音 真实用户评价整理</p>
+          <span className="font-handwrite text-4xl text-boomer-red">Voice of Customers</span>
+          <h1 className="font-display text-7xl font-black mt-2">
+            用户评价<span className="text-boomer-red">高频关键词</span>
+          </h1>
+          <p className="font-body text-2xl text-ink/65 mt-3">小红书 · 大众点评 · 抖音 真实用户评价整理</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-7">
           {groups.map((g) => (
-            <div key={g.cat} className={`vintage-border p-8 ${g.color}`}>
+            <div key={g.cat} className={`vintage-border p-8 ${g.color} ${g.rotate}`}>
               <div className="font-display text-3xl font-black mb-5 flex items-center gap-3">
-                <MessageCircle className="w-7 h-7" strokeWidth={2.5} />
+                <MessageCircle className="w-9 h-9" strokeWidth={2.5} />
                 {g.cat}
               </div>
               <div className="space-y-3">
                 {g.quotes.map((q) => (
-                  <div key={q} className="font-body text-xl leading-snug">"{q}"</div>
+                  <div key={q} className="font-body text-2xl leading-snug">"{q}"</div>
                 ))}
               </div>
             </div>
@@ -302,56 +360,56 @@ export function Slide07Keywords({ pageNumber, totalPages }: { pageNumber: number
 }
 
 /* ============================================================
- * 第 8 页 — 内容生产机器
+ * 第 8 页 — 内容生产机器（去黑色，改红+米黄）
  * ============================================================ */
 export function Slide08Engine({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="ink" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-32 pt-36 pb-28 flex flex-col">
-        <span className="font-handwrite text-3xl text-boomer-red mb-2">A Free Marketing Engine</span>
-        <h1 className="font-display text-7xl font-black text-paper-cream mb-12">
-          一台永不停歇的<span className="text-boomer-red">免费曝光引擎</span>
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="warm" chapter="01 · 中信泰富首店实绩">
+      <div className="absolute inset-0 px-28 pt-36 pb-24 flex flex-col">
+        <span className="font-handwrite text-4xl text-boomer-red mb-3">A Free Marketing Engine</span>
+        <h1 className="font-display text-7xl font-black mb-10 leading-tight">
+          一台永不停歇的<br/><span className="text-boomer-red highlight-yellow">免费曝光引擎</span>
         </h1>
 
         <div className="grid grid-cols-2 gap-12 flex-1">
           <div className="flex flex-col justify-center">
-            <p className="font-body text-3xl text-paper-cream/80 leading-relaxed mb-8">
+            <p className="font-body text-3xl text-ink/85 leading-relaxed mb-8">
               "国内首家标准化中古店"、"100+ 平价筐寻宝"、"巨型 Gameboy"、"佐藤象打卡"等标签，
-              <span className="text-boomer-red font-black highlight-yellow text-ink"> 自带极强的话题性和出片率</span>。
+              <span className="font-black highlight-red">自带极强的话题性和出片率</span>。
             </p>
-            <p className="font-body text-3xl text-paper-cream/80 leading-relaxed">
+            <p className="font-body text-3xl text-ink/85 leading-relaxed">
               中信泰富首店已用数据证明 ——
               全部曝光均为用户自发传播，<span className="text-boomer-red font-black">零付费推广</span>。
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div className="vintage-border-red bg-paper-cream text-ink p-8 flex flex-col justify-between">
-              <TrendingUp className="w-12 h-12 text-boomer-red" strokeWidth={2.5} />
+          <div className="grid grid-cols-2 gap-5">
+            <div className="vintage-border bg-paper-cream p-7 flex flex-col justify-between rotate-[-1deg]">
+              <TrendingUp className="w-14 h-14 text-boomer-red" strokeWidth={2.5} />
               <div>
-                <div className="big-number text-7xl text-boomer-red">300<span className="text-3xl">万+</span></div>
-                <div className="font-body text-xl mt-2">全网曝光</div>
+                <div className="mega-number text-7xl text-boomer-red">300<span className="text-3xl">万+</span></div>
+                <div className="font-body text-2xl mt-2 font-bold">全网曝光</div>
               </div>
             </div>
-            <div className="vintage-border-red bg-boomer-red text-paper-cream p-8 flex flex-col justify-between">
-              <Users className="w-12 h-12" strokeWidth={2.5} />
+            <div className="vintage-border bg-boomer-red text-paper-cream p-7 flex flex-col justify-between rotate-[1deg]">
+              <Users className="w-14 h-14" strokeWidth={2.5} />
               <div>
-                <div className="big-number text-7xl">10<span className="text-3xl">万+</span></div>
-                <div className="font-body text-xl mt-2">定向客流</div>
+                <div className="mega-number text-7xl">10<span className="text-3xl">万+</span></div>
+                <div className="font-body text-2xl mt-2 font-bold">定向客流</div>
               </div>
             </div>
-            <div className="vintage-border-red bg-vintage-gold text-ink p-8 flex flex-col justify-between">
-              <Star className="w-12 h-12" strokeWidth={2.5} />
+            <div className="vintage-border bg-vintage-gold p-7 flex flex-col justify-between rotate-[1deg]">
+              <Star className="w-14 h-14" strokeWidth={2.5} />
               <div>
-                <div className="big-number text-7xl">No.1</div>
-                <div className="font-body text-xl mt-2">商圈排名</div>
+                <div className="mega-number text-7xl">No.1</div>
+                <div className="font-body text-2xl mt-2 font-bold">商圈排名</div>
               </div>
             </div>
-            <div className="vintage-border-red bg-paper-cream text-ink p-8 flex flex-col justify-between">
-              <Heart className="w-12 h-12 text-boomer-red" strokeWidth={2.5} />
+            <div className="vintage-border bg-paper-cream p-7 flex flex-col justify-between rotate-[-1deg]">
+              <Heart className="w-14 h-14 text-boomer-red" strokeWidth={2.5} />
               <div>
-                <div className="big-number text-7xl text-boomer-red">1K<span className="text-3xl">+</span></div>
-                <div className="font-body text-xl mt-2">月均打卡</div>
+                <div className="mega-number text-7xl text-boomer-red">1K<span className="text-3xl">+</span></div>
+                <div className="font-body text-2xl mt-2 font-bold">月均打卡</div>
               </div>
             </div>
           </div>
@@ -374,39 +432,42 @@ export function Slide10Problem({ pageNumber, totalPages }: { pageNumber: number;
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="02 · 品牌定位与愿景">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="mb-6">
-          <span className="font-handwrite text-3xl text-boomer-red">The Problem We Solved</span>
-          <h1 className="font-display text-6xl font-black mt-1">两种中古店模式的<span className="text-boomer-red">融合升级</span></h1>
+          <span className="font-handwrite text-4xl text-boomer-red">The Problem We Solved</span>
+          <h1 className="font-display text-7xl font-black mt-2">两种中古店模式的<span className="text-boomer-red">融合升级</span></h1>
         </div>
 
         <div className="bg-paper-cream vintage-border overflow-hidden">
-          <div className="grid grid-cols-12 bg-ink text-paper-cream">
-            <div className="col-span-3 p-5 font-display text-2xl font-bold border-r border-paper-cream/20">对比维度</div>
-            <div className="col-span-3 p-5 font-display text-2xl border-r border-paper-cream/20">
-              日本标准化店<div className="font-body text-base text-paper-cream/60">如 Book Off</div>
+          <div className="grid grid-cols-12 bg-paper-warm">
+            <div className="col-span-3 p-6 font-display text-3xl font-bold border-r-2 border-ink/20">对比维度</div>
+            <div className="col-span-3 p-6 border-r-2 border-ink/20">
+              <div className="font-display text-2xl font-bold">日本标准化店</div>
+              <div className="font-body text-lg text-ink/60 mt-1">如 Book Off</div>
             </div>
-            <div className="col-span-3 p-5 font-display text-2xl border-r border-paper-cream/20">
-              街边设计师店<div className="font-body text-base text-paper-cream/60">主理人小店</div>
+            <div className="col-span-3 p-6 border-r-2 border-ink/20">
+              <div className="font-display text-2xl font-bold">街边设计师店</div>
+              <div className="font-body text-lg text-ink/60 mt-1">主理人小店</div>
             </div>
-            <div className="col-span-3 p-5 font-display text-2xl bg-boomer-red">
-              BOOMER OFF<div className="font-body text-base text-paper-cream/80">融合模式</div>
+            <div className="col-span-3 p-6 bg-boomer-red text-paper-cream">
+              <div className="font-display text-2xl font-black">BOOMER OFF</div>
+              <div className="font-body text-lg text-paper-cream/85 mt-1">融合模式</div>
             </div>
           </div>
           {rows.map((r, i) => (
-            <div key={r.dim} className={`grid grid-cols-12 ${i % 2 ? "bg-paper-deep/40" : ""}`}>
-              <div className="col-span-3 p-5 font-display text-xl font-bold border-r border-ink/10">{r.dim}</div>
-              <div className="col-span-3 p-5 font-body text-lg text-ink/75 border-r border-ink/10">{r.a}</div>
-              <div className="col-span-3 p-5 font-body text-lg text-ink/75 border-r border-ink/10">{r.b}</div>
-              <div className="col-span-3 p-5 font-body text-lg text-ink font-bold bg-boomer-red/10">{r.c}</div>
+            <div key={r.dim} className={`grid grid-cols-12 ${i % 2 ? "bg-paper-deep/50" : ""}`}>
+              <div className="col-span-3 p-5 font-display text-2xl font-bold border-r-2 border-ink/10">{r.dim}</div>
+              <div className="col-span-3 p-5 font-body text-xl text-ink/75 border-r-2 border-ink/10">{r.a}</div>
+              <div className="col-span-3 p-5 font-body text-xl text-ink/75 border-r-2 border-ink/10">{r.b}</div>
+              <div className="col-span-3 p-5 font-body text-xl text-ink font-bold bg-boomer-red/15">{r.c}</div>
             </div>
           ))}
         </div>
 
-        <p className="font-body text-xl text-ink/70 mt-6 leading-relaxed">
-          <span className="font-display text-2xl text-boomer-red font-black">核心创新：</span>
+        <p className="font-body text-2xl text-ink/75 mt-6 leading-relaxed">
+          <span className="font-display text-3xl text-boomer-red font-black">核心创新：</span>
           用标准化陈列保证<span className="highlight-red font-bold">信任感与可复制性</span>，
-          同时通过沉浸式声光体验注入街边店才有的<span className="highlight-yellow font-bold">氛围感与情绪价值</span>。
+          通过沉浸式体验注入街边店才有的<span className="highlight-yellow font-bold">氛围感与情绪价值</span>。
         </p>
       </div>
     </SlideShell>
@@ -414,50 +475,54 @@ export function Slide10Problem({ pageNumber, totalPages }: { pageNumber: number;
 }
 
 /* ============================================================
- * 第 11 页 — 品牌故事
+ * 第 11 页 — 品牌故事（去黑色，红色文字版块）
  * ============================================================ */
 export function Slide11Story({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="02 · 品牌定位与愿景">
       <div className="absolute inset-0 grid grid-cols-12">
-        {/* 左侧大字 */}
-        <div className="col-span-5 bg-ink text-paper-cream p-20 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -bottom-20 -right-20 w-96 h-96 dots-pattern opacity-20" />
+        {/* 左侧大字 — 红底 */}
+        <div className="col-span-5 bg-boomer-red text-paper-cream p-20 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] dots-pattern-cream opacity-25" />
           <div className="relative">
-            <span className="font-handwrite text-3xl text-boomer-red">Brand Story</span>
-            <h1 className="font-display text-7xl font-black mt-2 leading-tight">
-              一个<br/><span className="text-boomer-red">时间收容所</span>
+            <span className="font-handwrite text-4xl text-paper-cream/90">Brand Story</span>
+            <h1 className="font-display text-8xl font-black mt-3 leading-tight">
+              一个<br/>
+              <span className="font-handwrite text-9xl">时间</span>
+              <br/>
+              收容所
             </h1>
           </div>
           <div className="relative">
             <p className="font-display text-3xl leading-relaxed">
               让都市白领在下班后<br/>
-              可以「<span className="text-boomer-red font-black">合法浪费时间</span>」<br/>
+              可以「<span className="font-handwrite text-4xl text-vintage-gold">合法浪费时间</span>」<br/>
               的治愈系精神避风港
             </p>
           </div>
         </div>
 
         {/* 右侧故事 */}
-        <div className="col-span-7 px-24 pt-36 pb-32 flex flex-col justify-center">
-          <p className="font-body text-3xl leading-relaxed text-ink/85 mb-8">
+        <div className="col-span-7 px-20 pt-36 pb-32 flex flex-col justify-center bg-paper-cream relative">
+          <div className="absolute top-32 right-12 stamp-red text-2xl">VINTAGE</div>
+          <p className="font-body text-3xl leading-relaxed text-ink/85 mb-7">
             在物质极度丰盛的今天，都市人似乎拥有一切，却又常常感到空虚。
           </p>
-          <p className="font-body text-3xl leading-relaxed text-ink/85 mb-8">
+          <p className="font-body text-3xl leading-relaxed text-ink/85 mb-7">
             <span className="font-display font-black text-boomer-red">BOOMER OFF</span> 诞生于这样一个洞察 ——
             我们需要的不再是更多的新商品，而是那些<span className="highlight-yellow font-bold">带有时间温度、能引发情感共鸣的「旧物」</span>。
           </p>
           <p className="font-body text-3xl leading-relaxed text-ink/85">
-            我们不仅是一家中古店，更是一个让灵魂得以慢下来的栖息地。
+            我们不仅是一家中古店，更是一个让灵魂得以慢下来的<span className="font-bold text-boomer-red">栖息地</span>。
           </p>
 
           <div className="mt-12 grid grid-cols-2 gap-6">
-            <div className="border-l-4 border-boomer-red pl-6">
-              <div className="font-handwrite text-2xl text-boomer-red mb-2">Slogan</div>
+            <div className="border-l-[6px] border-boomer-red pl-7">
+              <div className="font-handwrite text-3xl text-boomer-red mb-2">Slogan</div>
               <div className="font-display text-3xl font-black">虽古但新，信任可见</div>
             </div>
-            <div className="border-l-4 border-ink pl-6">
-              <div className="font-handwrite text-2xl text-ink/60 mb-2">Core Model</div>
+            <div className="border-l-[6px] border-vintage-gold pl-7">
+              <div className="font-handwrite text-3xl text-vintage-gold mb-2">Core Model</div>
               <div className="font-display text-3xl font-black">标准化 × 氛围感</div>
             </div>
           </div>
@@ -472,42 +537,42 @@ export function Slide11Story({ pageNumber, totalPages }: { pageNumber: number; t
  * ============================================================ */
 export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const personas = [
-    { age: "儿童", icon: "🧸", pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏" },
-    { age: "青少年", icon: "🎒", pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片" },
-    { age: "都市白领", icon: "📷", pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到" },
-    { age: "中年群体", icon: "🎵", pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱" },
-    { age: "老年群体", icon: "🍵", pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具" },
+    { age: "儿童", icon: "🧸", pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏", color: "bg-paper-cream" },
+    { age: "青少年", icon: "🎒", pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片", color: "bg-vintage-gold" },
+    { age: "都市白领", icon: "📷", pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到", color: "bg-paper-cream" },
+    { age: "中年群体", icon: "🎵", pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱", color: "bg-vintage-coral text-paper-cream" },
+    { age: "老年群体", icon: "🍵", pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具", color: "bg-paper-cream" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="02 · 品牌定位与愿景">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">Target Audience</span>
-            <h1 className="font-display text-6xl font-black mt-1">
+            <span className="font-handwrite text-4xl text-boomer-red">Target Audience</span>
+            <h1 className="font-display text-7xl font-black mt-2">
               覆盖<span className="text-boomer-red">全年龄段</span>的中古杂货铺
             </h1>
           </div>
-          <div className="font-handwrite text-3xl text-ink/60 rotate-[-2deg]">从 3 岁到 90 岁 →</div>
+          <div className="font-handwrite text-4xl text-ink/65 rotate-[-2deg]">从 3 岁到 90 岁 →</div>
         </div>
 
         <div className="grid grid-cols-5 gap-5">
-          {personas.map((p) => (
-            <div key={p.age} className="bg-paper-cream vintage-border p-6 flex flex-col">
-              <div className="text-7xl mb-3">{p.icon}</div>
-              <div className="font-display text-3xl font-black text-boomer-red mb-3">{p.age}</div>
-              <div className="font-body text-base text-ink/75 leading-snug mb-4 flex-1">{p.pref}</div>
-              <div className="border-t-2 border-dashed border-ink/20 pt-3">
-                <div className="font-handwrite text-lg text-ink/60">真实案例：</div>
-                <div className="font-body text-sm text-ink/70 leading-snug">{p.case}</div>
+          {personas.map((p, i) => (
+            <div key={p.age} className={`vintage-border p-7 flex flex-col ${p.color} ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+              <div className="text-8xl mb-4 leading-none">{p.icon}</div>
+              <div className="font-display text-4xl font-black text-boomer-red mb-3">{p.age}</div>
+              <div className="font-body text-lg leading-snug mb-4 flex-1 opacity-85">{p.pref}</div>
+              <div className="border-t-2 border-dashed border-ink/25 pt-3">
+                <div className="font-handwrite text-xl opacity-70">真实案例：</div>
+                <div className="font-body text-base leading-snug opacity-80">{p.case}</div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-8 bg-ink text-paper-cream p-8 vintage-border-red">
-          <p className="font-display text-3xl text-center">
-            <span className="text-boomer-red font-black">每一件商品都有属于它的顾客</span> — 这意味着一家三口甚至更多人一起来 BOOMER OFF，
+        <div className="mt-8 bg-boomer-red text-paper-cream p-8 vintage-border rotate-[-0.5deg]">
+          <p className="font-display text-3xl text-center leading-snug">
+            <span className="font-black">每一件商品都有属于它的顾客</span> — 一家三口一起来 BOOMER OFF，
             <span className="font-handwrite text-4xl text-vintage-gold ml-2">每个人都能找到自己的回忆</span>
           </p>
         </div>
@@ -522,38 +587,38 @@ export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number;
 export function Slide13Market({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="03 · 市场机遇与赛道">
-      <div className="absolute inset-0 px-32 pt-36 pb-24 grid grid-cols-12 gap-12">
+      <div className="absolute inset-0 px-28 pt-36 pb-24 grid grid-cols-12 gap-10">
         <div className="col-span-5 flex flex-col justify-center">
-          <span className="font-handwrite text-3xl text-boomer-red">Blue Ocean</span>
-          <h1 className="font-display text-6xl font-black mt-2 mb-8">
+          <span className="font-handwrite text-4xl text-boomer-red">Blue Ocean</span>
+          <h1 className="font-display text-7xl font-black mt-2 mb-8 leading-tight">
             万亿级市场的<br/><span className="text-boomer-red">线下空白</span>
           </h1>
-          <p className="font-body text-2xl leading-relaxed text-ink/80">
+          <p className="font-body text-3xl leading-relaxed text-ink/85">
             尽管线上二手电商发展迅速，中国线下市场仍以「非标」、「高冷」的奢侈品二手店或杂乱无章的旧货铺为主，
-            <span className="highlight-red font-bold">缺乏真正意义上的标准化平价中古连锁店。</span>
+            <span className="highlight-red font-bold">缺乏真正的标准化平价中古连锁店。</span>
           </p>
         </div>
 
         <div className="col-span-7 flex flex-col justify-center gap-6">
           <div className="bg-boomer-red text-paper-cream vintage-border p-12 relative">
-            <div className="font-handwrite text-2xl mb-2">2024 年中国二手商品交易额</div>
-            <div className="big-number text-9xl">1.69<span className="text-5xl ml-2">万亿元</span></div>
-            <div className="font-display text-2xl mt-3">同比增长 +28%</div>
-            <div className="absolute top-6 right-6 bg-paper-cream text-boomer-red px-4 py-2 font-display text-2xl font-black rotate-3">
+            <div className="font-handwrite text-3xl mb-3">2024 年中国二手商品交易额</div>
+            <div className="mega-number text-[10rem]">1.69<span className="text-5xl ml-2">万亿元</span></div>
+            <div className="font-display text-3xl mt-3">同比增长 +28%</div>
+            <div className="absolute top-8 right-8 bg-vintage-gold text-ink px-5 py-3 font-display text-3xl font-black rotate-6 vintage-border-soft">
               ↑ 28%
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-paper-cream vintage-border p-8">
-              <div className="font-handwrite text-xl text-boomer-red mb-1">主力人群</div>
-              <div className="font-display text-3xl font-black">00 后 + 90 后</div>
-              <div className="font-body text-lg text-ink/65 mt-2">已成为二手交易绝对主力</div>
+            <div className="bg-vintage-gold vintage-border p-8 rotate-[-1deg]">
+              <div className="font-handwrite text-2xl mb-1">主力人群</div>
+              <div className="font-display text-4xl font-black">00 后 + 90 后</div>
+              <div className="font-body text-xl text-ink/75 mt-2">已成为二手交易绝对主力</div>
             </div>
-            <div className="bg-paper-cream vintage-border p-8">
-              <div className="font-handwrite text-xl text-boomer-red mb-1">线下空白</div>
-              <div className="font-display text-3xl font-black">标准化平价店</div>
-              <div className="font-body text-lg text-ink/65 mt-2">尚无对标 Book Off 的连锁</div>
+            <div className="bg-paper-cream vintage-border p-8 rotate-[1deg]">
+              <div className="font-handwrite text-2xl text-boomer-red mb-1">线下空白</div>
+              <div className="font-display text-4xl font-black">标准化平价店</div>
+              <div className="font-body text-xl text-ink/75 mt-2">尚无对标 Book Off 的连锁</div>
             </div>
           </div>
         </div>
@@ -568,45 +633,45 @@ export function Slide13Market({ pageNumber, totalPages }: { pageNumber: number; 
 export function Slide14Japan({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="03 · 市场机遇与赛道">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <span className="font-handwrite text-3xl text-boomer-red">Benchmark: Japan</span>
-        <h1 className="font-display text-6xl font-black mt-2 mb-12">
-          对标<span className="text-boomer-red">日本 Reuse 市场</span> · 成熟模式的本土化升级
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <span className="font-handwrite text-4xl text-boomer-red">Benchmark: Japan</span>
+        <h1 className="font-display text-7xl font-black mt-2 mb-12 leading-tight">
+          对标<span className="text-boomer-red">日本 Reuse 市场</span>
         </h1>
 
-        <div className="grid grid-cols-3 gap-8">
-          <div className="bg-paper-cream vintage-border p-10 flex flex-col">
-            <Recycle className="w-14 h-14 text-boomer-red mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-2xl text-ink/60 mb-2">市场规模</div>
-            <div className="big-number text-7xl text-ink mb-1">3.5<span className="text-3xl">万亿</span></div>
-            <div className="font-display text-2xl text-ink/70">日元</div>
-            <div className="font-body text-lg text-ink/60 mt-3">约 1,700 亿人民币</div>
+        <div className="grid grid-cols-3 gap-7">
+          <div className="bg-paper-cream vintage-border p-10 flex flex-col rotate-[-1deg]">
+            <Recycle className="w-16 h-16 text-boomer-red mb-4" strokeWidth={2.5} />
+            <div className="font-handwrite text-3xl text-ink/65 mb-2">市场规模</div>
+            <div className="mega-number text-8xl text-ink mb-1">3.5<span className="text-4xl">万亿</span></div>
+            <div className="font-display text-3xl text-ink/75 font-bold">日元</div>
+            <div className="font-body text-xl text-ink/65 mt-3">约 1,700 亿人民币</div>
           </div>
 
-          <div className="bg-ink text-paper-cream vintage-border-red p-10 flex flex-col">
-            <TrendingUp className="w-14 h-14 text-boomer-red mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-2xl text-paper-cream/60 mb-2">增长态势</div>
-            <div className="big-number text-7xl text-boomer-red mb-1">15<span className="text-3xl">年</span></div>
-            <div className="font-display text-2xl text-paper-cream/80">持续增长</div>
-            <div className="font-body text-lg text-paper-cream/60 mt-3">连续 15 年正增长</div>
+          <div className="bg-vintage-gold vintage-border p-10 flex flex-col">
+            <TrendingUp className="w-16 h-16 text-boomer-red mb-4" strokeWidth={2.5} />
+            <div className="font-handwrite text-3xl text-ink/65 mb-2">增长态势</div>
+            <div className="mega-number text-8xl text-boomer-red mb-1">15<span className="text-4xl">年</span></div>
+            <div className="font-display text-3xl text-ink/85 font-bold">持续增长</div>
+            <div className="font-body text-xl text-ink/65 mt-3">连续 15 年正增长</div>
           </div>
 
-          <div className="bg-boomer-red text-paper-cream vintage-border p-10 flex flex-col">
-            <Users className="w-14 h-14 text-paper-cream mb-4" strokeWidth={2.5} />
-            <div className="font-handwrite text-2xl text-paper-cream/80 mb-2">国民渗透</div>
-            <div className="big-number text-7xl mb-1">44.1<span className="text-3xl">%</span></div>
-            <div className="font-display text-2xl">日本国民</div>
-            <div className="font-body text-lg text-paper-cream/80 mt-3">过去一年购买过二手商品</div>
+          <div className="bg-boomer-red text-paper-cream vintage-border p-10 flex flex-col rotate-[1deg]">
+            <Users className="w-16 h-16 text-paper-cream mb-4" strokeWidth={2.5} />
+            <div className="font-handwrite text-3xl text-paper-cream/85 mb-2">国民渗透</div>
+            <div className="mega-number text-8xl mb-1">44.1<span className="text-4xl">%</span></div>
+            <div className="font-display text-3xl">日本国民</div>
+            <div className="font-body text-xl text-paper-cream/85 mt-3">过去一年购买过二手商品</div>
           </div>
         </div>
 
-        <div className="mt-12 bg-paper-cream vintage-border p-10">
+        <div className="mt-12 bg-paper-cream vintage-border p-10 rotate-[-0.5deg]">
           <p className="font-display text-3xl leading-relaxed">
-            <BadgeCheck className="inline w-10 h-10 text-boomer-red mr-3" />
-            BOOMER OFF 汲取了日本中古行业的核心优势 ——
-            <span className="highlight-red font-bold">严苛的评级体系</span>与
-            <span className="highlight-yellow font-bold">极致的陈列美学</span>，
-            并针对中国市场的核心痛点（信任缺失）进行了数字化升级。
+            <BadgeCheck className="inline w-12 h-12 text-boomer-red mr-3" />
+            BOOMER OFF 汲取日本中古行业核心优势 ——
+            <span className="highlight-red font-bold">严苛评级体系</span>与
+            <span className="highlight-yellow font-bold">极致陈列美学</span>，
+            针对中国市场信任痛点进行数字化升级。
           </p>
         </div>
       </div>
@@ -615,75 +680,80 @@ export function Slide14Japan({ pageNumber, totalPages }: { pageNumber: number; t
 }
 
 /* ============================================================
- * 第 16 页 — 空间概念
+ * 第 16 页 — 空间概念（嵌入实拍图）
  * ============================================================ */
 export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">Space Concept</span>
-            <h1 className="font-display text-6xl font-black mt-1">
+            <span className="font-handwrite text-4xl text-boomer-red">Space Concept</span>
+            <h1 className="font-display text-7xl font-black mt-2">
               超高密度 × <span className="text-boomer-red">寻宝体验</span>
             </h1>
           </div>
           <div className="text-right">
-            <div className="big-number text-7xl text-boomer-red">10,000<span className="text-3xl">+</span></div>
-            <div className="font-body text-xl text-ink/60">SKU / 80-100㎡ 单店</div>
+            <div className="mega-number text-8xl text-boomer-red">10,000<span className="text-3xl">+</span></div>
+            <div className="font-body text-2xl text-ink/65">SKU / 80-100㎡ 单店</div>
           </div>
         </div>
 
-        <div className="bg-paper-cream vintage-border overflow-hidden">
-          {/* 上层精品区 */}
-          <div className="grid grid-cols-12 border-b-4 border-ink">
-            <div className="col-span-3 bg-ink text-paper-cream p-10 flex flex-col justify-center">
-              <div className="font-handwrite text-2xl text-boomer-red mb-2">Upper Floor</div>
-              <div className="font-display text-4xl font-black mb-2">上层精品区</div>
-              <div className="font-body text-lg text-paper-cream/70">视线及以上高度</div>
+        <div className="grid grid-cols-12 gap-6">
+          {/* 上层精品 - 实拍 */}
+          <div className="col-span-7 vintage-border bg-paper-cream overflow-hidden">
+            <div className="grid grid-cols-5">
+              <div className="col-span-2 bg-boomer-red text-paper-cream p-7 flex flex-col justify-center">
+                <div className="font-handwrite text-2xl text-paper-cream/85 mb-2">Upper Floor</div>
+                <div className="font-display text-4xl font-black mb-2">上层<br/>精品区</div>
+                <div className="font-body text-lg text-paper-cream/85 mt-2">视线及以上</div>
+              </div>
+              <img
+                src={photoCeramics}
+                alt="精品瓷器"
+                className="col-span-3 w-full h-[260px] object-cover"
+              />
             </div>
-            <div className="col-span-9 p-10 dots-pattern bg-paper-deep/30">
-              <div className="font-display text-3xl font-bold mb-4">高价值精选中古商品</div>
-              <div className="flex flex-wrap gap-3">
-                {["绝版手办", "复古相机 CCD", "品牌瓷器", "中古腕表", "黑胶唱片机", "限量胶卷机", "经典毛绒精品"].map(t => (
-                  <span key={t} className="px-5 py-2 bg-boomer-red text-paper-cream font-display text-xl font-bold">{t}</span>
+            <div className="p-7">
+              <div className="font-display text-2xl font-bold mb-4">高价值精选中古商品</div>
+              <div className="flex flex-wrap gap-2">
+                {["绝版手办", "复古相机 CCD", "品牌瓷器", "中古腕表", "黑胶唱片机", "经典毛绒"].map(t => (
+                  <span key={t} className="px-4 py-2 bg-boomer-red text-paper-cream font-display text-lg font-bold">{t}</span>
                 ))}
               </div>
             </div>
           </div>
 
           {/* 下层翻筐乐 */}
-          <div className="grid grid-cols-12">
-            <div className="col-span-3 bg-boomer-red text-paper-cream p-10 flex flex-col justify-center">
-              <div className="font-handwrite text-2xl text-paper-cream/80 mb-2">Lower Floor</div>
-              <div className="font-display text-4xl font-black mb-2">下层淘货区</div>
-              <div className="font-body text-2xl">「翻 筐 乐」</div>
-            </div>
-            <div className="col-span-9 p-10 lines-pattern">
-              <div className="grid grid-cols-3 gap-6">
+          <div className="col-span-5 vintage-border-red bg-vintage-gold overflow-hidden flex flex-col">
+            <div className="p-7 flex-1">
+              <div className="font-handwrite text-2xl text-ink/65 mb-2">Lower Floor</div>
+              <div className="font-display text-4xl font-black mb-1">下层淘货区</div>
+              <div className="font-display text-3xl text-boomer-red mb-5">「翻 筐 乐」</div>
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <div className="big-number text-6xl text-boomer-red">100<span className="text-3xl">+</span></div>
-                  <div className="font-body text-lg text-ink/70">平价木筐</div>
+                  <div className="mega-number text-5xl text-boomer-red">100<span className="text-2xl">+</span></div>
+                  <div className="font-body text-base text-ink/75">平价木筐</div>
                 </div>
                 <div>
-                  <div className="big-number text-6xl text-boomer-red">¥6.9</div>
-                  <div className="font-body text-lg text-ink/70">起售价</div>
+                  <div className="mega-number text-5xl text-boomer-red">¥6.9</div>
+                  <div className="font-body text-base text-ink/75">起售价</div>
                 </div>
                 <div>
-                  <div className="big-number text-6xl text-boomer-red">∞</div>
-                  <div className="font-body text-lg text-ink/70">寻宝乐趣</div>
+                  <div className="mega-number text-5xl text-boomer-red">∞</div>
+                  <div className="font-body text-base text-ink/75">寻宝乐趣</div>
                 </div>
               </div>
-              <p className="font-body text-xl text-ink/70 mt-6 leading-snug">
-                海量小物件集中木筐，自由翻找，"逛不完"的探索欲驱动停留时间至 45-90 分钟
+              <p className="font-body text-lg text-ink/75 mt-4 leading-snug">
+                海量小物件集中木筐自由翻找，"逛不完"驱动停留 45-90 分钟
               </p>
             </div>
           </div>
         </div>
 
-        <p className="font-body text-xl text-ink/65 mt-6 text-center">
-          每一件皆为<span className="font-display font-bold text-boomer-red">孤品</span>，
-          营造强烈视觉冲击力 — "每次来货都不一样"驱动极高复购率
+        <p className="font-body text-2xl text-ink/75 mt-6 text-center">
+          每一件皆为<span className="font-display font-black text-boomer-red">孤品</span> · 
+          "每次来货都不一样"驱动极高复购率
         </p>
       </div>
     </SlideShell>
@@ -691,50 +761,50 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
 }
 
 /* ============================================================
- * 第 17 页 — 空间体验设计四大元素
+ * 第 17 页 — 空间体验设计四大元素（每个配实拍图）
  * ============================================================ */
 export function Slide17Experience({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const items = [
     {
       icon: Disc3, title: "大通 Diatone 唱片机", en: "AUDIO IMMERSION",
-      desc: "每店标配日本立式黑胶唱片机，全程播放昭和经典歌曲。视听共振创造独一无二「穿越感」",
-      color: "bg-paper-cream"
+      desc: "每店标配日本立式黑胶唱片机，全程播放昭和经典歌曲。视听共振创造「穿越感」",
+      color: "bg-paper-cream", photo: photoVinyl, rotate: "rotate-[-1deg]"
     },
     {
       icon: Gamepad2, title: "巨型 Gameboy 装置", en: "INTERACTIVE PLAY",
-      desc: "独家打造可实操的巨型 Gameboy，跨年龄段「回忆杀」打卡点，延长停留时长",
-      color: "bg-vintage-gold"
+      desc: "独家打造可实操的巨型 Gameboy，跨年龄段「回忆杀」打卡点",
+      color: "bg-vintage-gold", photo: photoUltraman, rotate: "rotate-[1deg]"
     },
     {
       icon: Sparkles, title: "佐藤象店头", en: "VISUAL LANDMARK",
-      desc: "经典橘色佐藤象 (Sato-chan) 站在门口，无声招牌 + 顾客合影第一站",
-      color: "bg-boomer-red text-paper-cream"
+      desc: "经典橘色佐藤象站在门口，无声招牌 + 顾客合影第一站",
+      color: "bg-boomer-red text-paper-cream", photo: photoSato, rotate: "rotate-[1deg]"
     },
     {
       icon: Gift, title: "DIY 互动体验区", en: "PARTICIPATORY EXPERIENCE",
-      desc: "大众点评收藏打卡免费 DIY 冰箱贴 — 月均 1,000+ 收藏，三重价值同时实现",
-      color: "bg-ink text-paper-cream"
+      desc: "大众点评收藏打卡免费 DIY 冰箱贴 — 月均 1,000+ 收藏",
+      color: "bg-paper-warm", photo: photoDIY, rotate: "rotate-[-1deg]"
     },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <div className="mb-8">
-          <span className="font-handwrite text-3xl text-boomer-red">Experience Design</span>
+      <div className="absolute inset-0 px-24 pt-36 pb-24">
+        <div className="mb-6">
+          <span className="font-handwrite text-4xl text-boomer-red">Experience Design</span>
           <h1 className="font-display text-6xl font-black mt-1">让每个角落都<span className="text-boomer-red">值得停留</span></h1>
-          <p className="font-body text-xl text-ink/60 mt-2">四大标志性空间元素 · 沉浸式体验场</p>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           {items.map((it) => (
-            <div key={it.title} className={`vintage-border p-8 ${it.color} flex gap-6`}>
-              <div className="flex-shrink-0">
-                <it.icon className="w-16 h-16" strokeWidth={2} />
-              </div>
-              <div className="flex-1">
-                <div className="font-condensed text-lg tracking-widest opacity-60 mb-1">{it.en}</div>
-                <div className="font-display text-3xl font-black mb-3">{it.title}</div>
-                <div className="font-body text-lg leading-relaxed opacity-90">{it.desc}</div>
+            <div key={it.title} className={`vintage-border ${it.color} ${it.rotate} overflow-hidden flex`}>
+              <img src={it.photo} alt={it.title} className="w-[200px] h-[260px] object-cover flex-shrink-0" />
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex items-center gap-3 mb-2">
+                  <it.icon className="w-10 h-10" strokeWidth={2.5} />
+                  <div className="font-condensed text-base tracking-widest opacity-65">{it.en}</div>
+                </div>
+                <div className="font-display text-3xl font-black mb-3 leading-tight">{it.title}</div>
+                <div className="font-body text-xl leading-relaxed opacity-90">{it.desc}</div>
               </div>
             </div>
           ))}
@@ -745,56 +815,53 @@ export function Slide17Experience({ pageNumber, totalPages }: { pageNumber: numb
 }
 
 /* ============================================================
- * 第 18 页 — 四大核心品类
+ * 第 18 页 — 四大核心品类（每个品类配实拍）
  * ============================================================ */
 export function Slide18Categories({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const cats = [
-    {
-      icon: Package, name: "玩具动漫", en: "Toys & Anime",
-      items: ["不二家 · 佐藤象", "三丽鸥 · 哆啦A梦", "奥特曼 · 假面骑士", "面包超人 · 龙珠"]
-    },
-    {
-      icon: Coffee, name: "家居日用", en: "Home & Living",
-      items: ["日式餐具 · 欧式瓷器", "中古线香 · 铁壶摆件", "丝巾手帕 · 毛巾浴巾", "复古玻璃器皿"]
-    },
-    {
-      icon: Award, name: "首饰配饰", en: "Jewelry & Accessories",
-      items: ["中古项链 · 胸针", "复古腕表", "经典徽章", "古着配饰"]
-    },
-    {
-      icon: Headphones, name: "数码音像", en: "Electronics & Media",
-      items: ["黑胶唱片 · 唱片机", "随身听 · CCD 相机", "复古游戏机", "中古数码玩具"]
-    },
+    { icon: Package, name: "玩具动漫", en: "Toys & Anime", photo: photoUltraman,
+      items: ["不二家 · 佐藤象", "三丽鸥 · 哆啦A梦", "奥特曼 · 假面骑士", "面包超人 · 龙珠"] },
+    { icon: Coffee, name: "家居日用", en: "Home & Living", photo: photoTeapot,
+      items: ["日式餐具 · 欧式瓷器", "中古线香 · 铁壶摆件", "丝巾手帕 · 毛巾浴巾", "复古玻璃器皿"] },
+    { icon: Award, name: "首饰配饰", en: "Jewelry & Acc.", photo: photoPikachu,
+      items: ["中古项链 · 胸针", "复古腕表", "经典徽章", "古着配饰"] },
+    { icon: Headphones, name: "数码音像", en: "Electronics", photo: photoVinyl,
+      items: ["黑胶唱片 · 唱片机", "随身听 · CCD 相机", "复古游戏机", "中古数码玩具"] },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <div className="flex items-end justify-between mb-8">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <div className="flex items-end justify-between mb-7">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">Four Core Categories</span>
+            <span className="font-handwrite text-4xl text-boomer-red">Four Core Categories</span>
             <h1 className="font-display text-6xl font-black mt-1">覆盖<span className="text-boomer-red">半个世纪</span>的中古宝藏</h1>
           </div>
-          <div className="text-right font-display text-2xl text-ink/60">
+          <div className="text-right font-display text-2xl text-ink/65">
             从 50 年代到千禧年<br/>满足不同圈层爱好
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-4 gap-5">
           {cats.map((c, i) => (
-            <div key={c.name} className={`vintage-border p-8 ${i % 2 === 0 ? "bg-paper-cream" : "bg-paper-deep"}`}>
-              <div className="bg-boomer-red text-paper-cream w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                <c.icon className="w-8 h-8" strokeWidth={2.5} />
+            <div key={c.name} className={`vintage-border bg-paper-cream overflow-hidden flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+              <div className="relative">
+                <img src={c.photo} alt={c.name} className="w-full h-[200px] object-cover" />
+                <div className="absolute top-3 right-3 bg-boomer-red text-paper-cream w-14 h-14 rounded-full flex items-center justify-center">
+                  <c.icon className="w-7 h-7" strokeWidth={2.5} />
+                </div>
               </div>
-              <div className="font-condensed text-lg tracking-widest text-ink/50 mb-1">{c.en}</div>
-              <div className="font-display text-3xl font-black mb-5">{c.name}</div>
-              <ul className="space-y-2">
-                {c.items.map((it) => (
-                  <li key={it} className="font-body text-lg text-ink/75 flex items-start gap-2">
-                    <ChevronRight className="w-5 h-5 text-boomer-red mt-1 flex-shrink-0" />
-                    <span>{it}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="font-condensed text-base tracking-widest text-ink/55 mb-1">{c.en}</div>
+                <div className="font-display text-3xl font-black mb-4 text-boomer-red">{c.name}</div>
+                <ul className="space-y-2 flex-1">
+                  {c.items.map((it) => (
+                    <li key={it} className="font-body text-lg text-ink/80 flex items-start gap-2">
+                      <ChevronRight className="w-5 h-5 text-boomer-red mt-1 flex-shrink-0" />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))}
         </div>
@@ -804,48 +871,54 @@ export function Slide18Categories({ pageNumber, totalPages }: { pageNumber: numb
 }
 
 /* ============================================================
- * 第 19 页 — 翻筐乐 杀手锏
+ * 第 19 页 — 翻筐乐（红底 + 实拍背景）
  * ============================================================ */
 export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="red" chapter="04 · 核心商业模式">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -right-20 chapter-num text-paper-cream/15">FUN</div>
-        <div className="absolute bottom-0 left-0 w-full h-32 dots-pattern opacity-30" />
+        <div className="absolute bottom-0 left-0 w-full h-32 dots-pattern-cream opacity-30" />
       </div>
 
-      <div className="absolute inset-0 px-32 pt-36 pb-24 flex flex-col">
-        <span className="font-handwrite text-3xl text-paper-cream/80">— Sub-brand Killer —</span>
-        <h1 className="font-display text-8xl font-black text-paper-cream mt-2 mb-2">
-          翻 筐 乐
-        </h1>
-        <div className="font-en text-5xl text-paper-cream/70 mb-12">FLIPPER FUN</div>
+      <div className="absolute inset-0 px-28 pt-36 pb-24 grid grid-cols-12 gap-8">
+        <div className="col-span-7 flex flex-col">
+          <span className="font-handwrite text-4xl text-paper-cream/90">— Sub-brand Killer —</span>
+          <h1 className="font-display text-9xl font-black text-paper-cream mt-2 mb-1 leading-none">
+            翻 筐 乐
+          </h1>
+          <div className="font-en text-6xl text-paper-cream/75 mb-10">FLIPPER FUN</div>
 
-        <div className="grid grid-cols-3 gap-8 mb-10">
-          <div className="bg-paper-cream text-ink vintage-border p-10 text-center">
-            <div className="font-handwrite text-2xl text-boomer-red mb-2">起售价</div>
-            <div className="big-number text-9xl text-boomer-red">¥6.9</div>
-            <div className="font-body text-xl mt-2">极致低消费门槛</div>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-paper-cream text-ink vintage-border-soft p-6 text-center rotate-[-1deg]">
+              <div className="font-handwrite text-xl text-boomer-red mb-1">起售价</div>
+              <div className="mega-number text-7xl text-boomer-red">¥6.9</div>
+              <div className="font-body text-base mt-2">极致低门槛</div>
+            </div>
+            <div className="bg-vintage-gold text-ink vintage-border-soft p-6 text-center rotate-[1deg]">
+              <div className="font-handwrite text-xl text-boomer-red mb-1">停留时长</div>
+              <div className="mega-number text-7xl text-boomer-red">45<span className="text-3xl">-90</span></div>
+              <div className="font-body text-base mt-2">分钟 / 人次</div>
+            </div>
+            <div className="bg-paper-cream text-ink vintage-border-soft p-6 text-center rotate-[-1deg]">
+              <div className="font-handwrite text-xl text-boomer-red mb-1">UGC 内容</div>
+              <div className="mega-number text-7xl text-boomer-red">∞</div>
+              <div className="font-body text-base mt-2">最具传播力</div>
+            </div>
           </div>
-          <div className="bg-paper-cream text-ink vintage-border p-10 text-center">
-            <div className="font-handwrite text-2xl text-boomer-red mb-2">停留时长</div>
-            <div className="big-number text-9xl text-boomer-red">45<span className="text-5xl">-90</span></div>
-            <div className="font-body text-xl mt-2">分 钟 / 人 次</div>
-          </div>
-          <div className="bg-paper-cream text-ink vintage-border p-10 text-center">
-            <div className="font-handwrite text-2xl text-boomer-red mb-2">UGC 内容</div>
-            <div className="big-number text-9xl text-boomer-red">∞</div>
-            <div className="font-body text-xl mt-2">最具传播力体验环节</div>
+
+          <div className="bg-paper-cream text-ink p-6 vintage-border-soft">
+            <p className="font-display text-2xl leading-relaxed">
+              <Quote className="inline w-7 h-7 text-boomer-red mr-2" />
+              统一低价 + 木筐自由翻找 — 大量用户在小红书、抖音
+              <span className="text-boomer-red font-black highlight-yellow">自发发布翻筐视频</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-ink text-paper-cream p-8 vintage-border-red">
-          <p className="font-display text-3xl leading-relaxed">
-            <Quote className="inline w-8 h-8 text-boomer-red mr-3" />
-            统一低价 + 木筐自由翻找，极大降低消费门槛 ——
-            大量用户在小红书、抖音自发发布翻筐视频，形成
-            <span className="text-boomer-red font-black">强大的 UGC 内容矩阵</span>。
-          </p>
+        <div className="col-span-5 flex flex-col gap-5 justify-center">
+          <img src={photoCups} alt="翻筐乐" className="w-full h-[280px] object-cover photo-vintage rotate-[2deg]" />
+          <img src={photoPikachu} alt="翻筐乐" className="w-full h-[280px] object-cover photo-vintage rotate-[-2deg]" />
         </div>
       </div>
     </SlideShell>
@@ -853,36 +926,36 @@ export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: numb
 }
 
 /* ============================================================
- * 第 20 页 — VERITAS-CHAIN 区块链溯源
+ * 第 20 页 — VERITAS-CHAIN
  * ============================================================ */
 export function Slide20Veritas({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const steps = ["源头收购", "鉴定", "清洗", "评级", "上链", "包装"];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="05 · BOVAS 信任体系">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <div className="flex items-baseline justify-between mb-2">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <div className="flex items-baseline justify-between mb-3">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">BOVAS · Part 1</span>
+            <span className="font-handwrite text-4xl text-boomer-red">BOVAS · Part 1</span>
             <h1 className="font-display text-6xl font-black mt-1">
               VERITAS-CHAIN <span className="text-boomer-red">区块链溯源</span>
             </h1>
           </div>
-          <div className="stamp-red text-2xl">开 发 中</div>
+          <div className="stamp-red text-3xl">开 发 中</div>
         </div>
-        <p className="font-body text-2xl text-ink/65 mb-10">每一件高价值商品配备 NFC 芯片专属红色吊牌 · 全流程上链可查</p>
+        <p className="font-body text-2xl text-ink/70 mb-10">每件高价值商品配备 NFC 芯片专属红色吊牌 · 全流程上链可查</p>
 
         <div className="bg-paper-cream vintage-border p-10 mb-8">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-3">
             {steps.map((s, i) => (
               <div key={s} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
-                  <div className="w-20 h-20 rounded-full bg-boomer-red text-paper-cream flex items-center justify-center font-en text-3xl mb-3">
+                  <div className="w-24 h-24 rounded-full bg-boomer-red text-paper-cream flex items-center justify-center font-en text-4xl mb-3 vintage-border-soft">
                     {i + 1}
                   </div>
                   <div className="font-display text-2xl font-bold">{s}</div>
                 </div>
                 {i < steps.length - 1 && (
-                  <ChevronRight className="w-10 h-10 text-boomer-red flex-shrink-0" strokeWidth={3} />
+                  <ChevronRight className="w-12 h-12 text-boomer-red flex-shrink-0" strokeWidth={3} />
                 )}
               </div>
             ))}
@@ -890,20 +963,20 @@ export function Slide20Veritas({ pageNumber, totalPages }: { pageNumber: number;
         </div>
 
         <div className="grid grid-cols-3 gap-6">
-          <div className="bg-ink text-paper-cream p-8 vintage-border-red">
-            <Shield className="w-12 h-12 text-boomer-red mb-3" />
-            <div className="font-display text-2xl font-bold mb-2">NFC 红色吊牌</div>
-            <div className="font-body text-lg text-paper-cream/70">扫码即可查看商品「前世今生」</div>
+          <div className="bg-vintage-gold p-8 vintage-border rotate-[-0.5deg]">
+            <Shield className="w-14 h-14 text-boomer-red mb-3" strokeWidth={2.5} />
+            <div className="font-display text-3xl font-black mb-2">NFC 红色吊牌</div>
+            <div className="font-body text-xl text-ink/80">扫码即可查看商品「前世今生」</div>
           </div>
           <div className="bg-paper-cream p-8 vintage-border">
-            <BadgeCheck className="w-12 h-12 text-boomer-red mb-3" />
-            <div className="font-display text-2xl font-bold mb-2">全流程视频记录</div>
-            <div className="font-body text-lg text-ink/70">鉴定到包装，全程上链可追溯</div>
+            <BadgeCheck className="w-14 h-14 text-boomer-red mb-3" strokeWidth={2.5} />
+            <div className="font-display text-3xl font-black mb-2">全流程视频</div>
+            <div className="font-body text-xl text-ink/75">鉴定到包装全程上链可追溯</div>
           </div>
-          <div className="bg-boomer-red text-paper-cream p-8 vintage-border">
-            <Sparkles className="w-12 h-12 mb-3" />
-            <div className="font-display text-2xl font-bold mb-2">行业开创性</div>
-            <div className="font-body text-lg text-paper-cream/85">消除来源与品质疑虑</div>
+          <div className="bg-boomer-red text-paper-cream p-8 vintage-border rotate-[0.5deg]">
+            <Sparkles className="w-14 h-14 mb-3" strokeWidth={2.5} />
+            <div className="font-display text-3xl font-black mb-2">行业开创性</div>
+            <div className="font-body text-xl text-paper-cream/90">消除来源与品质疑虑</div>
           </div>
         </div>
       </div>
@@ -917,39 +990,43 @@ export function Slide20Veritas({ pageNumber, totalPages }: { pageNumber: number;
 export function Slide21Aesthetica({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const grades = [
     { g: "N", name: "New / Unused", desc: "全新未使用", color: "bg-boomer-red text-paper-cream" },
-    { g: "S", name: "Mint Condition", desc: "极品微痕", color: "bg-vintage-gold text-ink" },
-    { g: "A", name: "Excellent", desc: "优良品相", color: "bg-vintage-moss text-paper-cream" },
-    { g: "B", name: "Good", desc: "良好品相", color: "bg-paper-cream text-ink" },
-    { g: "C", name: "Fair", desc: "岁月痕迹", color: "bg-paper-deep text-ink" },
-    { g: "J", name: "Junk / Parts", desc: "战损 / 配件", color: "bg-ink text-paper-cream" },
+    { g: "S", name: "Mint Condition", desc: "极品微痕", color: "bg-vintage-gold" },
+    { g: "A", name: "Excellent", desc: "优良品相", color: "bg-vintage-coral text-paper-cream" },
+    { g: "B", name: "Good", desc: "良好品相", color: "bg-paper-cream" },
+    { g: "C", name: "Fair", desc: "岁月痕迹", color: "bg-paper-warm" },
+    { g: "J", name: "Junk / Parts", desc: "战损 / 配件", color: "bg-paper-sand" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="05 · BOVAS 信任体系">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <div className="flex items-baseline justify-between mb-2">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <div className="flex items-baseline justify-between mb-3">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">BOVAS · Part 2</span>
+            <span className="font-handwrite text-4xl text-boomer-red">BOVAS · Part 2</span>
             <h1 className="font-display text-6xl font-black mt-1">
               AESTHETICA <span className="text-boomer-red">6 级品相评级</span>
             </h1>
           </div>
-          <div className="stamp-red text-2xl">开 发 中</div>
+          <div className="stamp-red text-3xl">开 发 中</div>
         </div>
-        <p className="font-body text-2xl text-ink/65 mb-10">引入日本最严苛的评级体系 · 明码标价 · 一目了然</p>
+        <p className="font-body text-2xl text-ink/70 mb-10">引入日本最严苛的评级体系 · 明码标价 · 一目了然</p>
 
         <div className="grid grid-cols-6 gap-4">
-          {grades.map((g) => (
-            <div key={g.g} className={`vintage-border ${g.color} p-6 flex flex-col items-center text-center`}>
-              <div className="font-en text-9xl leading-none mb-3">{g.g}</div>
+          {grades.map((g, i) => (
+            <div
+              key={g.g}
+              className={`vintage-border ${g.color} p-6 flex flex-col items-center text-center ${i % 2 === 0 ? "rotate-[-1deg]" : "rotate-[1deg]"}`}
+            >
+              <div className="font-en text-[8rem] leading-none mb-3">{g.g}</div>
               <div className="font-condensed text-lg tracking-wider opacity-80 mb-1">{g.name}</div>
-              <div className="font-display text-xl font-bold">{g.desc}</div>
+              <div className="font-display text-2xl font-bold">{g.desc}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-10 bg-boomer-red text-paper-cream p-8 vintage-border">
           <p className="font-display text-3xl text-center">
-            从源头到终端的全链路信任机制 — 解决中国消费者对二手商品的<span className="font-handwrite text-4xl text-vintage-gold">「信任痛点」</span>
+            从源头到终端的全链路信任机制 — 解决中国消费者对二手商品的
+            <span className="font-handwrite text-4xl text-vintage-gold">「信任痛点」</span>
           </p>
         </div>
       </div>
@@ -962,28 +1039,28 @@ export function Slide21Aesthetica({ pageNumber, totalPages }: { pageNumber: numb
  * ============================================================ */
 export function Slide22Value({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const values = [
-    { icon: Users, num: "01", title: "极具粘性的目的性消费客流", desc: "孤品属性 + 寻宝体验 = 高复购、高频次。10 万+ 累计客流持续验证。", color: "bg-paper-cream" },
-    { icon: Zap, num: "02", title: "延长顾客停留时间 · 带动连带消费", desc: "10,000+ SKU 高密度陈列 + 唱片 + Gameboy + DIY，停留时长 45-90 分钟。", color: "bg-vintage-gold" },
-    { icon: TrendingUp, num: "03", title: "社交媒体的自发传播引擎", desc: "首店全网曝光 300 万+，大众点评 No.1，全部为零付费自发传播。", color: "bg-boomer-red text-paper-cream" },
-    { icon: Award, num: "04", title: "差异化业态 · 提升商圈调性与口碑", desc: "「招商终于有品位了」「商场终于有了有趣的店」— 真实用户评价。", color: "bg-ink text-paper-cream" },
+    { icon: Users, num: "01", title: "高粘性目的性消费客流", desc: "孤品属性 + 寻宝体验 = 高复购、高频次。10 万+ 累计客流持续验证。", color: "bg-paper-cream", rotate: "rotate-[-1deg]" },
+    { icon: Zap, num: "02", title: "延长停留 · 带动连带消费", desc: "10,000+ SKU 高密度陈列 + 唱片 + Gameboy + DIY，停留 45-90 分钟。", color: "bg-vintage-gold", rotate: "rotate-[1deg]" },
+    { icon: TrendingUp, num: "03", title: "社交媒体自发传播引擎", desc: "首店全网曝光 300 万+，大众点评 No.1，全部为零付费自发传播。", color: "bg-boomer-red text-paper-cream", rotate: "rotate-[1deg]" },
+    { icon: Award, num: "04", title: "提升商圈调性与口碑", desc: "「招商终于有品位了」「商场终于有了有趣的店」— 真实用户评价。", color: "bg-vintage-coral text-paper-cream", rotate: "rotate-[-1deg]" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="06 · BOOMER OFF 的核心价值">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <span className="font-handwrite text-3xl text-boomer-red">Why BOOMER OFF</span>
-        <h1 className="font-display text-6xl font-black mt-1 mb-10">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <span className="font-handwrite text-4xl text-boomer-red">Why BOOMER OFF</span>
+        <h1 className="font-display text-7xl font-black mt-2 mb-10">
           BOOMER OFF 的<span className="text-boomer-red">四大核心价值</span>
         </h1>
 
         <div className="grid grid-cols-2 gap-6">
           {values.map((v) => (
-            <div key={v.num} className={`vintage-border p-8 ${v.color}`}>
+            <div key={v.num} className={`vintage-border p-8 ${v.color} ${v.rotate}`}>
               <div className="flex items-start justify-between mb-4">
-                <v.icon className="w-14 h-14" strokeWidth={2} />
-                <div className="font-en text-7xl opacity-30 leading-none">{v.num}</div>
+                <v.icon className="w-16 h-16" strokeWidth={2} />
+                <div className="font-en text-8xl opacity-30 leading-none">{v.num}</div>
               </div>
-              <div className="font-display text-3xl font-black mb-3 leading-tight">{v.title}</div>
-              <div className="font-body text-lg leading-relaxed opacity-85">{v.desc}</div>
+              <div className="font-display text-4xl font-black mb-3 leading-tight">{v.title}</div>
+              <div className="font-body text-xl leading-relaxed opacity-90">{v.desc}</div>
             </div>
           ))}
         </div>
@@ -993,38 +1070,40 @@ export function Slide22Value({ pageNumber, totalPages }: { pageNumber: number; t
 }
 
 /* ============================================================
- * 第 23 页 — 价值数据汇总
+ * 第 23 页 — 数据见真章（去黑色）
  * ============================================================ */
 export function Slide23Wall({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="ink" chapter="06 · BOOMER OFF 的核心价值">
-      <div className="absolute inset-0 px-32 pt-36 pb-24 flex flex-col">
-        <span className="font-handwrite text-3xl text-boomer-red mb-2">Numbers Speak</span>
-        <h1 className="font-display text-7xl font-black text-paper-cream mb-12">数 据 见 真 章</h1>
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="warm" chapter="06 · BOOMER OFF 的核心价值">
+      <div className="absolute inset-0 px-28 pt-36 pb-24 flex flex-col">
+        <span className="font-handwrite text-4xl text-boomer-red mb-2">Numbers Speak</span>
+        <h1 className="font-display text-8xl font-black mb-10">
+          数 据 见 <span className="text-boomer-red">真 章</span>
+        </h1>
 
-        <div className="flex-1 grid grid-cols-4 grid-rows-2 gap-6">
-          <div className="col-span-2 row-span-2 bg-boomer-red text-paper-cream vintage-border p-12 flex flex-col justify-between">
-            <div className="font-handwrite text-3xl">全网曝光</div>
+        <div className="flex-1 grid grid-cols-4 grid-rows-2 gap-5">
+          <div className="col-span-2 row-span-2 bg-boomer-red text-paper-cream vintage-border p-12 flex flex-col justify-between rotate-[-0.5deg]">
+            <div className="font-handwrite text-4xl">全网曝光</div>
             <div>
-              <div className="big-number text-[12rem] leading-none">300<span className="text-6xl">万+</span></div>
+              <div className="mega-number text-[14rem] leading-none">300<span className="text-7xl">万+</span></div>
               <div className="font-display text-3xl mt-3">零付费 · 自然传播</div>
             </div>
           </div>
-          <div className="bg-paper-cream text-ink vintage-border-red p-8 flex flex-col justify-between">
+          <div className="bg-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[1deg]">
             <div className="font-handwrite text-2xl text-boomer-red">累计客流</div>
-            <div className="big-number text-7xl text-boomer-red">10<span className="text-3xl">万+</span></div>
+            <div className="mega-number text-7xl text-boomer-red">10<span className="text-3xl">万+</span></div>
           </div>
-          <div className="bg-vintage-gold text-ink vintage-border-red p-8 flex flex-col justify-between">
+          <div className="bg-vintage-gold vintage-border-red p-7 flex flex-col justify-between rotate-[-1deg]">
             <div className="font-handwrite text-2xl">单店 SKU</div>
-            <div className="big-number text-7xl">10K<span className="text-3xl">+</span></div>
+            <div className="mega-number text-7xl">10K<span className="text-3xl">+</span></div>
           </div>
-          <div className="bg-paper-cream text-ink vintage-border-red p-8 flex flex-col justify-between">
+          <div className="bg-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[-1deg]">
             <div className="font-handwrite text-2xl text-boomer-red">起售价</div>
-            <div className="big-number text-7xl text-boomer-red">¥6.9</div>
+            <div className="mega-number text-7xl text-boomer-red">¥6.9</div>
           </div>
-          <div className="bg-vintage-moss text-paper-cream vintage-border-red p-8 flex flex-col justify-between">
+          <div className="bg-vintage-coral text-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[1deg]">
             <div className="font-handwrite text-2xl">月均打卡</div>
-            <div className="big-number text-7xl">1K<span className="text-3xl">+</span></div>
+            <div className="mega-number text-7xl">1K<span className="text-3xl">+</span></div>
           </div>
         </div>
       </div>
@@ -1037,36 +1116,36 @@ export function Slide23Wall({ pageNumber, totalPages }: { pageNumber: number; to
  * ============================================================ */
 export function Slide24Cooperation({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const conditions = [
-    { label: "目标面积", value: "80 - 100 ㎡", icon: Store },
-    { label: "楼层要求", value: "B1 层 或 1F", icon: Building2, sub: "高人流量楼层" },
-    { label: "铺位条件", value: "需基础装修", icon: HomeIcon, sub: "暂不接受毛胚铺位" },
-    { label: "工程条件", value: "常规商业用电 + 网络", icon: Zap, sub: "无特殊排烟 / 上下水" },
-    { label: "合作模式", value: "销售额扣点", icon: BadgeCheck, sub: "按月销售额约定比例结算" },
+    { label: "目标面积", value: "80 - 100 ㎡", icon: Store, color: "bg-paper-cream" },
+    { label: "楼层要求", value: "B1 层 或 1F", icon: Building2, sub: "高人流量楼层", color: "bg-vintage-gold" },
+    { label: "铺位条件", value: "需基础装修", icon: HomeIcon, sub: "暂不接受毛胚铺位", color: "bg-paper-cream" },
+    { label: "工程条件", value: "常规商业用电+网络", icon: Zap, sub: "无特殊排烟/上下水", color: "bg-vintage-coral text-paper-cream" },
+    { label: "合作模式", value: "销售额扣点", icon: BadgeCheck, sub: "按月销售额约定比例", color: "bg-boomer-red text-paper-cream" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="07 · 门店模型与合作">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <span className="font-handwrite text-3xl text-boomer-red">Partnership Conditions</span>
-        <h1 className="font-display text-6xl font-black mt-1 mb-10">
-          标准店 <span className="text-boomer-red">BOOMER OFF Vintage</span> · 合作条件
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <span className="font-handwrite text-4xl text-boomer-red">Partnership Conditions</span>
+        <h1 className="font-display text-7xl font-black mt-2 mb-10 leading-tight">
+          标准店 <span className="text-boomer-red">Vintage</span> · 合作条件
         </h1>
 
         <div className="grid grid-cols-5 gap-5 mb-8">
-          {conditions.map((c) => (
-            <div key={c.label} className="bg-paper-cream vintage-border p-6 flex flex-col">
-              <c.icon className="w-12 h-12 text-boomer-red mb-4" strokeWidth={2.5} />
-              <div className="font-handwrite text-xl text-ink/60 mb-1">{c.label}</div>
-              <div className="font-display text-2xl font-black mb-2 leading-tight">{c.value}</div>
-              {c.sub && <div className="font-body text-sm text-ink/60 mt-auto">{c.sub}</div>}
+          {conditions.map((c, i) => (
+            <div key={c.label} className={`vintage-border p-6 flex flex-col ${c.color} ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+              <c.icon className="w-14 h-14 mb-4" strokeWidth={2.5} />
+              <div className="font-handwrite text-2xl opacity-70 mb-1">{c.label}</div>
+              <div className="font-display text-3xl font-black mb-2 leading-tight">{c.value}</div>
+              {c.sub && <div className="font-body text-base opacity-75 mt-auto">{c.sub}</div>}
             </div>
           ))}
         </div>
 
-        <div className="bg-ink text-paper-cream p-10 vintage-border-red">
+        <div className="bg-boomer-red text-paper-cream p-10 vintage-border">
           <p className="font-display text-3xl leading-relaxed">
-            <span className="text-boomer-red font-black">高频次 · 高粘性</span>的流量型业态，采用销售额扣点模式实现深度利益绑定 ——
-            <span className="font-handwrite text-4xl text-vintage-gold"> 品牌销售越好，合作方收益越高，</span>
-            双方共同成长。工程条件极低，可<span className="text-boomer-red font-black">快速入驻、快速开业</span>。
+            <span className="font-black highlight-yellow text-ink">高频次 · 高粘性</span>的流量型业态，销售额扣点模式实现深度利益绑定 ——
+            <span className="font-handwrite text-4xl text-vintage-gold ml-2">品牌销售越好，合作方收益越高</span>
+            ，可<span className="font-black">快速入驻、快速开业</span>。
           </p>
         </div>
       </div>
@@ -1082,30 +1161,30 @@ export function Slide26Matrix1({ pageNumber, totalPages }: { pageNumber: number;
     { name: "Vintage", icon: Store, area: "80-100㎡", tag: "标准商场店", desc: "全品类中古杂货铺，已验证流量模型，快速复制核心店型", main: true },
     { name: "Home", icon: HomeIcon, area: "80-150㎡", tag: "家居垂直", desc: "瓷器、毛巾、丝巾、摆件、家具、线香等家居二手商品" },
     { name: "Hobby", icon: Gamepad2, area: "80-150㎡", tag: "兴趣爱好", desc: "玩具、卡牌、手办、二次元、黑胶、CD、磁带、书籍" },
-    { name: "Collection", icon: ShoppingBag, area: "80-200㎡", tag: "高端二奢", desc: "一线高端商场，时尚箱包/服饰/收藏品，数千至十几万元定价" },
+    { name: "Collection", icon: ShoppingBag, area: "80-200㎡", tag: "高端二奢", desc: "一线高端商场，时尚箱包/服饰/收藏品，数千至十几万元" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="08 · 品牌矩阵与未来">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">Brand Matrix · 1/2</span>
+            <span className="font-handwrite text-4xl text-boomer-red">Brand Matrix · 1/2</span>
             <h1 className="font-display text-6xl font-black mt-1">七大店型布局 <span className="text-boomer-red">[ 上 ]</span></h1>
           </div>
-          <div className="font-handwrite text-3xl text-ink/50 rotate-[-2deg]">不止一家店</div>
+          <div className="font-handwrite text-4xl text-ink/55 rotate-[-2deg]">不止一家店</div>
         </div>
 
         <div className="grid grid-cols-4 gap-5">
-          {stores.map((s) => (
-            <div key={s.name} className={`vintage-border p-7 ${s.main ? "bg-boomer-red text-paper-cream" : "bg-paper-cream"} flex flex-col`}>
-              <s.icon className={`w-12 h-12 ${s.main ? "text-paper-cream" : "text-boomer-red"} mb-4`} strokeWidth={2.5} />
-              <div className={`font-condensed text-lg tracking-widest mb-1 ${s.main ? "text-paper-cream/80" : "text-ink/50"}`}>BOOMER OFF</div>
-              <div className="font-en text-5xl mb-2 leading-none">{s.name}</div>
-              <div className={`font-display text-xl font-bold mb-2 ${s.main ? "text-paper-cream" : "text-boomer-red"}`}>{s.tag}</div>
-              <div className={`font-body text-base mb-3 ${s.main ? "text-paper-cream/85" : "text-ink/70"}`}>面积 · {s.area}</div>
-              <div className={`font-body text-sm leading-snug ${s.main ? "text-paper-cream/85" : "text-ink/65"} flex-1`}>{s.desc}</div>
+          {stores.map((s, i) => (
+            <div key={s.name} className={`vintage-border p-7 ${s.main ? "bg-boomer-red text-paper-cream" : "bg-paper-cream"} flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+              <s.icon className={`w-14 h-14 ${s.main ? "text-paper-cream" : "text-boomer-red"} mb-4`} strokeWidth={2.5} />
+              <div className={`font-condensed text-base tracking-widest mb-1 ${s.main ? "text-paper-cream/85" : "text-ink/55"}`}>BOOMER OFF</div>
+              <div className="font-en text-6xl mb-2 leading-none">{s.name}</div>
+              <div className={`font-display text-2xl font-bold mb-2 ${s.main ? "text-paper-cream" : "text-boomer-red"}`}>{s.tag}</div>
+              <div className={`font-body text-lg mb-3 font-bold ${s.main ? "text-paper-cream/90" : "text-ink/75"}`}>面积 · {s.area}</div>
+              <div className={`font-body text-base leading-snug ${s.main ? "text-paper-cream/85" : "text-ink/70"} flex-1`}>{s.desc}</div>
               {s.main && (
-                <div className="mt-4 inline-block bg-paper-cream text-boomer-red px-3 py-1 font-display text-sm font-black w-fit">★ 核心店型</div>
+                <div className="mt-4 inline-block bg-vintage-gold text-ink px-3 py-1 font-display text-base font-black w-fit">★ 核心店型</div>
               )}
             </div>
           ))}
@@ -1120,37 +1199,36 @@ export function Slide26Matrix1({ pageNumber, totalPages }: { pageNumber: number;
  * ============================================================ */
 export function Slide27Matrix2({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const stores = [
-    { name: "Digital", icon: Smartphone, area: "80-150㎡", tag: "数码家电", desc: "中古数码、二手家电、手机设备、3C 配件等全品类数码家电产品" },
-    { name: "NB", icon: Coffee, area: "30-60㎡", tag: "Neighborhood 社区店", desc: "辐射社区，标准化二手交换/寄售 + 自营中古品，社区二手循环站与私域中心" },
-    { name: "Plus", icon: Warehouse, area: "1,000㎡+", tag: "大型特卖", desc: "选址郊区，承接所有连锁店滞销商品的最终清仓出口，淘宝薅羊毛好去处" },
+    { name: "Digital", icon: Smartphone, area: "80-150㎡", tag: "数码家电", desc: "中古数码、二手家电、手机设备、3C 配件等全品类数码家电产品", color: "bg-vintage-gold" },
+    { name: "NB", icon: Coffee, area: "30-60㎡", tag: "Neighborhood 社区店", desc: "辐射社区，标准化二手交换/寄售 + 自营中古品，社区二手循环站", color: "bg-paper-cream" },
+    { name: "Plus", icon: Warehouse, area: "1,000㎡+", tag: "大型特卖", desc: "选址郊区，承接所有连锁店滞销商品的最终清仓出口", color: "bg-vintage-coral text-paper-cream" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="08 · 品牌矩阵与未来">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <span className="font-handwrite text-3xl text-boomer-red">Brand Matrix · 2/2</span>
+            <span className="font-handwrite text-4xl text-boomer-red">Brand Matrix · 2/2</span>
             <h1 className="font-display text-6xl font-black mt-1">七大店型布局 <span className="text-boomer-red">[ 下 ]</span></h1>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-6 mb-10">
-          {stores.map((s) => (
-            <div key={s.name} className="vintage-border p-8 bg-paper-cream flex flex-col">
-              <s.icon className="w-12 h-12 text-boomer-red mb-4" strokeWidth={2.5} />
-              <div className="font-condensed text-lg tracking-widest text-ink/50 mb-1">BOOMER OFF</div>
-              <div className="font-en text-5xl mb-2 leading-none">{s.name}</div>
-              <div className="font-display text-xl font-bold mb-2 text-boomer-red">{s.tag}</div>
-              <div className="font-body text-base mb-3 text-ink/70">面积 · {s.area}</div>
-              <div className="font-body text-base leading-snug text-ink/70 flex-1">{s.desc}</div>
+          {stores.map((s, i) => (
+            <div key={s.name} className={`vintage-border p-8 ${s.color} flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+              <s.icon className="w-14 h-14 mb-4" strokeWidth={2.5} />
+              <div className="font-condensed text-base tracking-widest opacity-60 mb-1">BOOMER OFF</div>
+              <div className="font-en text-6xl mb-2 leading-none">{s.name}</div>
+              <div className="font-display text-2xl font-bold mb-2 opacity-85">{s.tag}</div>
+              <div className="font-body text-lg mb-3 font-bold opacity-80">面积 · {s.area}</div>
+              <div className="font-body text-lg leading-snug opacity-80 flex-1">{s.desc}</div>
             </div>
           ))}
         </div>
 
-        <div className="bg-ink text-paper-cream p-8 vintage-border-red">
+        <div className="bg-boomer-red text-paper-cream p-8 vintage-border">
           <p className="font-display text-2xl leading-relaxed text-center">
-            构建<span className="text-boomer-red font-black">「核心商场 → 高端精品 → 垂直深耕 → 数码专营 → 社区渗透 → 郊区特卖」</span>
-            完整布局，全场景全人群覆盖
+            构建<span className="font-handwrite text-3xl text-vintage-gold">「核心商场 → 高端精品 → 垂直深耕 → 数码 → 社区 → 郊区」</span>完整布局
           </p>
         </div>
       </div>
@@ -1163,18 +1241,18 @@ export function Slide27Matrix2({ pageNumber, totalPages }: { pageNumber: number;
  * ============================================================ */
 export function Slide28Flywheel({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const stages = [
-    { stage: "核心城区商场", store: "Vintage", color: "bg-boomer-red text-paper-cream" },
-    { stage: "高端精品", store: "Collection", color: "bg-vintage-gold text-ink" },
-    { stage: "垂直品类", store: "Home / Hobby", color: "bg-vintage-moss text-paper-cream" },
-    { stage: "数码专营", store: "Digital", color: "bg-vintage-navy text-paper-cream" },
-    { stage: "社区渗透", store: "NB", color: "bg-paper-cream text-ink" },
-    { stage: "郊区特卖", store: "Plus", color: "bg-ink text-paper-cream" },
+    { stage: "核心商场", store: "Vintage", color: "bg-boomer-red text-paper-cream" },
+    { stage: "高端精品", store: "Collection", color: "bg-vintage-gold" },
+    { stage: "垂直品类", store: "Home / Hobby", color: "bg-vintage-coral text-paper-cream" },
+    { stage: "数码专营", store: "Digital", color: "bg-paper-cream" },
+    { stage: "社区渗透", store: "NB", color: "bg-vintage-gold" },
+    { stage: "郊区特卖", store: "Plus", color: "bg-boomer-red text-paper-cream" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="08 · 品牌矩阵与未来">
-      <div className="absolute inset-0 px-32 pt-36 pb-24 flex flex-col">
-        <span className="font-handwrite text-3xl text-boomer-red">Growth Flywheel</span>
-        <h1 className="font-display text-6xl font-black mt-1 mb-10">
+      <div className="absolute inset-0 px-28 pt-36 pb-24 flex flex-col">
+        <span className="font-handwrite text-4xl text-boomer-red">Growth Flywheel</span>
+        <h1 className="font-display text-7xl font-black mt-1 mb-10">
           BOOMER OFF <span className="text-boomer-red">长期增长飞轮</span>
         </h1>
 
@@ -1183,13 +1261,13 @@ export function Slide28Flywheel({ pageNumber, totalPages }: { pageNumber: number
             <div className="flex items-stretch gap-3">
               {stages.map((s, i) => (
                 <div key={s.stage} className="flex-1 flex items-center">
-                  <div className={`flex-1 ${s.color} vintage-border p-6 text-center`}>
-                    <div className="font-en text-4xl mb-2">{String(i + 1).padStart(2, "0")}</div>
-                    <div className="font-display text-xl font-bold mb-1">{s.stage}</div>
-                    <div className="font-body text-sm opacity-80">{s.store}</div>
+                  <div className={`flex-1 ${s.color} vintage-border p-6 text-center ${i % 2 === 0 ? "rotate-[-1deg]" : "rotate-[1deg]"}`}>
+                    <div className="font-en text-5xl mb-2">{String(i + 1).padStart(2, "0")}</div>
+                    <div className="font-display text-2xl font-black mb-1">{s.stage}</div>
+                    <div className="font-body text-base opacity-80 font-bold">{s.store}</div>
                   </div>
                   {i < stages.length - 1 && (
-                    <ChevronRight className="w-8 h-8 text-boomer-red mx-1 flex-shrink-0" strokeWidth={3} />
+                    <ChevronRight className="w-10 h-10 text-boomer-red mx-1 flex-shrink-0" strokeWidth={3} />
                   )}
                 </div>
               ))}
@@ -1197,16 +1275,16 @@ export function Slide28Flywheel({ pageNumber, totalPages }: { pageNumber: number
 
             <div className="mt-12 grid grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="big-number text-6xl text-boomer-red mb-2">7</div>
-                <div className="font-display text-xl">店型矩阵</div>
+                <div className="mega-number text-7xl text-boomer-red mb-2">7</div>
+                <div className="font-display text-2xl font-bold">店型矩阵</div>
               </div>
               <div className="text-center">
-                <div className="big-number text-6xl text-boomer-red mb-2">∞</div>
-                <div className="font-display text-xl">城市覆盖</div>
+                <div className="mega-number text-7xl text-boomer-red mb-2">∞</div>
+                <div className="font-display text-2xl font-bold">城市覆盖</div>
               </div>
               <div className="text-center">
-                <div className="big-number text-6xl text-boomer-red mb-2">100%</div>
-                <div className="font-display text-xl">人群覆盖</div>
+                <div className="mega-number text-7xl text-boomer-red mb-2">100%</div>
+                <div className="font-display text-2xl font-bold">人群覆盖</div>
               </div>
             </div>
           </div>
@@ -1217,51 +1295,51 @@ export function Slide28Flywheel({ pageNumber, totalPages }: { pageNumber: number
 }
 
 /* ============================================================
- * 第 29 页 — 联系我们
+ * 第 29 页 — 联系我们（去黑色，改红+米黄）
  * ============================================================ */
 export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="09 · 联系我们">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
         <div className="mb-10">
-          <span className="font-handwrite text-3xl text-boomer-red">Get in Touch</span>
-          <h1 className="font-display text-6xl font-black mt-1">
+          <span className="font-handwrite text-4xl text-boomer-red">Get in Touch</span>
+          <h1 className="font-display text-7xl font-black mt-1 leading-tight">
             期待与您<span className="text-boomer-red">携手同行</span>
           </h1>
-          <p className="font-body text-2xl text-ink/65 mt-3">将关于时间、记忆与惊喜的体验，带给更多城市</p>
+          <p className="font-body text-3xl text-ink/70 mt-3">将关于时间、记忆与惊喜的体验，带给更多城市</p>
         </div>
 
         <div className="grid grid-cols-2 gap-8">
-          <div className="bg-ink text-paper-cream vintage-border-red p-10">
-            <div className="font-handwrite text-3xl text-boomer-red mb-6">— Company —</div>
-            <div className="space-y-5">
+          <div className="bg-vintage-gold vintage-border p-10 rotate-[-1deg]">
+            <div className="font-handwrite text-4xl text-boomer-red mb-6">— Company —</div>
+            <div className="space-y-6">
               <div>
-                <div className="font-condensed text-lg tracking-widest text-paper-cream/60 mb-1">公司名称</div>
-                <div className="font-display text-2xl font-bold">宝暮（上海）品牌管理有限公司</div>
+                <div className="font-condensed text-xl tracking-[0.3em] text-ink/65 mb-2">公司名称</div>
+                <div className="font-display text-3xl font-bold leading-snug">宝暮（上海）品牌管理有限公司</div>
               </div>
               <div>
-                <div className="font-condensed text-lg tracking-widest text-paper-cream/60 mb-1">加盟体验中心</div>
-                <div className="font-display text-xl font-bold leading-snug">上海市闵行区光华路 728 号<br/>728Space C5 栋 3 楼</div>
+                <div className="font-condensed text-xl tracking-[0.3em] text-ink/65 mb-2">加盟体验中心</div>
+                <div className="font-display text-2xl font-bold leading-snug">上海市闵行区光华路 728 号<br/>728Space C5 栋 3 楼</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-boomer-red text-paper-cream vintage-border p-10">
-            <div className="font-handwrite text-3xl text-paper-cream mb-6">— Contact —</div>
-            <div className="space-y-5">
+          <div className="bg-boomer-red text-paper-cream vintage-border p-10 rotate-[1deg]">
+            <div className="font-handwrite text-4xl text-paper-cream mb-6">— Contact —</div>
+            <div className="space-y-6">
               <div>
-                <div className="font-condensed text-lg tracking-widest text-paper-cream/80 mb-1">联系人</div>
-                <div className="font-display text-3xl font-black">潘 瞻 远</div>
+                <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系人</div>
+                <div className="font-display text-5xl font-black">潘 瞻 远</div>
               </div>
               <div>
-                <div className="font-condensed text-lg tracking-widest text-paper-cream/80 mb-1">联系电话</div>
-                <div className="font-en text-5xl flex items-center gap-3">
-                  <Phone className="w-10 h-10" strokeWidth={2.5} />
+                <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系电话</div>
+                <div className="font-en text-6xl flex items-center gap-3">
+                  <Phone className="w-12 h-12" strokeWidth={2.5} />
                   186 5743 3310
                 </div>
               </div>
-              <div className="pt-4 border-t-2 border-paper-cream/30">
-                <div className="font-handwrite text-2xl">欢迎招商 · 加盟 · 品牌合作洽谈</div>
+              <div className="pt-4 border-t-2 border-paper-cream/40">
+                <div className="font-handwrite text-3xl">欢迎招商 · 加盟 · 品牌合作</div>
               </div>
             </div>
           </div>
@@ -1272,47 +1350,48 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
 }
 
 /* ============================================================
- * 第 30 页 — 门店地址
+ * 第 30 页 — 门店地址（去黑色）
  * ============================================================ */
 export function Slide30Stores({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="09 · 联系我们">
-      <div className="absolute inset-0 px-32 pt-36 pb-24">
-        <span className="font-handwrite text-3xl text-boomer-red">Our Stores</span>
-        <h1 className="font-display text-6xl font-black mt-1 mb-10">门 店 地 址</h1>
+      <div className="absolute inset-0 px-28 pt-36 pb-24">
+        <span className="font-handwrite text-4xl text-boomer-red">Our Stores</span>
+        <h1 className="font-display text-7xl font-black mt-1 mb-10">门 店 地 址</h1>
 
         <div className="space-y-6">
-          <div className="bg-paper-cream vintage-border p-10 flex items-center gap-10">
-            <MapPin className="w-20 h-20 text-boomer-red flex-shrink-0" strokeWidth={2} />
+          <div className="bg-paper-cream vintage-border p-10 flex items-center gap-10 rotate-[-0.5deg]">
+            <MapPin className="w-24 h-24 text-boomer-red flex-shrink-0" strokeWidth={2} />
             <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-4 mb-3 flex-wrap">
                 <div className="font-display text-4xl font-black">BOOMER OFF · 中信泰富店</div>
-                <span className="bg-boomer-red text-paper-cream px-4 py-1 font-display text-xl font-bold">营 业 中</span>
+                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold">营 业 中</span>
               </div>
-              <div className="font-body text-2xl text-ink/75">上海市静安区南京西路 1168 号 · 中信泰富广场 B1 层</div>
-              <div className="mt-3 flex gap-6 font-handwrite text-2xl text-boomer-red">
-                <span>★ 大众点评南京西路商圈 No.1</span>
+              <div className="font-body text-2xl text-ink/80 font-bold">上海市静安区南京西路 1168 号 · 中信泰富广场 B1 层</div>
+              <div className="mt-3 flex gap-6 font-handwrite text-3xl text-boomer-red flex-wrap">
+                <span>★ 南京西路商圈 No.1</span>
                 <span>★ 静安区 No.1</span>
                 <span>★ 全上海 No.5</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-ink text-paper-cream vintage-border-red p-10 flex items-center gap-10">
-            <MapPin className="w-20 h-20 text-paper-cream/50 flex-shrink-0" strokeWidth={2} />
+          <div className="bg-vintage-gold vintage-border-red p-10 flex items-center gap-10 rotate-[0.5deg]">
+            <MapPin className="w-24 h-24 text-boomer-red flex-shrink-0" strokeWidth={2} />
             <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-4 mb-3 flex-wrap">
                 <div className="font-display text-4xl font-black">更 多 门 店</div>
-                <span className="bg-vintage-gold text-ink px-4 py-1 font-display text-xl font-bold">筹 备 中</span>
+                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold">筹 备 中</span>
               </div>
-              <div className="font-body text-2xl text-paper-cream/70">敬请期待 · 期待与您共同将首店成功复制到更多城市</div>
+              <div className="font-body text-2xl text-ink/80 font-bold">敬请期待 · 期待与您共同将首店成功复制到更多城市</div>
             </div>
           </div>
         </div>
 
         <div className="mt-10 bg-boomer-red text-paper-cream p-8 vintage-border text-center">
           <p className="font-display text-3xl">
-            正在寻找<span className="font-handwrite text-4xl text-vintage-gold mx-2">志同道合</span>的合作伙伴 — 商业地产 · 投资机构 · 加盟商
+            正在寻找<span className="font-handwrite text-4xl text-vintage-gold mx-2">志同道合</span>的合作伙伴
+            — 商业地产 · 投资机构 · 加盟商
           </p>
         </div>
       </div>
@@ -1325,22 +1404,22 @@ export function Slide30Stores({ pageNumber, totalPages }: { pageNumber: number; 
  * ============================================================ */
 export function Slide31Slogan({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="red" showHeader noFooter={false}>
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="red">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[800px] h-[800px] dots-pattern opacity-15" />
+        <div className="absolute -top-40 -right-40 w-[900px] h-[900px] dots-pattern-cream opacity-20" />
         <div className="absolute bottom-0 left-0 w-full h-1/3 lines-pattern opacity-30" />
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-32">
-        <img src={logo} alt="BOOMER OFF" className="w-[700px] mb-16 brightness-0 invert" />
-        <div className="border-y-4 border-paper-cream py-10 px-20">
-          <div className="font-display text-9xl font-black text-paper-cream text-center leading-tight">
+        <img src={logo} alt="BOOMER OFF" className="w-[760px] mb-14 brightness-0 invert" />
+        <div className="border-y-[6px] border-paper-cream py-12 px-24">
+          <div className="font-display text-[10rem] font-black text-paper-cream text-center leading-none">
             虽 古 但 新
           </div>
-          <div className="font-display text-9xl font-black text-paper-cream text-center leading-tight mt-4">
+          <div className="font-display text-[10rem] font-black text-paper-cream text-center leading-none mt-6">
             信 任 可 见
           </div>
         </div>
-        <div className="font-handwrite text-4xl text-paper-cream/80 mt-12">
+        <div className="font-handwrite text-5xl text-paper-cream/85 mt-12">
           — Vintage but Brand New, Trust Made Visible —
         </div>
       </div>
@@ -1349,36 +1428,36 @@ export function Slide31Slogan({ pageNumber, totalPages }: { pageNumber: number; 
 }
 
 /* ============================================================
- * 第 32 页 — 致谢/合作邀请
+ * 第 32 页 — 致谢
  * ============================================================ */
 export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" noFooter>
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] dots-pattern-red opacity-40" />
-        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] dots-pattern opacity-30" />
+        <div className="absolute top-1/4 -left-20 w-[700px] h-[700px] dots-pattern-red opacity-40" />
+        <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] dots-pattern opacity-30" />
       </div>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center px-32 text-center">
-        <div className="font-en text-[14rem] text-boomer-red leading-none mb-4">THANK</div>
-        <div className="font-en text-[14rem] text-ink leading-none mb-12">YOU</div>
+        <div className="font-en text-[16rem] text-boomer-red leading-none mb-2">THANK</div>
+        <div className="font-en text-[16rem] text-ink leading-none mb-12">YOU</div>
 
-        <div className="font-display text-4xl text-ink/85 mb-2">欢 迎 招 商 · 加 盟 · 品 牌 合 作 洽 谈</div>
-        <div className="font-handwrite text-3xl text-boomer-red mb-12">we look forward to hearing from you</div>
+        <div className="font-display text-5xl text-ink/85 mb-3">欢 迎 招 商 · 加 盟 · 品 牌 合 作 洽 谈</div>
+        <div className="font-handwrite text-4xl text-boomer-red mb-12">we look forward to hearing from you</div>
 
         <div className="flex items-center gap-12">
           <div className="text-left">
-            <div className="font-handwrite text-2xl text-ink/60">Contact</div>
-            <div className="font-display text-3xl font-black">潘瞻远 · 18657433310</div>
+            <div className="font-handwrite text-3xl text-ink/65">Contact</div>
+            <div className="font-display text-4xl font-black">潘瞻远 · 18657433310</div>
           </div>
-          <div className="w-[2px] h-16 bg-ink/30" />
+          <div className="w-1 h-20 bg-boomer-red" />
           <div className="text-left">
-            <div className="font-handwrite text-2xl text-ink/60">Brand</div>
-            <div className="font-display text-3xl font-black">BOOMER OFF Vintage</div>
+            <div className="font-handwrite text-3xl text-ink/65">Brand</div>
+            <div className="font-display text-4xl font-black">BOOMER OFF Vintage</div>
           </div>
         </div>
 
-        <img src={logo} alt="BOOMER OFF" className="w-[300px] mt-16 opacity-80" />
+        <img src={logo} alt="BOOMER OFF" className="w-[340px] mt-16 opacity-85" />
       </div>
     </SlideShell>
   );
