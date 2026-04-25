@@ -200,11 +200,11 @@ export function SlideChapter({
         <div className="absolute top-1/3 left-0 w-1/3 h-2/3 lines-pattern opacity-20" />
       </div>
       <div className="absolute inset-0 flex flex-col justify-center px-32">
-        <div className="font-handwrite text-5xl text-paper-cream/90 mb-6">— Chapter {num} —</div>
+        <div className="font-handwrite text-6xl text-paper-cream/90 mb-6">— Chapter {num} —</div>
         <div className="font-en text-[11rem] leading-none text-paper-cream mb-8 drop-shadow-lg">{en}</div>
         <h1 className="font-display text-9xl font-black text-paper-cream mb-10">{title}</h1>
         <div className="w-40 h-2 bg-paper-cream mb-10" />
-        <p className="font-body text-4xl text-paper-cream/90 max-w-[1300px] leading-relaxed">{desc}</p>
+        <p className="font-body text-5xl text-paper-cream max-w-[1500px] leading-relaxed font-medium">{desc}</p>
       </div>
     </SlideShell>
   );
