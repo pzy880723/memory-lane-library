@@ -485,18 +485,18 @@ export function Slide10Problem({ pageNumber, totalPages }: { pageNumber: number;
         <div className="grid grid-cols-3 gap-6 flex-1 items-stretch">
           {/* 左卡 */}
           <div className="vintage-border bg-paper-cream p-8 flex flex-col rotate-[-0.5deg]">
-            <div className="font-condensed text-xl tracking-widest text-ink/55 mb-2">{left.sub}</div>
-            <div className="font-display text-4xl font-black mb-7">{left.title}</div>
-            <ul className="space-y-4 flex-1">
+            <div className="font-condensed text-3xl tracking-widest text-ink/55 mb-2">{left.sub}</div>
+            <div className="font-display text-5xl font-black mb-7">{left.title}</div>
+            <ul className="space-y-5 flex-1">
               {left.pros.map(p => (
-                <li key={p} className="flex items-start gap-3 font-body text-2xl text-ink/85">
-                  <Check className="w-8 h-8 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
+                <li key={p} className="flex items-start gap-3 font-body text-3xl text-ink/85">
+                  <Check className="w-9 h-9 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
                   <span>{p}</span>
                 </li>
               ))}
               {left.cons.map(c => (
-                <li key={c} className="flex items-start gap-3 font-body text-2xl text-ink/45">
-                  <X className="w-8 h-8 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
+                <li key={c} className="flex items-start gap-3 font-body text-3xl text-ink/45">
+                  <X className="w-9 h-9 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
                   <span>{c}</span>
                 </li>
               ))}
@@ -505,33 +505,33 @@ export function Slide10Problem({ pageNumber, totalPages }: { pageNumber: number;
 
           {/* 中卡 - 高亮主推 */}
           <div className="vintage-border bg-boomer-red text-paper-cream p-8 flex flex-col -translate-y-3 shadow-2xl">
-            <div className="font-condensed text-xl tracking-widest text-paper-cream/80 mb-2 text-center">{center.sub}</div>
-            <div className="font-display text-5xl font-black mb-7 text-center">{center.title}</div>
-            <ul className="space-y-4 flex-1">
+            <div className="font-condensed text-3xl tracking-widest text-paper-cream/80 mb-2 text-center">{center.sub}</div>
+            <div className="font-display text-6xl font-black mb-7 text-center">{center.title}</div>
+            <ul className="space-y-5 flex-1">
               {center.pros.map(p => (
-                <li key={p} className="flex items-start gap-3 font-body text-2xl">
-                  <Check className="w-8 h-8 text-paper-cream flex-shrink-0 mt-1" strokeWidth={3} />
+                <li key={p} className="flex items-start gap-3 font-body text-3xl">
+                  <Check className="w-9 h-9 text-paper-cream flex-shrink-0 mt-1" strokeWidth={3} />
                   <span className="font-bold">{p}</span>
                 </li>
               ))}
             </ul>
-            <div className="mt-6 text-center stamp-red text-2xl bg-paper-cream/95 inline-block self-center">★ 推 荐 ★</div>
+            <div className="mt-6 text-center stamp-red text-3xl bg-paper-cream/95 inline-block self-center">★ 推 荐 ★</div>
           </div>
 
           {/* 右卡 */}
           <div className="vintage-border bg-paper-cream p-8 flex flex-col rotate-[0.5deg]">
-            <div className="font-condensed text-xl tracking-widest text-ink/55 mb-2">{right.sub}</div>
-            <div className="font-display text-4xl font-black mb-7">{right.title}</div>
-            <ul className="space-y-4 flex-1">
+            <div className="font-condensed text-3xl tracking-widest text-ink/55 mb-2">{right.sub}</div>
+            <div className="font-display text-5xl font-black mb-7">{right.title}</div>
+            <ul className="space-y-5 flex-1">
               {right.pros.map(p => (
-                <li key={p} className="flex items-start gap-3 font-body text-2xl text-ink/85">
-                  <Check className="w-8 h-8 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
+                <li key={p} className="flex items-start gap-3 font-body text-3xl text-ink/85">
+                  <Check className="w-9 h-9 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
                   <span>{p}</span>
                 </li>
               ))}
               {right.cons.map(c => (
-                <li key={c} className="flex items-start gap-3 font-body text-2xl text-ink/45">
-                  <X className="w-8 h-8 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
+                <li key={c} className="flex items-start gap-3 font-body text-3xl text-ink/45">
+                  <X className="w-9 h-9 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
                   <span>{c}</span>
                 </li>
               ))}
