@@ -605,11 +605,11 @@ export function Slide11Story({ pageNumber, totalPages }: { pageNumber: number; t
  * ============================================================ */
 export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   const personas = [
-    { age: "儿童", icon: "🧸", pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏", color: "bg-paper-cream" },
-    { age: "青少年", icon: "🎒", pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片", color: "bg-vintage-gold" },
-    { age: "都市白领", icon: "📷", pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到", color: "bg-paper-cream" },
-    { age: "中年群体", icon: "🎵", pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱", color: "bg-vintage-coral text-paper-cream" },
-    { age: "老年群体", icon: "🍵", pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具", color: "bg-paper-cream" },
+    { age: "儿童", icon: "🧸", pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏" },
+    { age: "青少年", icon: "🎒", pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片" },
+    { age: "都市白领", icon: "📷", pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到" },
+    { age: "中年群体", icon: "🎵", pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱" },
+    { age: "老年群体", icon: "🍵", pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="02 · 品牌定位与愿景">
@@ -626,13 +626,13 @@ export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number;
 
         <div className="grid grid-cols-5 gap-5">
           {personas.map((p, i) => (
-            <div key={p.age} className={`vintage-border p-7 flex flex-col ${p.color} ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
+            <div key={p.age} className={`vintage-border p-7 flex flex-col bg-paper-cream ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
               <div className="text-8xl mb-4 leading-none">{p.icon}</div>
-              <div className="font-display text-4xl font-black text-boomer-red mb-3">{p.age}</div>
-              <div className="font-body text-lg leading-snug mb-4 flex-1 opacity-85">{p.pref}</div>
-              <div className="border-t-2 border-dashed border-ink/25 pt-3">
-                <div className="font-handwrite text-xl opacity-70">真实案例：</div>
-                <div className="font-body text-base leading-snug opacity-80">{p.case}</div>
+              <div className="font-display text-4xl font-black text-boomer-red mb-4">{p.age}</div>
+              <div className="font-body text-2xl leading-snug mb-5 flex-1 text-ink/85">{p.pref}</div>
+              <div className="border-t-2 border-dashed border-ink/25 pt-4">
+                <div className="font-handwrite text-2xl text-boomer-red mb-1">真实案例：</div>
+                <div className="font-body text-xl leading-snug text-ink/75">{p.case}</div>
               </div>
             </div>
           ))}
