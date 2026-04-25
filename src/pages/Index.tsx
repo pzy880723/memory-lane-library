@@ -262,21 +262,31 @@ const Index = () => {
             forceLandscape
               ? {
                   position: "fixed",
-                  top: 0,
-                  left: "100dvw",
+                  top: "50%",
+                  left: "50%",
                   width: "100dvh",
                   height: "100dvw",
-                  transform: "rotate(90deg)",
-                  transformOrigin: "top left",
+                  transform: "translate(-50%, -50%) rotate(90deg)",
+                  transformOrigin: "center center",
                   zIndex: 9999,
                 }
               : undefined
           }
         >
-          <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
-            <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
+          <div
+            className={
+              forceLandscape
+                ? "absolute inset-0"
+                : "absolute inset-0 flex items-center justify-center p-4 md:p-8"
+            }
+          >
+            {forceLandscape ? (
               <SlideRenderer index={current} />
-            </div>
+            ) : (
+              <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
+                <SlideRenderer index={current} />
+              </div>
+            )}
           </div>
 
           {/* 左右点击区域 */}
