@@ -5,6 +5,7 @@ import {
   Shield, Award, Recycle, Building2, Phone, Star, Quote, ChevronRight,
   Package, Coffee, Headphones, Gift, Store, Home as HomeIcon,
   ShoppingBag, Smartphone, Warehouse, MessageCircle, BadgeCheck, Disc3,
+  Check, X,
 } from "lucide-react";
 
 // 店铺实拍图
@@ -439,55 +440,103 @@ export function Slide08Engine({ pageNumber, totalPages }: { pageNumber: number; 
 }
 
 /* ============================================================
- * 第 10 页 — 解决的问题（三栏对比）
+ * 第 10 页 — 解决的问题（图二式三栏卡片）
  * ============================================================ */
 export function Slide10Problem({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  const rows = [
-    { dim: "陈列方式", a: "标准化货架，整洁有序", b: "主理人审美陈列，好出片", c: "标准化货架 + 层次感陈列" },
-    { dim: "信任感", a: "高：明码标价，品相分级", b: "低：定价不透明", c: "高：透明定价 + 标准化评级" },
-    { dim: "氛围感", a: "低：像大型二手商超", b: "高：设计感强，但杂乱", c: "高：音乐 + 互动 + IP 元素" },
-    { dim: "消费门槛", a: "中等", b: "高：定价虚高", c: "极低：6.9 元起" },
-    { dim: "可复制性", a: "强：标准化流程", b: "弱：依赖主理人", c: "强：标准化体系可快速复制" },
-  ];
+  const left = {
+    sub: "如 Book Off",
+    title: "日本标准化中古店",
+    pros: ["明码标价", "标准化陈列", "可复制性强"],
+    cons: ["缺乏氛围感", "情绪价值低"],
+  };
+  const right = {
+    sub: "主理人个人审美",
+    title: "街边设计师中古店",
+    pros: ["设计感强", "氛围出片"],
+    cons: ["定价不透明", "依赖主理人"],
+  };
+  const center = {
+    sub: "BOOMER OFF",
+    title: "融合模式",
+    pros: [
+      "标准化 + 层次感陈列",
+      "透明定价 + 6 级评级",
+      "沉浸声光 + IP 元素",
+      "6.9 元起 极低门槛",
+      "可复制可加盟",
+    ],
+  };
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="02 · 品牌定位与愿景">
-      <div className="absolute inset-0 px-28 pt-36 pb-24">
-        <div className="mb-6">
-          <span className="font-handwrite text-4xl text-boomer-red">The Problem We Solved</span>
-          <h1 className="font-display text-7xl font-black mt-2">两种中古店模式的<span className="text-boomer-red">融合升级</span></h1>
+      <div className="absolute inset-0 px-24 pt-32 pb-24 flex flex-col">
+        {/* 顶部居中标题 */}
+        <div className="text-center mb-10">
+          <span className="font-handwrite text-3xl text-boomer-red tracking-widest">ダブル DNA · Double Gene</span>
+          <h1 className="font-display text-8xl font-black mt-2 leading-tight">
+            标准化 <span className="text-boomer-red">×</span> 氛围感
+          </h1>
+          <p className="font-body text-2xl text-ink/70 mt-3">
+            首创双基因融合模式 — 既有日式 Book Off 的信任感，又有街边设计师店的情绪价值
+          </p>
         </div>
 
-        <div className="bg-paper-cream vintage-border overflow-hidden">
-          <div className="grid grid-cols-12 bg-paper-warm">
-            <div className="col-span-3 p-6 font-display text-3xl font-bold border-r-2 border-ink/20">对比维度</div>
-            <div className="col-span-3 p-6 border-r-2 border-ink/20">
-              <div className="font-display text-2xl font-bold">日本标准化店</div>
-              <div className="font-body text-lg text-ink/60 mt-1">如 Book Off</div>
-            </div>
-            <div className="col-span-3 p-6 border-r-2 border-ink/20">
-              <div className="font-display text-2xl font-bold">街边设计师店</div>
-              <div className="font-body text-lg text-ink/60 mt-1">主理人小店</div>
-            </div>
-            <div className="col-span-3 p-6 bg-boomer-red text-paper-cream">
-              <div className="font-display text-2xl font-black">BOOMER OFF</div>
-              <div className="font-body text-lg text-paper-cream/85 mt-1">融合模式</div>
-            </div>
+        {/* 三大卡片 */}
+        <div className="grid grid-cols-3 gap-6 flex-1 items-stretch">
+          {/* 左卡 */}
+          <div className="vintage-border bg-paper-cream p-8 flex flex-col rotate-[-0.5deg]">
+            <div className="font-condensed text-xl tracking-widest text-ink/55 mb-2">{left.sub}</div>
+            <div className="font-display text-4xl font-black mb-7">{left.title}</div>
+            <ul className="space-y-4 flex-1">
+              {left.pros.map(p => (
+                <li key={p} className="flex items-start gap-3 font-body text-2xl text-ink/85">
+                  <Check className="w-8 h-8 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
+                  <span>{p}</span>
+                </li>
+              ))}
+              {left.cons.map(c => (
+                <li key={c} className="flex items-start gap-3 font-body text-2xl text-ink/45">
+                  <X className="w-8 h-8 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          {rows.map((r, i) => (
-            <div key={r.dim} className={`grid grid-cols-12 ${i % 2 ? "bg-paper-deep/50" : ""}`}>
-              <div className="col-span-3 p-5 font-display text-2xl font-bold border-r-2 border-ink/10">{r.dim}</div>
-              <div className="col-span-3 p-5 font-body text-xl text-ink/75 border-r-2 border-ink/10">{r.a}</div>
-              <div className="col-span-3 p-5 font-body text-xl text-ink/75 border-r-2 border-ink/10">{r.b}</div>
-              <div className="col-span-3 p-5 font-body text-xl text-ink font-bold bg-boomer-red/15">{r.c}</div>
-            </div>
-          ))}
-        </div>
 
-        <p className="font-body text-2xl text-ink/75 mt-6 leading-relaxed">
-          <span className="font-display text-3xl text-boomer-red font-black">核心创新：</span>
-          用标准化陈列保证<span className="highlight-red font-bold">信任感与可复制性</span>，
-          通过沉浸式体验注入街边店才有的<span className="highlight-yellow font-bold">氛围感与情绪价值</span>。
-        </p>
+          {/* 中卡 - 高亮主推 */}
+          <div className="vintage-border bg-boomer-red text-paper-cream p-8 flex flex-col -translate-y-3 shadow-2xl">
+            <div className="font-condensed text-xl tracking-widest text-paper-cream/80 mb-2 text-center">{center.sub}</div>
+            <div className="font-display text-5xl font-black mb-7 text-center">{center.title}</div>
+            <ul className="space-y-4 flex-1">
+              {center.pros.map(p => (
+                <li key={p} className="flex items-start gap-3 font-body text-2xl">
+                  <Check className="w-8 h-8 text-paper-cream flex-shrink-0 mt-1" strokeWidth={3} />
+                  <span className="font-bold">{p}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-6 text-center stamp-red text-2xl bg-paper-cream/95 inline-block self-center">★ 推 荐 ★</div>
+          </div>
+
+          {/* 右卡 */}
+          <div className="vintage-border bg-paper-cream p-8 flex flex-col rotate-[0.5deg]">
+            <div className="font-condensed text-xl tracking-widest text-ink/55 mb-2">{right.sub}</div>
+            <div className="font-display text-4xl font-black mb-7">{right.title}</div>
+            <ul className="space-y-4 flex-1">
+              {right.pros.map(p => (
+                <li key={p} className="flex items-start gap-3 font-body text-2xl text-ink/85">
+                  <Check className="w-8 h-8 text-boomer-red flex-shrink-0 mt-1" strokeWidth={3} />
+                  <span>{p}</span>
+                </li>
+              ))}
+              {right.cons.map(c => (
+                <li key={c} className="flex items-start gap-3 font-body text-2xl text-ink/45">
+                  <X className="w-8 h-8 text-ink/40 flex-shrink-0 mt-1" strokeWidth={3} />
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </SlideShell>
   );
