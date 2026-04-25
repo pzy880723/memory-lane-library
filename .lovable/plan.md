@@ -1,64 +1,86 @@
 ## 目标
 
-让 **iPhone / iPad Safari** 用户点击「全屏」按钮后，也能获得接近原生全屏的沉浸式幻灯片体验 —— 解决目前 iOS 上点击全屏「无反应」的问题。
+手机用户点击「全屏」按钮时，**自动将幻灯片画面用 CSS 旋转 90° 变成横版**，无需依赖陀螺仪 / 设备旋转 / Screen Orientation API（iOS 不支持）。
+
+用户只需把手机横过来看，即可获得满屏 16:9 的沉浸体验。
 
 ---
 
-## 方案概述：三级降级策略
+## 核心原理
+
+**iOS Safari 不支持 `screen.orientation.lock()`**，因此只能用 **CSS Transform 旋转大法**：
 
 ```
-点击全屏按钮
-    │
-    ├─ 1️⃣ 标准 Fullscreen API        → 桌面浏览器、安卓 Chrome
-    │      ↓ 不支持
-    ├─ 2️⃣ webkitRequestFullscreen   → 老版本 Safari、部分 WebView
-    │      ↓ 不支持
-    └─ 3️⃣ CSS 伪全屏（fixed 铺满）   → iOS Safari ✅
+检测到「手机 + 伪全屏激活」
+   ↓
+把整个幻灯片舞台 transform: rotate(90deg)
+宽 = 视口高度（100dvh）
+高 = 视口宽度（100dvw）
+   ↓
+用户横过手机 = 完美横版全屏
 ```
 
-无论什么设备，按钮都「有反应」，体验一致。
+此方案在 **iOS Safari、安卓 Chrome、微信内置浏览器** 全部生效。
 
 ---
 
-## 具体改动
+## 改动详情
 
-### 1. 修改 `src/pages/Index.tsx`
+### 1. `src/pages/Index.tsx`
 
 **新增状态**：
-- `pseudoFullscreen: boolean` — 标记当前是否处于「伪全屏」模式
+- `forceLandscape: boolean` — 当前是否启用强制横屏旋转
 
-**重写 `toggleFullscreen` 函数**：
-- 优先尝试 `requestFullscreen()`
-- 失败则尝试 `webkitRequestFullscreen()`（带 `any` 类型断言）
-- 都不支持时，切换 `pseudoFullscreen` 状态启用 CSS 伪全屏
-- 退出时同样按顺序处理：`exitFullscreen` → `webkitExitFullscreen` → 关闭伪全屏
+**新增逻辑**：
+- 进入伪全屏 (`pseudoFullscreen === true`) **且** 检测到是手机设备 (`window.innerWidth < 768` 或 `navigator.userAgent` 匹配 `Mobi`) → 自动设置 `forceLandscape = true`
+- 退出伪全屏 → 自动复位 `forceLandscape = false`
+- 监听 `window.resize` 事件，避免设备类型判断失误
 
-**伪全屏视觉效果**（通过条件 className 实现）：
-- 当 `pseudoFullscreen === true` 时：
-  - 整个 `<div className="fixed inset-0">` 容器变为 `z-[9999]`
-  - **隐藏顶部黑色工具栏**（`<header>`）
-  - **隐藏底部页码控制条**和**顶部进度条**
-  - 幻灯片舞台扩展到整个视口
-  - 显示一个**浮动的「退出全屏」小按钮**（右上角，半透明，方便 iOS 用户退出）
-- 使用 `100dvh`（动态视口高度）确保 Safari 地址栏收起后内容自动撑满
+**新增 CSS 样式**（通过条件 className）：
+当 `forceLandscape === true` 时，给舞台容器添加：
+```css
+position: fixed;
+top: 0;
+left: 0;
+width: 100dvh;        /* 宽度 = 视口高度 */
+height: 100dvw;       /* 高度 = 视口宽度 */
+transform: rotate(90deg) translateY(-100dvw);
+transform-origin: top left;
+```
 
-**键盘 ESC 兼容**：
-- 监听 ESC 键，若处于伪全屏模式则退出
+**手势映射修正**：
+- 旋转后用户视觉上的「左右滑」实际是「上下滑」
+- 需要调整 `onTouchStart/onTouchMove` 的方向判断逻辑：当 `forceLandscape === true` 时，把 `deltaY` 当作 `deltaX` 来判断翻页
+
+**退出按钮位置修正**：
+- 旋转后视觉上的「右上角」实际是 DOM 的「右下角」
+- 退出按钮在 `forceLandscape` 时改用 `bottom-4 right-4` 但配合反向旋转保持视觉正确
+
+**横屏提示组件**：
+- 进入强制横屏时显示居中浮层：「📱 请将手机横过来观看」
+- 3 秒后通过 `setTimeout + opacity 过渡` 自动淡出
+- 使用 `useState` 控制显隐 + Tailwind `transition-opacity duration-700`
 
 ---
 
-### 2. 修改 `index.html`
+### 2. 兼容性处理
 
-新增 PWA / iOS 优化 meta 标签：
-- `<meta name="apple-mobile-web-app-capable" content="yes">` — 允许「添加到主屏幕」后无浏览器 UI
-- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` — 状态栏透明
-- 更新 viewport：`<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">` — 支持刘海屏 / 灵动岛
+| 设备 / 场景 | 行为 |
+|------------|------|
+| 桌面浏览器点击全屏 | 真原生全屏，**不旋转** |
+| 安卓 Chrome 点击全屏 | 真原生全屏，**不旋转** |
+| iPhone Safari 点击全屏 | 伪全屏 + **CSS 旋转 90°** |
+| iPad Safari 点击全屏 | 伪全屏 + **不旋转**（屏幕足够大） |
+| 已经横屏的手机 | 仍然旋转（按用户选择「所有手机点全屏都旋转」执行）|
+| 退出全屏 | 旋转自动还原 |
 
 ---
 
-### 3. （可选小增强）横屏提示
+### 3. 不会改动的部分
 
-在伪全屏模式下，若检测到手机**竖屏**，在角落显示一个小提示：「💡 横屏观看体验更佳」，几秒后自动淡出。
+- ✅ 所有幻灯片内容文件（`AllSlides.tsx`、`SlideShell.tsx` 等）零改动
+- ✅ 导出 PDF / PPT 逻辑不受影响（导出走 `SlideStaticRenderer`，不经过旋转）
+- ✅ 桌面端体验完全不变
 
 ---
 
@@ -66,21 +88,18 @@
 
 | 文件 | 改动类型 |
 |------|---------|
-| `src/pages/Index.tsx` | 重构全屏逻辑 + 新增伪全屏样式条件 + 退出按钮 |
-| `index.html` | 增加 iOS PWA meta 标签 |
+| `src/pages/Index.tsx` | 新增 `forceLandscape` 状态、CSS 旋转样式、手势映射修正、横屏提示组件 |
 
-**不会改动** `SlideShell` / `ScaledSlide` / `AllSlides` 等幻灯片内容文件，纯外壳层调整，零风险。
+仅改一个文件，零风险。
 
 ---
 
 ## 验收标准
 
-- ✅ **桌面 Chrome / Edge**：点击全屏 = 真原生全屏（行为不变）
-- ✅ **安卓 Chrome**：点击全屏 = 真原生全屏
-- ✅ **iOS Safari（iPhone）**：点击全屏 = 幻灯片铺满整个屏幕，工具栏全部隐藏，右上角有退出按钮
-- ✅ **iPad Safari**：同上
-- ✅ ESC 键 / 退出按钮可正常退出
-
----
-
-确认后我会切换到执行模式实施这些改动 🚀
+- ✅ **iPhone Safari**：点击全屏 → 画面瞬间旋转成横版铺满屏幕，把手机横过来看 = 完美 16:9 体验
+- ✅ **安卓手机**：同上效果
+- ✅ **横屏滑动翻页方向正确**（视觉上的左右滑 = 翻页）
+- ✅ **「请把手机横过来」提示** 3 秒后自动淡出
+- ✅ **退出按钮**位置在视觉右上角，可正常点击退出
+- ✅ **桌面/iPad** 行为不变
+- ✅ **导出 PDF/PPT** 不受影响
