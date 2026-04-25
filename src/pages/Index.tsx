@@ -147,8 +147,14 @@ const Index = () => {
       <meta property="og:title" content="BOOMER OFF Vintage 品牌手册" />
       <meta property="og:description" content="国内首家标准化中古连锁品牌 — 虽古但新，信任可见" />
 
-      <div className="fixed inset-0 paper-texture flex flex-col">
+      <div
+        className={`fixed inset-0 paper-texture flex flex-col ${
+          pseudoFullscreen ? "z-[9999] bg-ink" : ""
+        }`}
+        style={pseudoFullscreen ? { height: "100dvh" } : undefined}
+      >
         {/* 顶部工具栏 */}
+        {!pseudoFullscreen && (
         <header className="h-16 flex-shrink-0 bg-ink text-paper-cream flex items-center justify-between px-6 border-b-4 border-boomer-red z-30">
           <div className="flex items-center gap-4">
             <Button
