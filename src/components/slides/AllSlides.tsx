@@ -808,8 +808,8 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
 
           {/* 上层 — 精品区（红色调，置于上方） */}
           <div className="vintage-border bg-paper-cream overflow-hidden">
-            <div className="grid grid-cols-12 items-stretch">
-              <div className="col-span-4 bg-boomer-red text-paper-cream p-7 flex flex-col justify-center">
+            <div className="grid grid-cols-12 items-stretch min-h-[280px]">
+              <div className="col-span-4 bg-boomer-red text-paper-cream p-8 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-en text-5xl text-paper-cream/90">01</span>
                   <span className="font-handwrite text-2xl text-paper-cream/85">Upper Floor</span>
@@ -820,7 +820,7 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
               <img
                 src={photoCeramics}
                 alt="精品瓷器"
-                className="col-span-4 w-full h-[230px] object-cover"
+                className="col-span-4 w-full h-[280px] object-cover"
               />
               <div className="col-span-4 p-6 flex flex-col justify-center bg-paper-cream">
                 <div className="font-display text-2xl font-bold mb-3 text-ink">高价值中古商品</div>
@@ -841,8 +841,8 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
 
           {/* 下层 — 翻筐乐区（金色调，置于下方） */}
           <div className="vintage-border-red bg-vintage-gold overflow-hidden">
-            <div className="grid grid-cols-12 items-stretch">
-              <div className="col-span-4 p-7 flex flex-col justify-center">
+            <div className="grid grid-cols-12 items-stretch min-h-[280px]">
+              <div className="col-span-4 p-8 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-en text-5xl text-boomer-red">02</span>
                   <span className="font-handwrite text-2xl text-ink/70">Lower Floor</span>
