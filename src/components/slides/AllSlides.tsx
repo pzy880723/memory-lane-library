@@ -1471,7 +1471,7 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
                 </div>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3">
+                <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3 rounded-2xl">
                   <img src={wechatQR} alt="微信二维码" className="w-44 h-44 object-contain" />
                 </div>
                 <div className="font-handwrite text-2xl text-paper-cream/90">Scan WeChat</div>
@@ -1603,7 +1603,7 @@ export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; 
             <div className="font-handwrite text-4xl text-paper-cream mb-2 text-center">— Scan to Connect —</div>
             <div className="font-display text-3xl font-black text-center mb-6">扫 码 添 加 微 信</div>
 
-            <div className="bg-boomer-red p-4">
+            <div className="bg-boomer-red p-4 rounded-xl">
               <img
                 src={wechatQR}
                 alt="微信二维码"
