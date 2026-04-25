@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
-import { exportPDF, exportPPTX } from "@/lib/export";
+import { exportPDF, exportPPTX, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
   ChevronLeft, ChevronRight, Download, FileText, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 
