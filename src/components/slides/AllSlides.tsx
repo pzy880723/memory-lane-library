@@ -853,19 +853,19 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
               <div className="col-span-5 p-6 flex flex-col justify-center bg-paper-cream/60">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="mega-number text-5xl text-boomer-red leading-none">100<span className="text-2xl">+</span></div>
-                    <div className="font-body text-base text-ink/75 mt-1">平价木筐</div>
+                    <div className="mega-number text-7xl text-boomer-red leading-none">100<span className="text-3xl">+</span></div>
+                    <div className="font-body text-xl text-ink/75 mt-2">平价木筐</div>
                   </div>
                   <div>
-                    <div className="mega-number text-5xl text-boomer-red leading-none">¥6.9</div>
-                    <div className="font-body text-base text-ink/75 mt-1">起售价</div>
+                    <div className="mega-number text-7xl text-boomer-red leading-none">¥6.9</div>
+                    <div className="font-body text-xl text-ink/75 mt-2">起售价</div>
                   </div>
                   <div>
-                    <div className="mega-number text-5xl text-boomer-red leading-none">∞</div>
-                    <div className="font-body text-base text-ink/75 mt-1">寻宝乐趣</div>
+                    <div className="mega-number text-7xl text-boomer-red leading-none">∞</div>
+                    <div className="font-body text-xl text-ink/75 mt-2">寻宝乐趣</div>
                   </div>
                 </div>
-                <p className="font-body text-lg text-ink/80 mt-4 leading-snug">
+                <p className="font-body text-2xl text-ink/80 mt-5 leading-snug">
                   海量小物件集中木筐自由翻找，"逛不完"驱动停留 <span className="font-bold text-boomer-red">45-90 分钟</span>
                 </p>
               </div>
