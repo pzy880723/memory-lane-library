@@ -920,11 +920,11 @@ export function Slide18Categories({ pageNumber, totalPages }: { pageNumber: numb
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="04 · 核心商业模式">
-      <div className="absolute inset-0 px-28 pt-36 pb-24">
+      <div className="absolute inset-0 px-24 pt-32 pb-24">
         <div className="flex items-end justify-between mb-7">
           <div>
             <span className="font-handwrite text-4xl text-boomer-red">Four Core Categories</span>
-            <h1 className="font-display text-6xl font-black mt-1">覆盖<span className="text-boomer-red">半个世纪</span>的中古宝藏</h1>
+            <h1 className="font-display text-7xl font-black mt-1">覆盖<span className="text-boomer-red">半个世纪</span>的中古宝藏</h1>
           </div>
           <div className="text-right font-display text-2xl text-ink/65">
             从 50 年代到千禧年<br/>满足不同圈层爱好
@@ -934,19 +934,19 @@ export function Slide18Categories({ pageNumber, totalPages }: { pageNumber: numb
         <div className="grid grid-cols-4 gap-5">
           {cats.map((c, i) => (
             <div key={c.name} className={`vintage-border bg-paper-cream overflow-hidden flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
-              <div className="relative">
-                <img src={c.photo} alt={c.name} className="w-full h-[200px] object-cover" />
-                <div className="absolute top-3 right-3 bg-boomer-red text-paper-cream w-14 h-14 rounded-full flex items-center justify-center">
-                  <c.icon className="w-7 h-7" strokeWidth={2.5} />
+              <div className="relative aspect-square">
+                <img src={c.photo} alt={c.name} className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute top-4 right-4 bg-boomer-red text-paper-cream w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+                  <c.icon className="w-8 h-8" strokeWidth={2.5} />
                 </div>
               </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="font-condensed text-base tracking-widest text-ink/55 mb-1">{c.en}</div>
-                <div className="font-display text-3xl font-black mb-4 text-boomer-red">{c.name}</div>
-                <ul className="space-y-2 flex-1">
+              <div className="p-7 flex-1 flex flex-col">
+                <div className="font-condensed text-xl tracking-widest text-ink/55 mb-2">{c.en}</div>
+                <div className="font-display text-4xl font-black mb-5 text-boomer-red">{c.name}</div>
+                <ul className="space-y-3 flex-1">
                   {c.items.map((it) => (
-                    <li key={it} className="font-body text-lg text-ink/80 flex items-start gap-2">
-                      <ChevronRight className="w-5 h-5 text-boomer-red mt-1 flex-shrink-0" />
+                    <li key={it} className="font-body text-2xl text-ink/85 flex items-start gap-2 leading-snug">
+                      <ChevronRight className="w-6 h-6 text-boomer-red mt-1.5 flex-shrink-0" />
                       <span>{it}</span>
                     </li>
                   ))}
