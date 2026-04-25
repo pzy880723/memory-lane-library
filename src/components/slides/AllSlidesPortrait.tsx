@@ -71,23 +71,21 @@ function Frame({ children, bg = "paper", page, total, chapter, dark = false, fle
 /* ============ 1. 封面 — 全屏拼贴海报 ============ */
 export function P_Cover() {
   return (
-    <Frame bg="paper">
-      {/* 大色块红色背景 */}
-      <div className="absolute top-0 left-0 right-0 h-[55%] bg-boomer-red overflow-hidden">
+    <Frame bg="paper" flex>
+      {/* 上半部分：红色满版照片 60% 高 */}
+      <div className="relative basis-[60%] grow-0 shrink-0 bg-boomer-red overflow-hidden">
         <div className="absolute inset-0 dots-pattern-cream opacity-25" />
-        {/* 大照片满屏 */}
         <img src={photoSatoDetail} alt="" className="absolute right-0 top-0 w-[680px] h-full object-cover opacity-95" />
-        {/* 渐变遮罩 */}
-        <div className="absolute inset-0 bg-gradient-to-r from-boomer-red via-boomer-red/85 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-boomer-red via-boomer-red/80 to-transparent" />
 
-        {/* 顶部标签 */}
+        {/* 顶部品牌条 */}
         <div className="absolute top-12 left-12 right-12 flex items-center justify-between z-10">
           <img src={logo} alt="BOOMER OFF" className="h-16 brightness-0 invert" />
           <div className="font-condensed text-2xl tracking-[0.4em] text-paper-cream/90">BRAND BOOK · 2026</div>
         </div>
 
-        {/* 主标题 */}
-        <div className="absolute bottom-20 left-12 right-12 z-10">
+        {/* 主标题 — 居中偏下 */}
+        <div className="absolute bottom-16 left-12 right-12 z-10">
           <div className="font-handwrite text-5xl text-vintage-gold mb-3">— National No.1 —</div>
           <h1 className="font-display text-paper-cream text-[120px] font-black leading-[0.92]">
             国 内 首 家
@@ -98,25 +96,30 @@ export function P_Cover() {
         </div>
       </div>
 
-      {/* 下半部分：米色块 */}
-      <div className="absolute top-[55%] left-0 right-0 bottom-0 px-12 pt-12">
-        {/* 大 slogan 印章 */}
-        <div className="vintage-border bg-paper-cream px-10 py-7 inline-block rotate-[-2deg]">
-          <p className="font-display text-7xl font-black tracking-wider">
-            虽 古 但 新
-          </p>
-          <p className="font-display text-5xl text-boomer-red font-black mt-2">信 任 可 见</p>
+      {/* 下半部分：米色块 — flex 自适应填满剩余 40% */}
+      <div className="relative grow flex flex-col justify-between px-12 py-14">
+        {/* 顶部印章 + 右侧照片 */}
+        <div className="flex items-start justify-between gap-6">
+          <div className="vintage-border bg-paper-cream px-10 py-7 rotate-[-2deg]">
+            <p className="font-display text-7xl font-black tracking-wider whitespace-nowrap">
+              虽 古 但 新
+            </p>
+            <p className="font-display text-5xl text-boomer-red font-black mt-2 whitespace-nowrap">信 任 可 见</p>
+          </div>
+          <div className="relative shrink-0 mt-2">
+            <img src={photoCeramics} alt="" className="absolute -top-4 -right-2 w-[180px] h-[230px] object-cover photo-vintage rotate-[-5deg]" />
+            <img src={photoVinyl} alt="" className="relative w-[230px] h-[290px] object-cover photo-vintage rotate-[6deg] ml-32" />
+          </div>
         </div>
 
-        {/* 实拍照片小拼贴 */}
-        <img src={photoVinyl} alt="" className="absolute bottom-32 right-12 w-[280px] h-[360px] object-cover photo-vintage rotate-[6deg]" />
-        <img src={photoCeramics} alt="" className="absolute bottom-44 right-[280px] w-[200px] h-[260px] object-cover photo-vintage rotate-[-4deg]" />
-
-        {/* 引用 */}
-        <div className="absolute bottom-24 left-12">
-          <div className="font-handwrite text-3xl text-boomer-red leading-tight">A Tiny Basement Shop</div>
-          <div className="font-handwrite text-3xl text-boomer-red leading-tight">Full of Old Toys</div>
-          <div className="font-condensed text-lg tracking-widest text-ink/55 mt-2">— SmartShanghai · 2026.03</div>
+        {/* 底部引用 + 大编号 */}
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <div className="font-handwrite text-4xl text-boomer-red leading-tight">A Tiny Basement Shop</div>
+            <div className="font-handwrite text-4xl text-boomer-red leading-tight">Full of Old Toys</div>
+            <div className="font-condensed text-xl tracking-widest text-ink/60 mt-3">— SmartShanghai · 2026.03</div>
+          </div>
+          <div className="font-en text-[180px] text-boomer-red/15 leading-none -mb-6">No.1</div>
         </div>
       </div>
     </Frame>
