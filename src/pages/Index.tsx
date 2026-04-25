@@ -255,7 +255,24 @@ const Index = () => {
         )}
 
         {/* 幻灯片舞台 */}
-        <div ref={stageRef} className="flex-1 relative bg-ink overflow-hidden">
+        <div
+          ref={stageRef}
+          className="flex-1 relative bg-ink overflow-hidden"
+          style={
+            forceLandscape
+              ? {
+                  position: "fixed",
+                  top: 0,
+                  left: "100dvw",
+                  width: "100dvh",
+                  height: "100dvw",
+                  transform: "rotate(90deg)",
+                  transformOrigin: "top left",
+                  zIndex: 9999,
+                }
+              : undefined
+          }
+        >
           <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
             <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
               <SlideRenderer index={current} />
