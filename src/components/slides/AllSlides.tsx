@@ -19,6 +19,7 @@ import photoUltraman from "@/assets/store/ultraman-toys.jpeg";
 import photoTeapot from "@/assets/store/iron-teapot.jpeg";
 import photoPikachu from "@/assets/store/pikachu-mug.jpeg";
 import photoDiatone from "@/assets/store/diatone-spinning.jpeg";
+import wechatQR from "@/assets/wechat-qr.png";
 
 /* ============================================================
  * 第 1 页 — 封面（拼贴风 + 真实照片）
@@ -1526,29 +1527,54 @@ export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; 
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" noFooter>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-20 w-[700px] h-[700px] dots-pattern-red opacity-40" />
-        <div className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] dots-pattern opacity-30" />
+        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] dots-pattern opacity-30" />
       </div>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-32 text-center">
-        <div className="font-en text-[16rem] text-boomer-red leading-none mb-2">THANK</div>
-        <div className="font-en text-[16rem] text-ink leading-none mb-12">YOU</div>
+      <div className="absolute inset-0 grid grid-cols-12 gap-10 px-24 py-24 items-center">
+        {/* 左侧：致谢 + 联系信息 */}
+        <div className="col-span-7 flex flex-col items-start">
+          <div className="font-en text-[14rem] text-boomer-red leading-none">THANK</div>
+          <div className="font-en text-[14rem] text-ink leading-none mb-10">YOU</div>
 
-        <div className="font-display text-5xl text-ink/85 mb-3">欢 迎 招 商 · 加 盟 · 品 牌 合 作 洽 谈</div>
-        <div className="font-handwrite text-4xl text-boomer-red mb-12">we look forward to hearing from you</div>
+          <div className="font-display text-4xl text-ink/85 mb-2">欢 迎 招 商 · 加 盟 · 品 牌 合 作</div>
+          <div className="font-handwrite text-3xl text-boomer-red mb-10">we look forward to hearing from you</div>
 
-        <div className="flex items-center gap-12">
-          <div className="text-left">
-            <div className="font-handwrite text-3xl text-ink/65">Contact</div>
-            <div className="font-display text-4xl font-black">潘瞻远 · 18657433310</div>
+          <div className="space-y-4">
+            <div>
+              <div className="font-handwrite text-2xl text-ink/65">Contact · 联系人</div>
+              <div className="font-display text-4xl font-black">潘瞻远 · 18657433310</div>
+            </div>
+            <div>
+              <div className="font-handwrite text-2xl text-ink/65">Brand</div>
+              <div className="font-display text-3xl font-black">BOOMER OFF Vintage</div>
+            </div>
           </div>
-          <div className="w-1 h-20 bg-boomer-red" />
-          <div className="text-left">
-            <div className="font-handwrite text-3xl text-ink/65">Brand</div>
-            <div className="font-display text-4xl font-black">BOOMER OFF Vintage</div>
-          </div>
+
+          <img src={logo} alt="BOOMER OFF" className="w-[260px] mt-10 opacity-85" />
         </div>
 
-        <img src={logo} alt="BOOMER OFF" className="w-[340px] mt-16 opacity-85" />
+        {/* 右侧：红色二维码卡片 */}
+        <div className="col-span-5 flex items-center justify-center">
+          <div className="bg-boomer-red text-paper-cream vintage-border p-8 rotate-[2deg] relative">
+            <div className="absolute -top-4 -right-4 stamp-red bg-paper-cream text-2xl">SCAN ME</div>
+            <div className="font-handwrite text-4xl text-paper-cream mb-2 text-center">— Scan to Connect —</div>
+            <div className="font-display text-3xl font-black text-center mb-6">扫 码 添 加 微 信</div>
+
+            <div className="bg-boomer-red p-4">
+              <img
+                src={wechatQR}
+                alt="微信二维码"
+                className="w-[420px] h-[420px] block"
+                style={{ filter: "invert(1) hue-rotate(180deg)" }}
+              />
+            </div>
+
+            <div className="text-center mt-6">
+              <div className="font-display text-2xl font-bold">微信咨询 · 招商加盟</div>
+              <div className="font-handwrite text-2xl text-paper-cream/85 mt-1">WeChat · 7×24h</div>
+            </div>
+          </div>
+        </div>
       </div>
     </SlideShell>
   );
