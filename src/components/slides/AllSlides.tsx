@@ -209,51 +209,66 @@ export function SlideChapter({
 }
 
 /* ============================================================
- * 第 5 页 — 零投放的自然流量奇迹
+ * 第 5 页 — 零投放的自然流量奇迹（数字冲击力升级）
  * ============================================================ */
 export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  const data = [
-    { label: "大众点评 · 南京西路商圈", value: "排名第 1", icon: Star, big: true, color: "bg-boomer-red text-paper-cream" },
-    { label: "大众点评 · 静安区", value: "排名第 1", icon: Star, big: true, color: "bg-vintage-gold" },
-    { label: "大众点评 · 全上海", value: "排名第 5", icon: Award, color: "bg-paper-cream" },
-    { label: "小红书", value: "官方 AI 推荐", icon: Sparkles, color: "bg-paper-cream" },
-    { label: "全网曝光量", value: "300 万+", icon: TrendingUp, big: true, color: "bg-boomer-red text-paper-cream" },
-    { label: "门店定向客流", value: "10 万+ 人次", icon: Users, big: true, color: "bg-vintage-gold" },
-    { label: "明星 / KOL 自发打卡", value: "多位头部网红", icon: Heart, color: "bg-paper-cream" },
-    { label: "大众点评月均收藏", value: "1,000+", icon: BadgeCheck, color: "bg-paper-cream" },
+  const subData = [
+    { label: "南京西路商圈", value: "No.1", sub: "大众点评", icon: Star, color: "bg-paper-cream" },
+    { label: "静安区", value: "No.1", sub: "大众点评", icon: Star, color: "bg-vintage-gold" },
+    { label: "全上海", value: "No.5", sub: "大众点评", icon: Award, color: "bg-paper-cream" },
+    { label: "小红书", value: "官方 AI 推荐", sub: "中古杂货铺", icon: Sparkles, color: "bg-paper-cream" },
+    { label: "明星 / KOL", value: "自发打卡", sub: "多位头部网红", icon: Heart, color: "bg-paper-cream" },
+    { label: "大众点评月均", value: "1,000+", sub: "收藏打卡", icon: BadgeCheck, color: "bg-vintage-gold" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-28 pt-36 pb-28">
-        <div className="flex items-end justify-between mb-3">
+      <div className="absolute inset-0 px-24 pt-36 pb-24">
+        <div className="flex items-end justify-between mb-6">
           <h1 className="font-display text-7xl font-black leading-tight">
-            零投放的<br/><span className="text-boomer-red highlight-yellow">自然流量奇迹</span>
+            零投放的<span className="text-boomer-red highlight-yellow">自然流量奇迹</span>
           </h1>
           <div className="stamp-red text-3xl">0 ¥ 推广费</div>
         </div>
-        <p className="font-body text-3xl text-ink/70 mb-10">未进行任何付费推广，凭借业态差异化与极高内容传播性 · 现象级自然爆发</p>
 
-        <div className="grid grid-cols-4 gap-5">
-          {data.map((d, i) => (
-            <div
-              key={d.label}
-              className={`vintage-border p-7 ${d.color} ${i % 3 === 1 ? "rotate-[-0.5deg]" : ""}`}
-            >
-              <d.icon className="w-12 h-12 mb-4" strokeWidth={2.5} />
-              <div className="font-body text-xl mb-3 leading-snug opacity-80">{d.label}</div>
-              <div className={`font-display font-black ${d.big ? "text-4xl" : "text-3xl"}`}>
-                {d.value}
+        {/* 顶部两个超大数据 hero 卡 */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="vintage-border bg-boomer-red text-paper-cream p-8 relative overflow-hidden rotate-[-0.5deg]">
+            <div className="absolute -top-10 -right-10 w-72 h-72 dots-pattern-cream opacity-30" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-2">
+                <TrendingUp className="w-12 h-12" strokeWidth={2.5} />
+                <div className="font-display text-3xl font-bold">全网曝光量</div>
               </div>
+              <div className="mega-number text-[12rem] leading-none">300<span className="text-6xl ml-2">万+</span></div>
+              <div className="font-display text-2xl mt-2 text-paper-cream/90">零付费推广 · 自然爆发</div>
             </div>
-          ))}
+          </div>
+          <div className="vintage-border bg-vintage-gold text-ink p-8 relative overflow-hidden rotate-[0.5deg]">
+            <div className="absolute -bottom-10 -right-10 w-72 h-72 dots-pattern opacity-30" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-2">
+                <Users className="w-12 h-12" strokeWidth={2.5} />
+                <div className="font-display text-3xl font-bold">门店定向客流</div>
+              </div>
+              <div className="mega-number text-[12rem] leading-none text-boomer-red">10<span className="text-6xl ml-2">万+</span></div>
+              <div className="font-display text-2xl mt-2 text-ink/80">高粘性 · 累计人次</div>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-8 bg-paper-cream px-10 py-6 vintage-border-red">
-          <p className="font-display text-3xl">
-            <Quote className="inline w-9 h-9 text-boomer-red mr-3" />
-            BOOMER OFF 不仅是一家零售店，更是一台
-            <span className="text-boomer-red font-black highlight-yellow">内容生产机器</span>
-          </p>
+        {/* 下方 6 个次级卡片 */}
+        <div className="grid grid-cols-6 gap-4">
+          {subData.map((d, i) => (
+            <div
+              key={d.label}
+              className={`vintage-border p-5 ${d.color} ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}
+            >
+              <d.icon className="w-10 h-10 mb-3 text-boomer-red" strokeWidth={2.5} />
+              <div className="font-body text-lg mb-1 opacity-65">{d.label}</div>
+              <div className="font-display text-3xl font-black leading-tight">{d.value}</div>
+              <div className="font-body text-base mt-1 opacity-65">{d.sub}</div>
+            </div>
+          ))}
         </div>
       </div>
     </SlideShell>
