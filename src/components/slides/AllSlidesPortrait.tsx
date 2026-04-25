@@ -47,8 +47,10 @@ function Footer({ page, total, chapter, dark = false }: { page?: number; total?:
   );
 }
 
-function Frame({ children, bg = "paper", page, total, chapter, dark = false }: {
+function Frame({ children, bg = "paper", page, total, chapter, dark = false, flex = false }: {
   children: React.ReactNode; bg?: string; page?: number; total?: number; chapter?: string; dark?: boolean;
+  /** 设为 true 时，根容器变 flex-col，子级用 flex-1/grow 自适应撑满 1920 高度 */
+  flex?: boolean;
 }) {
   const bgCls: Record<string, string> = {
     paper: "paper-texture",
@@ -59,7 +61,7 @@ function Frame({ children, bg = "paper", page, total, chapter, dark = false }: {
     "red-deep": "bg-boomer-red-deep",
   };
   return (
-    <div className={`relative w-[1080px] h-[1920px] overflow-hidden ${bgCls[bg]} ${dark ? "text-paper-cream" : "text-ink"}`}>
+    <div className={`relative w-[1080px] h-[1920px] overflow-hidden ${bgCls[bg]} ${dark ? "text-paper-cream" : "text-ink"} ${flex ? "flex flex-col" : ""}`}>
       {children}
       <Footer page={page} total={total} chapter={chapter} dark={dark} />
     </div>
