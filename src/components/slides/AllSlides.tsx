@@ -823,10 +823,10 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
                 className="col-span-4 w-full h-[280px] object-cover"
               />
               <div className="col-span-4 p-6 flex flex-col justify-center bg-paper-cream">
-                <div className="font-display text-2xl font-bold mb-3 text-ink">高价值中古商品</div>
-                <div className="flex flex-wrap gap-2">
+                <div className="font-display text-4xl font-bold mb-4 text-ink">高价值中古商品</div>
+                <div className="flex flex-wrap gap-2.5">
                   {["绝版手办", "复古相机", "品牌瓷器", "中古腕表", "黑胶机", "经典毛绒"].map(t => (
-                    <span key={t} className="px-3 py-1.5 bg-boomer-red text-paper-cream font-display text-base font-bold">{t}</span>
+                    <span key={t} className="px-4 py-2 bg-boomer-red text-paper-cream font-display text-2xl font-bold">{t}</span>
                   ))}
                 </div>
               </div>
