@@ -299,8 +299,9 @@ const Index = () => {
                   position: "fixed",
                   top: "50%",
                   left: "50%",
-                  width: "100dvh",
-                  height: "100dvw",
+                  // 用 JS 实测像素值代替 dvh/dvw — 规避 iOS Safari 在 fixed body 下的尺寸 bug
+                  width: `${vh}px`,
+                  height: `${vw}px`,
                   transform: "translate(-50%, -50%) rotate(90deg)",
                   transformOrigin: "center center",
                   zIndex: 9999,
