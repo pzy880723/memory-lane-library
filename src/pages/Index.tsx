@@ -16,6 +16,8 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
+  const [forceLandscape, setForceLandscape] = useState(false);
+  const [showRotateHint, setShowRotateHint] = useState(false);
   const [exportPreview, setExportPreview] = useState<{
     type: string;
     items: ExportPreviewItem[];
