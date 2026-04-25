@@ -47,8 +47,10 @@ function Footer({ page, total, chapter, dark = false }: { page?: number; total?:
   );
 }
 
-function Frame({ children, bg = "paper", page, total, chapter, dark = false }: {
+function Frame({ children, bg = "paper", page, total, chapter, dark = false, flex = false }: {
   children: React.ReactNode; bg?: string; page?: number; total?: number; chapter?: string; dark?: boolean;
+  /** 设为 true 时，根容器变 flex-col，子级用 flex-1/grow 自适应撑满 1920 高度 */
+  flex?: boolean;
 }) {
   const bgCls: Record<string, string> = {
     paper: "paper-texture",
@@ -59,7 +61,7 @@ function Frame({ children, bg = "paper", page, total, chapter, dark = false }: {
     "red-deep": "bg-boomer-red-deep",
   };
   return (
-    <div className={`relative w-[1080px] h-[1920px] overflow-hidden ${bgCls[bg]} ${dark ? "text-paper-cream" : "text-ink"}`}>
+    <div className={`relative w-[1080px] h-[1920px] overflow-hidden ${bgCls[bg]} ${dark ? "text-paper-cream" : "text-ink"} ${flex ? "flex flex-col" : ""}`}>
       {children}
       <Footer page={page} total={total} chapter={chapter} dark={dark} />
     </div>
@@ -69,23 +71,21 @@ function Frame({ children, bg = "paper", page, total, chapter, dark = false }: {
 /* ============ 1. 封面 — 全屏拼贴海报 ============ */
 export function P_Cover() {
   return (
-    <Frame bg="paper">
-      {/* 大色块红色背景 */}
-      <div className="absolute top-0 left-0 right-0 h-[55%] bg-boomer-red overflow-hidden">
+    <Frame bg="paper" flex>
+      {/* 上半部分：红色满版照片 60% 高 */}
+      <div className="relative basis-[60%] grow-0 shrink-0 bg-boomer-red overflow-hidden">
         <div className="absolute inset-0 dots-pattern-cream opacity-25" />
-        {/* 大照片满屏 */}
         <img src={photoSatoDetail} alt="" className="absolute right-0 top-0 w-[680px] h-full object-cover opacity-95" />
-        {/* 渐变遮罩 */}
-        <div className="absolute inset-0 bg-gradient-to-r from-boomer-red via-boomer-red/85 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-boomer-red via-boomer-red/80 to-transparent" />
 
-        {/* 顶部标签 */}
+        {/* 顶部品牌条 */}
         <div className="absolute top-12 left-12 right-12 flex items-center justify-between z-10">
           <img src={logo} alt="BOOMER OFF" className="h-16 brightness-0 invert" />
           <div className="font-condensed text-2xl tracking-[0.4em] text-paper-cream/90">BRAND BOOK · 2026</div>
         </div>
 
-        {/* 主标题 */}
-        <div className="absolute bottom-20 left-12 right-12 z-10">
+        {/* 主标题 — 居中偏下 */}
+        <div className="absolute bottom-16 left-12 right-12 z-10">
           <div className="font-handwrite text-5xl text-vintage-gold mb-3">— National No.1 —</div>
           <h1 className="font-display text-paper-cream text-[120px] font-black leading-[0.92]">
             国 内 首 家
@@ -96,25 +96,30 @@ export function P_Cover() {
         </div>
       </div>
 
-      {/* 下半部分：米色块 */}
-      <div className="absolute top-[55%] left-0 right-0 bottom-0 px-12 pt-12">
-        {/* 大 slogan 印章 */}
-        <div className="vintage-border bg-paper-cream px-10 py-7 inline-block rotate-[-2deg]">
-          <p className="font-display text-7xl font-black tracking-wider">
-            虽 古 但 新
-          </p>
-          <p className="font-display text-5xl text-boomer-red font-black mt-2">信 任 可 见</p>
+      {/* 下半部分：米色块 — flex 自适应填满剩余 40% */}
+      <div className="relative grow flex flex-col justify-between px-12 py-14">
+        {/* 顶部印章 + 右侧照片 */}
+        <div className="flex items-start justify-between gap-6">
+          <div className="vintage-border bg-paper-cream px-10 py-7 rotate-[-2deg]">
+            <p className="font-display text-7xl font-black tracking-wider whitespace-nowrap">
+              虽 古 但 新
+            </p>
+            <p className="font-display text-5xl text-boomer-red font-black mt-2 whitespace-nowrap">信 任 可 见</p>
+          </div>
+          <div className="relative shrink-0 mt-2">
+            <img src={photoCeramics} alt="" className="absolute -top-4 -right-2 w-[180px] h-[230px] object-cover photo-vintage rotate-[-5deg]" />
+            <img src={photoVinyl} alt="" className="relative w-[230px] h-[290px] object-cover photo-vintage rotate-[6deg] ml-32" />
+          </div>
         </div>
 
-        {/* 实拍照片小拼贴 */}
-        <img src={photoVinyl} alt="" className="absolute bottom-32 right-12 w-[280px] h-[360px] object-cover photo-vintage rotate-[6deg]" />
-        <img src={photoCeramics} alt="" className="absolute bottom-44 right-[280px] w-[200px] h-[260px] object-cover photo-vintage rotate-[-4deg]" />
-
-        {/* 引用 */}
-        <div className="absolute bottom-24 left-12">
-          <div className="font-handwrite text-3xl text-boomer-red leading-tight">A Tiny Basement Shop</div>
-          <div className="font-handwrite text-3xl text-boomer-red leading-tight">Full of Old Toys</div>
-          <div className="font-condensed text-lg tracking-widest text-ink/55 mt-2">— SmartShanghai · 2026.03</div>
+        {/* 底部引用 + 大编号 */}
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <div className="font-handwrite text-4xl text-boomer-red leading-tight">A Tiny Basement Shop</div>
+            <div className="font-handwrite text-4xl text-boomer-red leading-tight">Full of Old Toys</div>
+            <div className="font-condensed text-xl tracking-widest text-ink/60 mt-3">— SmartShanghai · 2026.03</div>
+          </div>
+          <div className="font-en text-[180px] text-boomer-red/15 leading-none -mb-6">No.1</div>
         </div>
       </div>
     </Frame>
@@ -175,19 +180,19 @@ export function P_TOC({ pageNumber, totalPages }: { pageNumber: number; totalPag
 /* ============ 3. 核心摘要 — 满版照片 + 数据条 ============ */
 export function P_Executive({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="EXECUTIVE">
-      {/* 上半 满版图 */}
-      <div className="absolute top-0 left-0 right-0 h-[920px] overflow-hidden">
+    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="EXECUTIVE" flex>
+      {/* 上半 满版图 — 50% */}
+      <div className="relative basis-1/2 grow-0 shrink-0 overflow-hidden">
         <img src={photoCeramics} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/20 to-ink/85" />
 
         <div className="absolute top-12 left-12 right-12 z-10">
-          <div className="font-handwrite text-3xl text-vintage-gold mb-2">Executive Summary</div>
-          <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/80">摘 · 要</div>
+          <div className="font-handwrite text-4xl text-vintage-gold mb-2">Executive Summary</div>
+          <div className="font-condensed text-2xl tracking-[0.3em] text-paper-cream/80">摘 · 要</div>
         </div>
 
-        <div className="absolute bottom-12 left-12 right-12 z-10">
-          <h1 className="font-display text-paper-cream text-[88px] font-black leading-[0.95]">
+        <div className="absolute bottom-10 left-12 right-12 z-10">
+          <h1 className="font-display text-paper-cream text-[92px] font-black leading-[0.95]">
             一 个<br/>
             <span className="text-boomer-red bg-paper-cream px-4 py-1 inline-block mt-2">现 象 级</span><br/>
             <span className="mt-2 inline-block">零售新物种</span>
@@ -195,28 +200,38 @@ export function P_Executive({ pageNumber, totalPages }: { pageNumber: number; to
         </div>
       </div>
 
-      {/* 下半 数据条 — 满宽红色 */}
-      <div className="absolute top-[920px] left-0 right-0 bottom-14 bg-boomer-red text-paper-cream px-12 pt-10">
-        <div className="font-handwrite text-3xl text-vintage-gold mb-4">— 开业首店 · 实绩 —</div>
+      {/* 下半 红色块自适应 — 数据 + 双基因 */}
+      <div className="relative grow flex flex-col bg-boomer-red text-paper-cream px-12 pt-10 pb-20">
+        <div className="font-handwrite text-4xl text-vintage-gold mb-6">— 开业首店 · 实绩 —</div>
 
-        <div className="grid grid-cols-3 gap-6 mb-6">
-          <div>
-            <div className="mega-number text-[110px] leading-none">300<span className="text-3xl ml-1">万+</span></div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">全网曝光</div>
-          </div>
-          <div>
-            <div className="mega-number text-[110px] leading-none">10<span className="text-3xl ml-1">万+</span></div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">定向客流</div>
-          </div>
-          <div>
-            <div className="mega-number text-[110px] leading-none">No.1</div>
-            <div className="font-display text-xl font-bold mt-2 border-t-2 border-paper-cream/60 pt-2">大众点评</div>
-          </div>
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          {[
+            { v: "300", u: "万+", l: "全网曝光" },
+            { v: "10",  u: "万+", l: "定向客流" },
+            { v: "No.1", u: "",   l: "大众点评" },
+          ].map((d) => (
+            <div key={d.l}>
+              <div className="mega-number text-[120px] leading-none">{d.v}<span className="text-4xl ml-1">{d.u}</span></div>
+              <div className="font-display text-2xl font-bold mt-3 border-t-2 border-paper-cream/60 pt-3">{d.l}</div>
+            </div>
+          ))}
         </div>
 
-        <p className="font-display text-3xl leading-snug font-bold mt-4">
-          首创 <span className="bg-vintage-gold text-ink px-3 py-0.5">「标准化 × 氛围感」</span> 双基因
-        </p>
+        {/* 自适应填充：双基因卡片 */}
+        <div className="grow flex flex-col justify-end">
+          <div className="bg-paper-cream text-ink p-7 vintage-border-red">
+            <div className="font-handwrite text-3xl text-boomer-red mb-2">Double DNA</div>
+            <p className="font-display text-4xl font-black leading-tight">
+              首创 <span className="bg-vintage-gold px-3 py-0.5">「标准化 × 氛围感」</span>
+            </p>
+            <p className="font-display text-4xl font-black leading-tight mt-2">双基因融合模式</p>
+            <div className="grid grid-cols-3 gap-3 mt-5">
+              {["可复制", "高粘性", "强口碑"].map((t) => (
+                <div key={t} className="bg-ink text-paper-cream font-display text-xl font-bold py-2 text-center">{t}</div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Frame>
   );
@@ -408,74 +423,74 @@ export function P_Keywords({ pageNumber, totalPages }: { pageNumber: number; tot
 
 /* ============ 10. 解决问题 — 三段式对比表 ============ */
 export function P_Problem({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  const A = {
+    letter: "A", label: "如 BOOK OFF · 日本", title: "标准化中古店",
+    pros: ["✓ 明码标价", "✓ 标准陈列", "✓ 可复制"],
+    cons: ["✗ 缺氛围", "✗ 情绪低"],
+  };
+  const C = {
+    letter: "C", label: "主理人审美 · 街边", title: "设计师中古店",
+    pros: ["✓ 设计感强", "✓ 氛围出片"],
+    cons: ["✗ 定价不透明", "✗ 依赖主理人"],
+  };
+
+  const Side = ({ d }: { d: typeof A }) => (
+    <div className="bg-paper-cream border-y-4 border-ink/15 px-10 py-8 flex items-center gap-6">
+      <div className="font-en text-8xl text-ink/25 leading-none shrink-0">{d.letter}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-condensed text-lg tracking-[0.2em] text-ink/55">{d.label}</div>
+        <div className="font-display text-4xl font-black mt-1 mb-3">{d.title}</div>
+        <div className="flex flex-wrap gap-2">
+          {d.pros.map(t => (
+            <span key={t} className="px-3 py-1.5 bg-vintage-moss/15 text-vintage-moss font-display text-xl font-bold">{t}</span>
+          ))}
+          {d.cons.map(t => (
+            <span key={t} className="px-3 py-1.5 bg-ink/10 text-ink/45 font-display text-xl font-bold line-through">{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="02 · 品牌定位">
-      {/* 顶部 */}
-      <div className="absolute top-12 left-12 right-12 text-center">
-        <div className="font-handwrite text-3xl text-boomer-red">ダブル DNA · 双基因</div>
+    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="02 · 品牌定位" flex>
+      {/* 顶部标题 */}
+      <div className="px-12 pt-14 pb-8 text-center shrink-0">
+        <div className="font-handwrite text-4xl text-boomer-red">ダブル DNA · 双基因</div>
         <h1 className="font-display text-7xl font-black mt-2 leading-[0.95]">
           标准化 <span className="text-boomer-red">×</span> 氛围感
         </h1>
         <div className="font-display text-3xl mt-3 text-ink/75">融 合 模 式</div>
       </div>
 
-      {/* A 模式 */}
-      <div className="absolute top-[400px] left-0 right-0 bg-paper-cream border-y-4 border-ink/15 p-7">
-        <div className="flex items-start gap-5">
-          <div className="font-en text-7xl text-ink/30 leading-none">A</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-ink/55">如 BOOK OFF · 日本</div>
-            <div className="font-display text-3xl font-black mb-3">标准化中古店</div>
-            <div className="flex flex-wrap gap-2">
-              {["✓ 明码标价", "✓ 标准陈列", "✓ 可复制"].map(t => (
-                <span key={t} className="px-3 py-1 bg-vintage-moss/15 text-vintage-moss font-display text-lg font-bold">{t}</span>
-              ))}
-              {["✗ 缺氛围", "✗ 情绪低"].map(t => (
-                <span key={t} className="px-3 py-1 bg-ink/10 text-ink/45 font-display text-lg font-bold line-through">{t}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* A / B / C 三段，flex-1 等高占满 */}
+      <div className="grow flex flex-col">
+        <div className="grow"><Side d={A} /></div>
 
-      {/* B 模式 - BOOMER OFF 突出 */}
-      <div className="absolute top-[720px] left-0 right-0 bg-boomer-red text-paper-cream p-8 z-10 shadow-2xl">
-        <div className="absolute -top-4 -right-4 bg-vintage-gold text-ink font-display text-2xl font-black px-4 py-2 rotate-6 vintage-border-soft">★ BOOMER OFF</div>
-        <div className="flex items-start gap-5">
-          <div className="font-en text-8xl text-paper-cream leading-none">B</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-paper-cream/85">融 · 合 · 模 · 式</div>
-            <div className="font-display text-4xl font-black mb-4">两者最优组合</div>
-            <div className="grid grid-cols-2 gap-2">
-              {["★ 标准化 + 氛围感", "★ 透明定价 + 评级", "★ 沉浸声光 + IP", "★ 6.9 元起售", "★ 可复制可加盟", "★ 信任可见"].map(t => (
-                <div key={t} className="font-display text-xl font-bold leading-snug">{t}</div>
-              ))}
+        {/* B 模式 — BOOMER OFF 主推，更大占比 */}
+        <div className="relative bg-boomer-red text-paper-cream px-10 py-10 z-10 shadow-2xl basis-[40%] grow-0 flex items-center">
+          <div className="absolute -top-5 right-6 bg-vintage-gold text-ink font-display text-2xl font-black px-5 py-2 rotate-6 vintage-border-soft">★ BOOMER OFF</div>
+          <div className="flex items-start gap-6 w-full">
+            <div className="font-en text-[140px] text-paper-cream leading-[0.85] shrink-0">B</div>
+            <div className="flex-1">
+              <div className="font-condensed text-lg tracking-[0.2em] text-paper-cream/85">融 · 合 · 模 · 式</div>
+              <div className="font-display text-5xl font-black mb-5 mt-1">两者最优组合</div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {["★ 标准化 + 氛围感", "★ 透明定价 + 评级", "★ 沉浸声光 + IP", "★ 6.9 元起售", "★ 可复制可加盟", "★ 信任可见"].map(t => (
+                  <div key={t} className="font-display text-2xl font-bold leading-snug">{t}</div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* C 模式 */}
-      <div className="absolute bottom-14 left-0 right-0 bg-paper-cream border-y-4 border-ink/15 p-7">
-        <div className="flex items-start gap-5">
-          <div className="font-en text-7xl text-ink/30 leading-none">C</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-ink/55">主理人审美 · 街边</div>
-            <div className="font-display text-3xl font-black mb-3">设计师中古店</div>
-            <div className="flex flex-wrap gap-2">
-              {["✓ 设计感强", "✓ 氛围出片"].map(t => (
-                <span key={t} className="px-3 py-1 bg-vintage-moss/15 text-vintage-moss font-display text-lg font-bold">{t}</span>
-              ))}
-              {["✗ 定价不透明", "✗ 依赖主理人"].map(t => (
-                <span key={t} className="px-3 py-1 bg-ink/10 text-ink/45 font-display text-lg font-bold line-through">{t}</span>
-              ))}
-            </div>
-          </div>
-        </div>
+        <div className="grow"><Side d={C} /></div>
       </div>
+      <div className="h-14 shrink-0" />
     </Frame>
   );
 }
+
 
 /* ============ 11. 品牌故事 — 红色全屏故事书 ============ */
 export function P_Story({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
