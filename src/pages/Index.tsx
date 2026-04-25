@@ -218,7 +218,7 @@ const Index = () => {
               onClick={toggleFullscreen}
               aria-label="全屏"
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {inAnyFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </Button>
           </div>
         </header>
