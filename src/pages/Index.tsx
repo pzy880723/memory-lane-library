@@ -15,6 +15,7 @@ const Index = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
   const total = SLIDES.length;
@@ -22,22 +23,6 @@ const Index = () => {
   const go = useCallback((i: number) => {
     setCurrent(Math.max(0, Math.min(total - 1, i)));
   }, [total]);
-
-  // 键盘导航
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
-      else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
-      else if (e.key === "Home") go(0);
-      else if (e.key === "End") go(total - 1);
-      else if (e.key === "f" || e.key === "F") toggleFullscreen();
-      else if (e.key === "g" || e.key === "G") setShowThumbs((s) => !s);
-      else if (e.key === "Escape") { setShowThumbs(false); setShowMenu(false); }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [current, go, total]);
 
   // URL hash 同步
   useEffect(() => {
@@ -51,19 +36,84 @@ const Index = () => {
     window.history.replaceState(null, "", `#slide-${current + 1}`);
   }, [current]);
 
-  // 全屏
+  // 三级降级全屏：标准 → webkit → CSS 伪全屏（iOS Safari）
   const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      stageRef.current?.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
+    const doc = document as Document & {
+      webkitFullscreenElement?: Element;
+      webkitExitFullscreen?: () => Promise<void>;
+    };
+    const el = stageRef.current as (HTMLDivElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    }) | null;
+
+    const inNativeFS = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+
+    if (inNativeFS) {
+      // 退出原生全屏
+      (doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.());
+      return;
     }
-  }, []);
+    if (pseudoFullscreen) {
+      // 退出伪全屏
+      setPseudoFullscreen(false);
+      return;
+    }
+
+    // 1️⃣ 标准 Fullscreen API
+    if (el?.requestFullscreen) {
+      el.requestFullscreen().catch(() => {
+        // 2️⃣ webkit 前缀
+        if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        } else {
+          // 3️⃣ CSS 伪全屏兜底
+          setPseudoFullscreen(true);
+        }
+      });
+    } else if (el?.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else {
+      // iOS Safari 走这里
+      setPseudoFullscreen(true);
+    }
+  }, [pseudoFullscreen]);
+
+  // 监听原生全屏状态
   useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    const handler = () => {
+      const doc = document as Document & { webkitFullscreenElement?: Element };
+      setIsFullscreen(!!(doc.fullscreenElement || doc.webkitFullscreenElement));
+    };
     document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
+    document.addEventListener("webkitfullscreenchange", handler);
+    return () => {
+      document.removeEventListener("fullscreenchange", handler);
+      document.removeEventListener("webkitfullscreenchange", handler);
+    };
   }, []);
+
+  // 任意全屏状态（原生 OR 伪）
+  const inAnyFullscreen = isFullscreen || pseudoFullscreen;
+
+  // 键盘导航（含 ESC 退出伪全屏）
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
+      else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
+      else if (e.key === "Home") go(0);
+      else if (e.key === "End") go(total - 1);
+      else if (e.key === "f" || e.key === "F") toggleFullscreen();
+      else if (e.key === "g" || e.key === "G") setShowThumbs((s) => !s);
+      else if (e.key === "Escape") {
+        if (pseudoFullscreen) setPseudoFullscreen(false);
+        setShowThumbs(false);
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [current, go, total, toggleFullscreen, pseudoFullscreen]);
 
   // 复制分享链接
   const copyLink = useCallback(async () => {
