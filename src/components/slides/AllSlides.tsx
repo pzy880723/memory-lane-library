@@ -1210,27 +1210,27 @@ export function Slide23Wall({ pageNumber, totalPages }: { pageNumber: number; to
 
         <div className="flex-1 grid grid-cols-4 grid-rows-2 gap-5">
           <div className="col-span-2 row-span-2 bg-boomer-red text-paper-cream vintage-border p-12 flex flex-col justify-between rotate-[-0.5deg]">
-            <div className="font-handwrite text-4xl">全网曝光</div>
+            <div className="font-handwrite text-6xl">全网曝光</div>
             <div>
-              <div className="mega-number text-[14rem] leading-none">300<span className="text-7xl">万+</span></div>
-              <div className="font-display text-3xl mt-3">零付费 · 自然传播</div>
+              <div className="mega-number text-[14rem] leading-none">300<span className="text-8xl">万+</span></div>
+              <div className="font-display text-5xl mt-3">零付费 · 自然传播</div>
             </div>
           </div>
           <div className="bg-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[1deg]">
-            <div className="font-handwrite text-2xl text-boomer-red">累计客流</div>
-            <div className="mega-number text-7xl text-boomer-red">10<span className="text-3xl">万+</span></div>
+            <div className="font-handwrite text-4xl text-boomer-red">累计客流</div>
+            <div className="mega-number text-9xl text-boomer-red">10<span className="text-5xl">万+</span></div>
           </div>
           <div className="bg-vintage-gold vintage-border-red p-7 flex flex-col justify-between rotate-[-1deg]">
-            <div className="font-handwrite text-2xl">单店 SKU</div>
-            <div className="mega-number text-7xl">10K<span className="text-3xl">+</span></div>
+            <div className="font-handwrite text-4xl">单店 SKU</div>
+            <div className="mega-number text-9xl">10K<span className="text-5xl">+</span></div>
           </div>
           <div className="bg-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[-1deg]">
-            <div className="font-handwrite text-2xl text-boomer-red">起售价</div>
-            <div className="mega-number text-7xl text-boomer-red">¥6.9</div>
+            <div className="font-handwrite text-4xl text-boomer-red">起售价</div>
+            <div className="mega-number text-9xl text-boomer-red">¥6.9</div>
           </div>
           <div className="bg-vintage-coral text-paper-cream vintage-border-red p-7 flex flex-col justify-between rotate-[1deg]">
-            <div className="font-handwrite text-2xl">月均打卡</div>
-            <div className="mega-number text-7xl">1K<span className="text-3xl">+</span></div>
+            <div className="font-handwrite text-4xl">月均打卡</div>
+            <div className="mega-number text-9xl">1K<span className="text-5xl">+</span></div>
           </div>
         </div>
       </div>
