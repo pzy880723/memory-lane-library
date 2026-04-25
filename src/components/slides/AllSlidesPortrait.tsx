@@ -490,9 +490,7 @@ export function P_Problem({ pageNumber, totalPages }: { pageNumber: number; tota
     </Frame>
   );
 }
-    </Frame>
-  );
-}
+
 
 /* ============ 11. 品牌故事 — 红色全屏故事书 ============ */
 export function P_Story({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
