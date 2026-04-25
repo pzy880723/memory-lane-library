@@ -5,11 +5,7 @@ export default {
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: { "2xl": "1400px" },
-    },
+    container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
       fontFamily: {
         display: ["var(--font-display)"],
@@ -24,53 +20,35 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        // BOOMER 品牌色
+        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
+        secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
+        destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
+        muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
+        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
+        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
+        card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
         boomer: {
           red: "hsl(var(--boomer-red))",
           "red-deep": "hsl(var(--boomer-red-deep))",
           "red-soft": "hsl(var(--boomer-red-soft))",
+          "red-warm": "hsl(var(--boomer-red-warm))",
         },
-        ink: {
-          DEFAULT: "hsl(var(--ink-black))",
-          soft: "hsl(var(--ink-soft))",
-        },
+        ink: { DEFAULT: "hsl(var(--ink-black))", soft: "hsl(var(--ink-soft))" },
         paper: {
           DEFAULT: "hsl(var(--paper))",
           deep: "hsl(var(--paper-deep))",
           cream: "hsl(var(--paper-cream))",
+          warm: "hsl(var(--paper-warm))",
+          sand: "hsl(var(--paper-sand))",
         },
         vintage: {
           gold: "hsl(var(--vintage-gold))",
+          "gold-soft": "hsl(var(--vintage-gold-soft))",
+          mustard: "hsl(var(--vintage-mustard))",
           moss: "hsl(var(--vintage-moss))",
           navy: "hsl(var(--vintage-navy))",
+          coral: "hsl(var(--vintage-coral))",
+          teal: "hsl(var(--vintage-teal))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
