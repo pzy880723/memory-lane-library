@@ -15,6 +15,7 @@ const Index = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
   const total = SLIDES.length;
@@ -22,22 +23,6 @@ const Index = () => {
   const go = useCallback((i: number) => {
     setCurrent(Math.max(0, Math.min(total - 1, i)));
   }, [total]);
-
-  // 键盘导航
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
-      else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
-      else if (e.key === "Home") go(0);
-      else if (e.key === "End") go(total - 1);
-      else if (e.key === "f" || e.key === "F") toggleFullscreen();
-      else if (e.key === "g" || e.key === "G") setShowThumbs((s) => !s);
-      else if (e.key === "Escape") { setShowThumbs(false); setShowMenu(false); }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [current, go, total]);
 
   // URL hash 同步
   useEffect(() => {
@@ -51,19 +36,84 @@ const Index = () => {
     window.history.replaceState(null, "", `#slide-${current + 1}`);
   }, [current]);
 
-  // 全屏
+  // 三级降级全屏：标准 → webkit → CSS 伪全屏（iOS Safari）
   const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      stageRef.current?.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
+    const doc = document as Document & {
+      webkitFullscreenElement?: Element;
+      webkitExitFullscreen?: () => Promise<void>;
+    };
+    const el = stageRef.current as (HTMLDivElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    }) | null;
+
+    const inNativeFS = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+
+    if (inNativeFS) {
+      // 退出原生全屏
+      (doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.());
+      return;
     }
-  }, []);
+    if (pseudoFullscreen) {
+      // 退出伪全屏
+      setPseudoFullscreen(false);
+      return;
+    }
+
+    // 1️⃣ 标准 Fullscreen API
+    if (el?.requestFullscreen) {
+      el.requestFullscreen().catch(() => {
+        // 2️⃣ webkit 前缀
+        if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        } else {
+          // 3️⃣ CSS 伪全屏兜底
+          setPseudoFullscreen(true);
+        }
+      });
+    } else if (el?.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else {
+      // iOS Safari 走这里
+      setPseudoFullscreen(true);
+    }
+  }, [pseudoFullscreen]);
+
+  // 监听原生全屏状态
   useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    const handler = () => {
+      const doc = document as Document & { webkitFullscreenElement?: Element };
+      setIsFullscreen(!!(doc.fullscreenElement || doc.webkitFullscreenElement));
+    };
     document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
+    document.addEventListener("webkitfullscreenchange", handler);
+    return () => {
+      document.removeEventListener("fullscreenchange", handler);
+      document.removeEventListener("webkitfullscreenchange", handler);
+    };
   }, []);
+
+  // 任意全屏状态（原生 OR 伪）
+  const inAnyFullscreen = isFullscreen || pseudoFullscreen;
+
+  // 键盘导航（含 ESC 退出伪全屏）
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
+      else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
+      else if (e.key === "Home") go(0);
+      else if (e.key === "End") go(total - 1);
+      else if (e.key === "f" || e.key === "F") toggleFullscreen();
+      else if (e.key === "g" || e.key === "G") setShowThumbs((s) => !s);
+      else if (e.key === "Escape") {
+        if (pseudoFullscreen) setPseudoFullscreen(false);
+        setShowThumbs(false);
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [current, go, total, toggleFullscreen, pseudoFullscreen]);
 
   // 复制分享链接
   const copyLink = useCallback(async () => {
@@ -97,8 +147,14 @@ const Index = () => {
       <meta property="og:title" content="BOOMER OFF Vintage 品牌手册" />
       <meta property="og:description" content="国内首家标准化中古连锁品牌 — 虽古但新，信任可见" />
 
-      <div className="fixed inset-0 paper-texture flex flex-col">
+      <div
+        className={`fixed inset-0 paper-texture flex flex-col ${
+          pseudoFullscreen ? "z-[9999] bg-ink" : ""
+        }`}
+        style={pseudoFullscreen ? { height: "100dvh" } : undefined}
+      >
         {/* 顶部工具栏 */}
+        {!pseudoFullscreen && (
         <header className="h-16 flex-shrink-0 bg-ink text-paper-cream flex items-center justify-between px-6 border-b-4 border-boomer-red z-30">
           <div className="flex items-center gap-4">
             <Button
@@ -162,10 +218,11 @@ const Index = () => {
               onClick={toggleFullscreen}
               aria-label="全屏"
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {inAnyFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </Button>
           </div>
         </header>
+        )}
 
         {/* 幻灯片舞台 */}
         <div ref={stageRef} className="flex-1 relative bg-ink overflow-hidden">
@@ -193,7 +250,8 @@ const Index = () => {
             <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
           </button>
 
-          {/* 底部页码控制 */}
+          {/* 底部页码控制（伪全屏时隐藏） */}
+          {!pseudoFullscreen && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/80 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20">
             <Button
               variant="ghost" size="icon"
@@ -214,14 +272,51 @@ const Index = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
+          )}
 
-          {/* 顶部进度条 */}
+          {/* 顶部进度条（伪全屏时隐藏） */}
+          {!pseudoFullscreen && (
           <div className="absolute top-0 left-0 right-0 h-1 bg-paper-cream/10 z-20">
             <div
               className="h-full bg-boomer-red transition-all"
               style={{ width: `${((current + 1) / total) * 100}%` }}
             />
           </div>
+          )}
+
+          {/* 伪全屏专属：浮动退出按钮 + 简易翻页 */}
+          {pseudoFullscreen && (
+            <>
+              <Button
+                size="icon"
+                className="absolute top-4 right-4 z-30 h-12 w-12 rounded-full bg-ink/70 text-paper-cream hover:bg-ink/90 backdrop-blur border border-paper-cream/30"
+                onClick={() => setPseudoFullscreen(false)}
+                aria-label="退出全屏"
+              >
+                <Minimize2 className="w-5 h-5" />
+              </Button>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/70 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20">
+                <Button
+                  variant="ghost" size="icon"
+                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
+                  onClick={() => go(current - 1)} disabled={current === 0}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="font-en text-lg tracking-wider min-w-[70px] text-center">
+                  <span className="text-boomer-red">{String(current + 1).padStart(2, "0")}</span>
+                  <span className="text-paper-cream/50"> / {String(total).padStart(2, "0")}</span>
+                </span>
+                <Button
+                  variant="ghost" size="icon"
+                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
+                  onClick={() => go(current + 1)} disabled={current === total - 1}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 缩略图抽屉 */}
