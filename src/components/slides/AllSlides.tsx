@@ -826,7 +826,7 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
                 <div className="font-display text-4xl font-bold mb-4 text-ink">高价值中古商品</div>
                 <div className="flex flex-wrap gap-2.5">
                   {["绝版手办", "复古相机", "品牌瓷器", "中古腕表", "黑胶机", "经典毛绒"].map(t => (
-                    <span key={t} className="px-4 py-2 bg-boomer-red text-paper-cream font-display text-2xl font-bold">{t}</span>
+                    <span key={t} className="px-4 py-2 bg-boomer-red text-paper-cream font-display text-2xl font-bold rounded-lg">{t}</span>
                   ))}
                 </div>
               </div>
@@ -1471,7 +1471,7 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
                 </div>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3">
+                <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3 rounded-2xl">
                   <img src={wechatQR} alt="微信二维码" className="w-44 h-44 object-contain" />
                 </div>
                 <div className="font-handwrite text-2xl text-paper-cream/90">Scan WeChat</div>
@@ -1500,7 +1500,7 @@ export function Slide30Stores({ pageNumber, totalPages }: { pageNumber: number; 
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-3 flex-wrap">
                 <div className="font-display text-4xl font-black">BOOMER OFF · 中信泰富店</div>
-                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold">营 业 中</span>
+                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold rounded-lg">营 业 中</span>
               </div>
               <div className="font-body text-2xl text-ink/80 font-bold">上海市静安区南京西路 1168 号 · 中信泰富广场 B1 层</div>
               <div className="mt-3 flex gap-6 font-handwrite text-3xl text-boomer-red flex-wrap">
@@ -1516,7 +1516,7 @@ export function Slide30Stores({ pageNumber, totalPages }: { pageNumber: number; 
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-3 flex-wrap">
                 <div className="font-display text-4xl font-black">更 多 门 店</div>
-                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold">筹 备 中</span>
+                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold rounded-lg">筹 备 中</span>
               </div>
               <div className="font-body text-2xl text-ink/80 font-bold">敬请期待 · 期待与您共同将首店成功复制到更多城市</div>
             </div>
@@ -1603,7 +1603,7 @@ export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; 
             <div className="font-handwrite text-4xl text-paper-cream mb-2 text-center">— Scan to Connect —</div>
             <div className="font-display text-3xl font-black text-center mb-6">扫 码 添 加 微 信</div>
 
-            <div className="bg-boomer-red p-4">
+            <div className="bg-boomer-red p-4 rounded-xl">
               <img
                 src={wechatQR}
                 alt="微信二维码"
