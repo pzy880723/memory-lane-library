@@ -134,8 +134,10 @@ const Index = () => {
     setExporting({ type: type.toUpperCase(), n: 0, total });
     try {
       const fn = type === "pdf" ? exportPDF : exportPPTX;
-      await fn((n, t) => setExporting({ type: type.toUpperCase(), n, total: t }));
-      toast({ title: `✓ ${type.toUpperCase()} 已生成`, description: "已开始下载" });
+      const items = await fn((n, t) => setExporting({ type: type.toUpperCase(), n, total: t }));
+      toast({ title: `✓ ${type.toUpperCase()} 已生成`, description: "已开始下载，对比预览即将打开" });
+      // 打开对比预览
+      setExportPreview({ type: type.toUpperCase(), items, activeIndex: current });
     } catch (err) {
       console.error(err);
       toast({ title: "导出失败", description: String(err), variant: "destructive" });
