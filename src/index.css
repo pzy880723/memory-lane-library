@@ -292,7 +292,7 @@
   .slide-content { font-family: var(--font-body); }
 }
 
-/* ============ 幻灯片缩放容器 — 横版 ============ */
+/* ============ 幻灯片缩放容器 ============ */
 .slide-stage {
   position: relative;
   width: 100%;
@@ -310,24 +310,3 @@
   transform: scale(var(--scale, 1));
   transform-origin: center center;
 }
-
-/* ============ 幻灯片缩放容器 — 竖版（9:16 / 1080×1920）============ */
-.slide-wrapper-portrait {
-  position: absolute;
-  width: 1080px;
-  height: 1920px;
-  left: 50%;
-  top: 50%;
-  margin-left: -540px;
-  margin-top: -960px;
-  transform: scale(var(--scale, 1));
-  transform-origin: center center;
-}
-
-/* 竖版下提升小字号下限，确保手机上可读 */
-.slide-content-portrait .text-xs   { font-size: 28px !important; line-height: 1.35 !important; }
-.slide-content-portrait .text-sm   { font-size: 32px !important; line-height: 1.35 !important; }
-.slide-content-portrait .text-base { font-size: 36px !important; line-height: 1.45 !important; }
-.slide-content-portrait .text-lg   { font-size: 40px !important; line-height: 1.45 !important; }
-.slide-content-portrait .text-xl   { font-size: 44px !important; line-height: 1.45 !important; }
-.slide-content-portrait .text-2xl  { font-size: 50px !important; line-height: 1.35 !important; }
