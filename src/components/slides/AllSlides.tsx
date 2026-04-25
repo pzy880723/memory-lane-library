@@ -1453,20 +1453,28 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
 
           <div className="bg-boomer-red text-paper-cream vintage-border p-10 rotate-[1deg]">
             <div className="font-handwrite text-4xl text-paper-cream mb-6">— Contact —</div>
-            <div className="space-y-6">
-              <div>
-                <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系人</div>
-                <div className="font-display text-5xl font-black">潘 瞻 远</div>
-              </div>
-              <div>
-                <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系电话</div>
-                <div className="font-en text-6xl flex items-center gap-3">
-                  <Phone className="w-12 h-12" strokeWidth={2.5} />
-                  186 5743 3310
+            <div className="grid grid-cols-[1fr_auto] gap-6 items-center">
+              <div className="space-y-6">
+                <div>
+                  <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系人</div>
+                  <div className="font-display text-5xl font-black">潘 瞻 远</div>
+                </div>
+                <div>
+                  <div className="font-condensed text-xl tracking-[0.3em] text-paper-cream/85 mb-2">联系电话</div>
+                  <div className="font-en text-5xl flex items-center gap-3">
+                    <Phone className="w-10 h-10" strokeWidth={2.5} />
+                    186 5743 3310
+                  </div>
+                </div>
+                <div className="pt-4 border-t-2 border-paper-cream/40">
+                  <div className="font-handwrite text-3xl">欢迎招商 · 加盟 · 品牌合作</div>
                 </div>
               </div>
-              <div className="pt-4 border-t-2 border-paper-cream/40">
-                <div className="font-handwrite text-3xl">欢迎招商 · 加盟 · 品牌合作</div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3">
+                  <img src={wechatQR} alt="微信二维码" className="w-44 h-44 object-contain" />
+                </div>
+                <div className="font-handwrite text-2xl text-paper-cream/90">Scan WeChat</div>
               </div>
             </div>
           </div>
