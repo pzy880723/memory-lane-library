@@ -2,22 +2,27 @@ import { useEffect, useRef, useState } from "react";
 
 interface ScaledSlideProps {
   children: React.ReactNode;
-  /** 1 = full size (1920x1080), use smaller for thumbnails */
-  fitTo?: HTMLElement | null;
   className?: string;
+  orientation?: "landscape" | "portrait";
 }
 
-/** 1920x1080 fixed-resolution slide that scales to fit its parent */
-export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
+/**
+ * Fixed-resolution slide that scales to fit its parent.
+ * - landscape: 1920×1080
+ * - portrait:  1080×1920
+ */
+export function ScaledSlide({ children, className = "", orientation = "landscape" }: ScaledSlideProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const baseW = orientation === "portrait" ? 1080 : 1920;
+  const baseH = orientation === "portrait" ? 1920 : 1080;
 
   useEffect(() => {
     const update = () => {
       const el = stageRef.current;
       if (!el) return;
       const { width, height } = el.getBoundingClientRect();
-      const s = Math.min(width / 1920, height / 1080);
+      const s = Math.min(width / baseW, height / baseH);
       setScale(s);
     };
     update();
@@ -28,14 +33,16 @@ export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
       ro.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [baseW, baseH]);
+
+  const wrapperClass =
+    orientation === "portrait"
+      ? "slide-wrapper-portrait slide-content slide-content-portrait"
+      : "slide-wrapper slide-content";
 
   return (
     <div ref={stageRef} className={`slide-stage ${className}`}>
-      <div
-        className="slide-wrapper slide-content"
-        style={{ ["--scale" as string]: scale } as React.CSSProperties}
-      >
+      <div className={wrapperClass} style={{ ["--scale" as string]: scale } as React.CSSProperties}>
         {children}
       </div>
     </div>
