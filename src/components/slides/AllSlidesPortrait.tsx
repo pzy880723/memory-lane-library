@@ -423,71 +423,73 @@ export function P_Keywords({ pageNumber, totalPages }: { pageNumber: number; tot
 
 /* ============ 10. 解决问题 — 三段式对比表 ============ */
 export function P_Problem({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  const A = {
+    letter: "A", label: "如 BOOK OFF · 日本", title: "标准化中古店",
+    pros: ["✓ 明码标价", "✓ 标准陈列", "✓ 可复制"],
+    cons: ["✗ 缺氛围", "✗ 情绪低"],
+  };
+  const C = {
+    letter: "C", label: "主理人审美 · 街边", title: "设计师中古店",
+    pros: ["✓ 设计感强", "✓ 氛围出片"],
+    cons: ["✗ 定价不透明", "✗ 依赖主理人"],
+  };
+
+  const Side = ({ d }: { d: typeof A }) => (
+    <div className="bg-paper-cream border-y-4 border-ink/15 px-10 py-8 flex items-center gap-6">
+      <div className="font-en text-8xl text-ink/25 leading-none shrink-0">{d.letter}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-condensed text-lg tracking-[0.2em] text-ink/55">{d.label}</div>
+        <div className="font-display text-4xl font-black mt-1 mb-3">{d.title}</div>
+        <div className="flex flex-wrap gap-2">
+          {d.pros.map(t => (
+            <span key={t} className="px-3 py-1.5 bg-vintage-moss/15 text-vintage-moss font-display text-xl font-bold">{t}</span>
+          ))}
+          {d.cons.map(t => (
+            <span key={t} className="px-3 py-1.5 bg-ink/10 text-ink/45 font-display text-xl font-bold line-through">{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="02 · 品牌定位">
-      {/* 顶部 */}
-      <div className="absolute top-12 left-12 right-12 text-center">
-        <div className="font-handwrite text-3xl text-boomer-red">ダブル DNA · 双基因</div>
+    <Frame bg="paper" page={pageNumber} total={totalPages} chapter="02 · 品牌定位" flex>
+      {/* 顶部标题 */}
+      <div className="px-12 pt-14 pb-8 text-center shrink-0">
+        <div className="font-handwrite text-4xl text-boomer-red">ダブル DNA · 双基因</div>
         <h1 className="font-display text-7xl font-black mt-2 leading-[0.95]">
           标准化 <span className="text-boomer-red">×</span> 氛围感
         </h1>
         <div className="font-display text-3xl mt-3 text-ink/75">融 合 模 式</div>
       </div>
 
-      {/* A 模式 */}
-      <div className="absolute top-[400px] left-0 right-0 bg-paper-cream border-y-4 border-ink/15 p-7">
-        <div className="flex items-start gap-5">
-          <div className="font-en text-7xl text-ink/30 leading-none">A</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-ink/55">如 BOOK OFF · 日本</div>
-            <div className="font-display text-3xl font-black mb-3">标准化中古店</div>
-            <div className="flex flex-wrap gap-2">
-              {["✓ 明码标价", "✓ 标准陈列", "✓ 可复制"].map(t => (
-                <span key={t} className="px-3 py-1 bg-vintage-moss/15 text-vintage-moss font-display text-lg font-bold">{t}</span>
-              ))}
-              {["✗ 缺氛围", "✗ 情绪低"].map(t => (
-                <span key={t} className="px-3 py-1 bg-ink/10 text-ink/45 font-display text-lg font-bold line-through">{t}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* A / B / C 三段，flex-1 等高占满 */}
+      <div className="grow flex flex-col">
+        <div className="grow"><Side d={A} /></div>
 
-      {/* B 模式 - BOOMER OFF 突出 */}
-      <div className="absolute top-[720px] left-0 right-0 bg-boomer-red text-paper-cream p-8 z-10 shadow-2xl">
-        <div className="absolute -top-4 -right-4 bg-vintage-gold text-ink font-display text-2xl font-black px-4 py-2 rotate-6 vintage-border-soft">★ BOOMER OFF</div>
-        <div className="flex items-start gap-5">
-          <div className="font-en text-8xl text-paper-cream leading-none">B</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-paper-cream/85">融 · 合 · 模 · 式</div>
-            <div className="font-display text-4xl font-black mb-4">两者最优组合</div>
-            <div className="grid grid-cols-2 gap-2">
-              {["★ 标准化 + 氛围感", "★ 透明定价 + 评级", "★ 沉浸声光 + IP", "★ 6.9 元起售", "★ 可复制可加盟", "★ 信任可见"].map(t => (
-                <div key={t} className="font-display text-xl font-bold leading-snug">{t}</div>
-              ))}
+        {/* B 模式 — BOOMER OFF 主推，更大占比 */}
+        <div className="relative bg-boomer-red text-paper-cream px-10 py-10 z-10 shadow-2xl basis-[40%] grow-0 flex items-center">
+          <div className="absolute -top-5 right-6 bg-vintage-gold text-ink font-display text-2xl font-black px-5 py-2 rotate-6 vintage-border-soft">★ BOOMER OFF</div>
+          <div className="flex items-start gap-6 w-full">
+            <div className="font-en text-[140px] text-paper-cream leading-[0.85] shrink-0">B</div>
+            <div className="flex-1">
+              <div className="font-condensed text-lg tracking-[0.2em] text-paper-cream/85">融 · 合 · 模 · 式</div>
+              <div className="font-display text-5xl font-black mb-5 mt-1">两者最优组合</div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {["★ 标准化 + 氛围感", "★ 透明定价 + 评级", "★ 沉浸声光 + IP", "★ 6.9 元起售", "★ 可复制可加盟", "★ 信任可见"].map(t => (
+                  <div key={t} className="font-display text-2xl font-bold leading-snug">{t}</div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* C 模式 */}
-      <div className="absolute bottom-14 left-0 right-0 bg-paper-cream border-y-4 border-ink/15 p-7">
-        <div className="flex items-start gap-5">
-          <div className="font-en text-7xl text-ink/30 leading-none">C</div>
-          <div className="flex-1">
-            <div className="font-condensed text-base tracking-[0.2em] text-ink/55">主理人审美 · 街边</div>
-            <div className="font-display text-3xl font-black mb-3">设计师中古店</div>
-            <div className="flex flex-wrap gap-2">
-              {["✓ 设计感强", "✓ 氛围出片"].map(t => (
-                <span key={t} className="px-3 py-1 bg-vintage-moss/15 text-vintage-moss font-display text-lg font-bold">{t}</span>
-              ))}
-              {["✗ 定价不透明", "✗ 依赖主理人"].map(t => (
-                <span key={t} className="px-3 py-1 bg-ink/10 text-ink/45 font-display text-lg font-bold line-through">{t}</span>
-              ))}
-            </div>
-          </div>
-        </div>
+        <div className="grow"><Side d={C} /></div>
       </div>
+      <div className="h-14 shrink-0" />
+    </Frame>
+  );
+}
     </Frame>
   );
 }
