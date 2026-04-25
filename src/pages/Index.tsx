@@ -18,6 +18,8 @@ const Index = () => {
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [forceLandscape, setForceLandscape] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
+  const [vw, setVw] = useState(typeof window !== "undefined" ? window.innerWidth : 0);
+  const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
   const [exportPreview, setExportPreview] = useState<{
     type: string;
     items: ExportPreviewItem[];
@@ -120,8 +122,19 @@ const Index = () => {
     document.body.style.width = "100%";
     document.body.style.height = "100%";
 
+    // 实时同步真实视口尺寸 — 不依赖 dvh/dvw（iOS Safari 在 fixed body 下计算有 bug）
+    const syncSize = () => {
+      const w = window.visualViewport?.width ?? window.innerWidth;
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      setVw(w);
+      setVh(h);
+    };
+    syncSize();
+    window.addEventListener("resize", syncSize);
+    window.visualViewport?.addEventListener("resize", syncSize);
+    window.visualViewport?.addEventListener("scroll", syncSize);
+
     const ua = navigator.userAgent || "";
-    // 三重判断：UA 包含手机标识 / 触摸设备 + 窄屏 / 单纯窄竖屏
     const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const isNarrowPortrait =
       window.innerWidth < 768 && window.innerHeight > window.innerWidth;
@@ -130,12 +143,20 @@ const Index = () => {
       (hasTouch && isNarrowPortrait) ||
       isNarrowPortrait;
     const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+
+    let hintTimer: number | undefined;
     if (isPhone && !isIpad) {
       setForceLandscape(true);
       setShowRotateHint(true);
-      const t = setTimeout(() => setShowRotateHint(false), 3000);
-      return () => clearTimeout(t);
+      hintTimer = window.setTimeout(() => setShowRotateHint(false), 3000);
     }
+
+    return () => {
+      window.removeEventListener("resize", syncSize);
+      window.visualViewport?.removeEventListener("resize", syncSize);
+      window.visualViewport?.removeEventListener("scroll", syncSize);
+      if (hintTimer) clearTimeout(hintTimer);
+    };
   }, [pseudoFullscreen]);
   // 键盘导航（含 ESC 退出伪全屏）
   useEffect(() => {
@@ -278,8 +299,9 @@ const Index = () => {
                   position: "fixed",
                   top: "50%",
                   left: "50%",
-                  width: "100dvh",
-                  height: "100dvw",
+                  // 用 JS 实测像素值代替 dvh/dvw — 规避 iOS Safari 在 fixed body 下的尺寸 bug
+                  width: `${vh}px`,
+                  height: `${vw}px`,
                   transform: "translate(-50%, -50%) rotate(90deg)",
                   transformOrigin: "center center",
                   zIndex: 9999,
@@ -295,7 +317,9 @@ const Index = () => {
             }
           >
             {forceLandscape ? (
-              <SlideRenderer index={current} />
+              <div className="w-full h-full">
+                <SlideRenderer index={current} />
+              </div>
             ) : (
               <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
                 <SlideRenderer index={current} />
