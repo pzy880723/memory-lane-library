@@ -16,6 +16,8 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
+  const [forceLandscape, setForceLandscape] = useState(false);
+  const [showRotateHint, setShowRotateHint] = useState(false);
   const [exportPreview, setExportPreview] = useState<{
     type: string;
     items: ExportPreviewItem[];
@@ -100,6 +102,27 @@ const Index = () => {
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
 
+  // 进入伪全屏 → 手机自动启用强制横屏旋转 + 显示提示
+  useEffect(() => {
+    if (!pseudoFullscreen) {
+      setForceLandscape(false);
+      setShowRotateHint(false);
+      return;
+    }
+    const ua = navigator.userAgent || "";
+    const isPhone =
+      /iPhone|Android.*Mobile|Mobi/i.test(ua) ||
+      (window.innerWidth < 768 && window.innerHeight > window.innerWidth + 100);
+    // iPad 不旋转：iPad 走 webkitRequestFullscreen，理论上不会进入伪全屏；
+    // 即便误判，屏幕足够大也无需旋转
+    const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    if (isPhone && !isIpad) {
+      setForceLandscape(true);
+      setShowRotateHint(true);
+      const t = setTimeout(() => setShowRotateHint(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [pseudoFullscreen]);
   // 键盘导航（含 ESC 退出伪全屏）
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -232,7 +255,24 @@ const Index = () => {
         )}
 
         {/* 幻灯片舞台 */}
-        <div ref={stageRef} className="flex-1 relative bg-ink overflow-hidden">
+        <div
+          ref={stageRef}
+          className="flex-1 relative bg-ink overflow-hidden"
+          style={
+            forceLandscape
+              ? {
+                  position: "fixed",
+                  top: 0,
+                  left: "100dvw",
+                  width: "100dvh",
+                  height: "100dvw",
+                  transform: "rotate(90deg)",
+                  transformOrigin: "top left",
+                  zIndex: 9999,
+                }
+              : undefined
+          }
+        >
           <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
             <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
               <SlideRenderer index={current} />
@@ -322,6 +362,21 @@ const Index = () => {
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
+
+              {/* 强制横屏提示 — 3 秒后淡出 */}
+              {forceLandscape && (
+                <div
+                  className={`absolute inset-0 z-40 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
+                    showRotateHint ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <div className="bg-ink/85 backdrop-blur-md text-paper-cream px-8 py-6 rounded-2xl border-2 border-boomer-red shadow-2xl flex flex-col items-center gap-3">
+                    <div className="text-5xl animate-pulse">📱↻</div>
+                    <div className="font-display text-xl font-black tracking-wide">请将手机横过来观看</div>
+                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE</div>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
