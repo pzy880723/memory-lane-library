@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
-import { exportPDF, exportPPTX, type ExportPreviewItem } from "@/lib/export";
+import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
   ChevronLeft, ChevronRight, Download, FileText, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 
