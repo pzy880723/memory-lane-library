@@ -540,26 +540,39 @@ const Index = () => {
           </div>
         )}
 
-        {/* 导出进度遮罩 */}
+        {/* 导出进度浮窗（可继续浏览，可随时取消） */}
         {exporting && (
-          <div className="fixed inset-0 bg-ink/85 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-paper-cream vintage-border-red p-12 max-w-md w-full mx-4 text-center">
-              <div className="font-handwrite text-3xl text-boomer-red mb-3">Generating...</div>
-              <h3 className="font-display text-3xl font-black mb-6">正在生成 {exporting.type} 文件</h3>
-              <div className="w-full bg-paper-deep rounded-full h-3 overflow-hidden mb-3">
-                <div
-                  className="bg-boomer-red h-full transition-all"
-                  style={{ width: `${(exporting.n / exporting.total) * 100}%` }}
-                />
+          <div className="fixed bottom-6 right-6 z-[100] w-80 bg-paper-cream vintage-border-red shadow-2xl p-5 animate-in slide-in-from-bottom-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-boomer-red animate-pulse" />
+                <h3 className="font-display text-lg font-black">
+                  正在生成 {exporting.type}
+                </h3>
               </div>
-              <div className="font-en text-2xl">
-                <span className="text-boomer-red">{exporting.n}</span>
-                <span className="text-ink/50"> / {exporting.total}</span>
-                <span className="font-body text-base ml-3 text-ink/60">页</span>
-              </div>
-              <p className="font-body text-sm text-ink/60 mt-4">
-                请稍候 · 文件较大，预计需要 30-90 秒
-              </p>
+              <button
+                onClick={cancelExport}
+                className="text-ink/50 hover:text-boomer-red transition-colors"
+                aria-label="取消下载"
+                title="取消下载"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="w-full bg-paper-deep rounded-full h-2 overflow-hidden mb-2">
+              <div
+                className="bg-boomer-red h-full transition-all"
+                style={{ width: `${(exporting.n / exporting.total) * 100}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-en text-sm">
+                <span className="text-boomer-red font-bold">{exporting.n}</span>
+                <span className="text-ink/50"> / {exporting.total} 页</span>
+              </span>
+              <span className="font-body text-xs text-ink/60">
+                后台运行 · 可继续浏览
+              </span>
             </div>
           </div>
         )}
