@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { exportPDF, exportPPTX, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,29 @@ const Index = () => {
 
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
+  const pseudoFullscreenViewportStyle: CSSProperties | undefined = pseudoFullscreen
+    ? {
+        paddingTop: "max(12px, env(safe-area-inset-top))",
+        paddingRight: "12px",
+        paddingBottom: "max(88px, calc(env(safe-area-inset-bottom) + 76px))",
+        paddingLeft: "12px",
+      }
+    : undefined;
+  const pseudoFullscreenSlideStyle: CSSProperties | undefined = pseudoFullscreen
+    ? isPhonePortrait
+      ? {
+          width: "100%",
+          maxWidth: "100%",
+          maxHeight: "100%",
+          aspectRatio: "16 / 9",
+        }
+      : {
+          height: "100%",
+          width: "auto",
+          maxWidth: "100%",
+          aspectRatio: "16 / 9",
+        }
+    : undefined;
 
   // 进入伪全屏 → 锁 body 滚动 + 检测手机方向 + 必要时显示「请横过来」提示
   useEffect(() => {
@@ -297,11 +320,12 @@ const Index = () => {
                 ? "absolute inset-0 flex items-center justify-center"
                 : "absolute inset-0 flex items-center justify-center p-4 md:p-8"
             }
+            style={pseudoFullscreenViewportStyle}
           >
             {/* 16:9 容器：用 aspect-ratio + max-w/h 让幻灯片在任意视口下等比缩放 + 居中 */}
             <div
-              className="max-w-full max-h-full w-full"
-              style={{ aspectRatio: "16 / 9" }}
+              className={pseudoFullscreen ? "max-w-full max-h-full" : "max-w-full max-h-full w-full"}
+              style={pseudoFullscreenSlideStyle ?? { aspectRatio: "16 / 9" }}
             >
               <SlideRenderer index={current} />
             </div>
@@ -365,12 +389,19 @@ const Index = () => {
               <Button
                 size="icon"
                 className="absolute top-4 right-4 z-30 h-12 w-12 rounded-full bg-ink/70 text-paper-cream hover:bg-ink/90 backdrop-blur border border-paper-cream/30"
+                style={{
+                  top: "max(1rem, env(safe-area-inset-top))",
+                  right: "max(1rem, env(safe-area-inset-right))",
+                }}
                 onClick={() => setPseudoFullscreen(false)}
                 aria-label="退出全屏"
               >
                 <Minimize2 className="w-5 h-5" />
               </Button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/70 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20">
+              <div
+                className="absolute left-1/2 -translate-x-1/2 z-20 bg-ink/70 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20"
+                style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+              >
                 <Button
                   variant="ghost" size="icon"
                   className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
