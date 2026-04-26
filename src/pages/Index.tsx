@@ -102,57 +102,56 @@ const Index = () => {
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
 
-  // 进入伪全屏 → 手机自动启用强制横屏旋转 + 显示提示 + 锁定 body 滚动
+  // 进入伪全屏 → 锁 body 滚动 + 检测手机方向 + 必要时显示「请横过来」提示
   useEffect(() => {
     if (!pseudoFullscreen) {
-      setForceLandscape(false);
+      setIsPhonePortrait(false);
       setShowRotateHint(false);
-      // 还原 body 样式
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.width = "";
       document.body.style.height = "";
       return;
     }
-    // 锁定 body 防止 iOS Safari 出现可滚动空白
     document.body.style.overflow = "hidden";
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
     document.body.style.height = "100%";
 
-    // 实时同步真实视口尺寸 — 不依赖 dvh/dvw（iOS Safari 在 fixed body 下计算有 bug）
-    const syncSize = () => {
-      const w = window.visualViewport?.width ?? window.innerWidth;
-      const h = window.visualViewport?.height ?? window.innerHeight;
-      setVw(w);
-      setVh(h);
-    };
-    syncSize();
-    window.addEventListener("resize", syncSize);
-    window.visualViewport?.addEventListener("resize", syncSize);
-    window.visualViewport?.addEventListener("scroll", syncSize);
-
     const ua = navigator.userAgent || "";
     const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const isNarrowPortrait =
-      window.innerWidth < 768 && window.innerHeight > window.innerWidth;
-    const isPhone =
-      /iPhone|Android.*Mobile|Mobi/i.test(ua) ||
-      (hasTouch && isNarrowPortrait) ||
-      isNarrowPortrait;
-    const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    const isIpad =
+      /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    const isPhoneUA = /iPhone|Android.*Mobile|Mobi/i.test(ua);
+    const isLikelyPhone =
+      (isPhoneUA || (hasTouch && Math.min(window.innerWidth, window.innerHeight) < 500)) &&
+      !isIpad;
 
     let hintTimer: number | undefined;
-    if (isPhone && !isIpad) {
-      setForceLandscape(true);
-      setShowRotateHint(true);
-      hintTimer = window.setTimeout(() => setShowRotateHint(false), 3000);
-    }
+
+    const syncOrientation = () => {
+      const w = window.visualViewport?.width ?? window.innerWidth;
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      const portrait = h > w;
+      const phonePortrait = isLikelyPhone && portrait;
+      setIsPhonePortrait(phonePortrait);
+      if (phonePortrait) {
+        setShowRotateHint(true);
+        if (hintTimer) clearTimeout(hintTimer);
+        hintTimer = window.setTimeout(() => setShowRotateHint(false), 3000);
+      } else {
+        setShowRotateHint(false);
+      }
+    };
+    syncOrientation();
+    window.addEventListener("resize", syncOrientation);
+    window.addEventListener("orientationchange", syncOrientation);
+    window.visualViewport?.addEventListener("resize", syncOrientation);
 
     return () => {
-      window.removeEventListener("resize", syncSize);
-      window.visualViewport?.removeEventListener("resize", syncSize);
-      window.visualViewport?.removeEventListener("scroll", syncSize);
+      window.removeEventListener("resize", syncOrientation);
+      window.removeEventListener("orientationchange", syncOrientation);
+      window.visualViewport?.removeEventListener("resize", syncOrientation);
       if (hintTimer) clearTimeout(hintTimer);
     };
   }, [pseudoFullscreen]);
