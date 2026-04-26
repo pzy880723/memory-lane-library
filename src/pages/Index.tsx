@@ -233,8 +233,15 @@ const Index = () => {
       );
       toast({
         title: `✓ ${label} 已生成`,
-        description: "文件已开始下载，点此查看导出对比预览",
-        onClick: () => setExportPreview({ type: label, items, activeIndex: current }),
+        description: "文件已开始下载，可点击查看导出对比预览",
+        action: (
+          <ToastAction
+            altText="查看对比"
+            onClick={() => setExportPreview({ type: label, items, activeIndex: current })}
+          >
+            查看对比
+          </ToastAction>
+        ),
       });
     } catch (err) {
       if (err instanceof ExportCancelledError) {
