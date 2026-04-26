@@ -16,10 +16,8 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
-  const [forceLandscape, setForceLandscape] = useState(false);
+  const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [vw, setVw] = useState(typeof window !== "undefined" ? window.innerWidth : 0);
-  const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
   const [exportPreview, setExportPreview] = useState<{
     type: string;
     items: ExportPreviewItem[];
