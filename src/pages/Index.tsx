@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
-import { exportPDF, exportPPTX, type ExportPreviewItem } from "@/lib/export";
+import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import {
-  ChevronLeft, ChevronRight, Download, FileText, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  ChevronLeft, ChevronRight, Download, Share2,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 
@@ -24,6 +28,7 @@ const Index = () => {
     activeIndex: number;
   } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const exportAbortRef = useRef<AbortController | null>(null);
 
   const total = SLIDES.length;
 
@@ -214,19 +219,45 @@ const Index = () => {
   }, []);
 
   const handleExport = async (type: "pdf" | "pptx") => {
-    setExporting({ type: type.toUpperCase(), n: 0, total });
+    if (exporting) return;
+    const controller = new AbortController();
+    exportAbortRef.current = controller;
+    const label = type.toUpperCase();
+    setExporting({ type: label, n: 0, total });
+    toast({ title: `开始生成 ${label}`, description: "可继续浏览，下载将在后台进行" });
     try {
       const fn = type === "pdf" ? exportPDF : exportPPTX;
-      const items = await fn((n, t) => setExporting({ type: type.toUpperCase(), n, total: t }));
-      toast({ title: `✓ ${type.toUpperCase()} 已生成`, description: "已开始下载，对比预览即将打开" });
-      // 打开对比预览
-      setExportPreview({ type: type.toUpperCase(), items, activeIndex: current });
+      const items = await fn(
+        (n, t) => setExporting({ type: label, n, total: t }),
+        { signal: controller.signal },
+      );
+      toast({
+        title: `✓ ${label} 已生成`,
+        description: "文件已开始下载，可点击查看导出对比预览",
+        action: (
+          <ToastAction
+            altText="查看对比"
+            onClick={() => setExportPreview({ type: label, items, activeIndex: current })}
+          >
+            查看对比
+          </ToastAction>
+        ),
+      });
     } catch (err) {
-      console.error(err);
-      toast({ title: "导出失败", description: String(err), variant: "destructive" });
+      if (err instanceof ExportCancelledError) {
+        toast({ title: `${label} 导出已取消` });
+      } else {
+        console.error(err);
+        toast({ title: "导出失败", description: String(err), variant: "destructive" });
+      }
     } finally {
+      exportAbortRef.current = null;
       setExporting(null);
     }
+  };
+
+  const cancelExport = () => {
+    exportAbortRef.current?.abort();
   };
 
   return (
@@ -283,24 +314,44 @@ const Index = () => {
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">分享</span>
             </Button>
-            <Button
-              size="sm"
-              className="bg-paper-cream text-ink hover:bg-paper-cream/90 gap-2"
-              onClick={() => handleExport("pdf")}
-              disabled={!!exporting}
-            >
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">下载 PDF</span>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-              onClick={() => handleExport("pptx")}
-              disabled={!!exporting}
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">下载 PPT</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+                  disabled={!!exporting}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {exporting ? `生成中 ${exporting.n}/${exporting.total}` : "下载"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => handleExport("pdf")}
+                  disabled={!!exporting}
+                  className="gap-3 cursor-pointer"
+                >
+                  <FileDown className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PDF</span>
+                    <span className="text-xs text-muted-foreground">便于阅读分享</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleExport("pptx")}
+                  disabled={!!exporting}
+                  className="gap-3 cursor-pointer"
+                >
+                  <Presentation className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PPT</span>
+                    <span className="text-xs text-muted-foreground">可二次编辑</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               size="icon"
@@ -489,26 +540,39 @@ const Index = () => {
           </div>
         )}
 
-        {/* 导出进度遮罩 */}
+        {/* 导出进度浮窗（可继续浏览，可随时取消） */}
         {exporting && (
-          <div className="fixed inset-0 bg-ink/85 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-paper-cream vintage-border-red p-12 max-w-md w-full mx-4 text-center">
-              <div className="font-handwrite text-3xl text-boomer-red mb-3">Generating...</div>
-              <h3 className="font-display text-3xl font-black mb-6">正在生成 {exporting.type} 文件</h3>
-              <div className="w-full bg-paper-deep rounded-full h-3 overflow-hidden mb-3">
-                <div
-                  className="bg-boomer-red h-full transition-all"
-                  style={{ width: `${(exporting.n / exporting.total) * 100}%` }}
-                />
+          <div className="fixed bottom-6 right-6 z-[100] w-80 bg-paper-cream vintage-border-red shadow-2xl p-5 animate-in slide-in-from-bottom-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-boomer-red animate-pulse" />
+                <h3 className="font-display text-lg font-black">
+                  正在生成 {exporting.type}
+                </h3>
               </div>
-              <div className="font-en text-2xl">
-                <span className="text-boomer-red">{exporting.n}</span>
-                <span className="text-ink/50"> / {exporting.total}</span>
-                <span className="font-body text-base ml-3 text-ink/60">页</span>
-              </div>
-              <p className="font-body text-sm text-ink/60 mt-4">
-                请稍候 · 文件较大，预计需要 30-90 秒
-              </p>
+              <button
+                onClick={cancelExport}
+                className="text-ink/50 hover:text-boomer-red transition-colors"
+                aria-label="取消下载"
+                title="取消下载"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="w-full bg-paper-deep rounded-full h-2 overflow-hidden mb-2">
+              <div
+                className="bg-boomer-red h-full transition-all"
+                style={{ width: `${(exporting.n / exporting.total) * 100}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-en text-sm">
+                <span className="text-boomer-red font-bold">{exporting.n}</span>
+                <span className="text-ink/50"> / {exporting.total} 页</span>
+              </span>
+              <span className="font-body text-xs text-ink/60">
+                后台运行 · 可继续浏览
+              </span>
             </div>
           </div>
         )}
