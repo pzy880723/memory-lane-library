@@ -266,9 +266,9 @@ export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number;
               className={`vintage-border p-5 ${d.color} ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}
             >
               <d.icon className="w-10 h-10 mb-3 text-boomer-red" strokeWidth={2.5} />
-              <div className="font-body text-lg mb-1 opacity-65">{d.label}</div>
-              <div className="font-display text-3xl font-black leading-tight">{d.value}</div>
-              <div className="font-body text-base mt-1 opacity-65">{d.sub}</div>
+              <div className="font-body text-3xl mb-1 opacity-65">{d.label}</div>
+              <div className="font-display text-6xl font-black leading-tight">{d.value}</div>
+              <div className="font-body text-2xl mt-1 opacity-65">{d.sub}</div>
             </div>
           ))}
         </div>
