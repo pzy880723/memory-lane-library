@@ -5,7 +5,7 @@ import {
   Shield, Award, Recycle, Building2, Phone, Star, Quote, ChevronRight,
   Package, Coffee, Headphones, Gift, Store, Home as HomeIcon,
   ShoppingBag, Smartphone, Warehouse, MessageCircle, BadgeCheck, Disc3,
-  Check, X,
+  Check, X, Truck, Search, Droplets, Link as LinkIcon,
 } from "lucide-react";
 
 // 店铺实拍图
