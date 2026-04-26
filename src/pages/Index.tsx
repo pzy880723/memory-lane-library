@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { exportPDF, exportPPTX, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ const Index = () => {
 
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
-  const pseudoFullscreenViewportStyle: React.CSSProperties | undefined = pseudoFullscreen
+  const pseudoFullscreenViewportStyle: CSSProperties | undefined = pseudoFullscreen
     ? {
         paddingTop: "max(12px, env(safe-area-inset-top))",
         paddingRight: "12px",
@@ -109,7 +109,7 @@ const Index = () => {
         paddingLeft: "12px",
       }
     : undefined;
-  const pseudoFullscreenSlideStyle: React.CSSProperties | undefined = pseudoFullscreen
+  const pseudoFullscreenSlideStyle: CSSProperties | undefined = pseudoFullscreen
     ? isPhonePortrait
       ? {
           width: "100%",
