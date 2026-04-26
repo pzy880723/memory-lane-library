@@ -1,94 +1,96 @@
-## 问题诊断
+## 问题已经定位清楚
 
-从你上传的截图可以清楚看到：**幻灯片确实旋转了 90°，但只显示在屏幕中间一个小方框里，远没有铺满整个手机屏幕**。
+当前不是单一 CSS 小 bug，而是两个问题叠加：
 
-### 根本原因（三层问题叠加）
+1. `src/pages/Index.tsx` 里把手机伪全屏做成了“永远旋转 90° + 永远宽高互换”。
+   这样一来，只要真实视口方向变化，舞台就会继续按错误坐标系计算，结果就是幻灯片被缩成中间一个小框。
 
-**① 内层 `aspectRatio: 16/9` + `p-4` 包装把舞台压成小盒子**
+2. `src/components/slides/ScaledSlide.tsx` 现在用 `getBoundingClientRect()` 量自己的容器尺寸。这个值会受 transform/旋转后的视觉盒子影响，导致缩放比例按“被旋转过的盒子”算，而不是按真正可用的 16:9 逻辑画布算。
 
-`src/pages/Index.tsx` 第 276-280 行：
-```tsx
-<div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
-  <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
-    <SlideRenderer index={current} />
-  </div>
-</div>
-```
+3. 更关键的一点：iPhone 屏幕本身不是 16:9。你的幻灯片是 16:9，而 iPhone 视口通常接近 19.5:9 或更宽。
+   所以如果要求“导出和预览一模一样”且不裁切内容，那么物理上就不可能把整页 16:9 幻灯片无损铺满整个 iPhone 屏幕。现在看到的纯黑边可以消除，但“完全无留白且不裁切”做不到。
 
-这层 wrapper 在桌面端是为了「让 16:9 幻灯片在任意容器里居中并保持比例」，但**旋转后的舞台本身就已经是 16:9 比例的横版**（宽 = 100dvh ≈ 844px，高 = 100dvw ≈ 390px），再套一层 `aspectRatio: 16/9` + `p-4 / md:p-8` 内边距，就会把内容再次缩成一个小框 → 这就是你看到的"小卡片飘在中间"的根因。
+## 这次的修复方向
 
-**② iOS Safari 的 `100dvh` 和地址栏会动态变化**
+### 1) 重做手机伪全屏的布局逻辑
+只改 `src/pages/Index.tsx` 的全屏容器结构：
 
-虽然 `100dvh` 应该是「动态视口高度」，但在 iOS Safari 进入页面后地址栏的展开/收起会让数值跳变，导致旋转后的尺寸不稳定。
+- 外层固定层只负责占满真实视口
+- 内层再根据“当前真实方向”决定如何显示
+- 不再使用“所有手机一进全屏就永远 rotate(90deg)”的策略
 
-**③ `transform-origin: top left` + `left: 100dvw` 的布局**
+新逻辑会变成：
+- 手机竖屏进入伪全屏：显示全屏提示层，引导横过来查看，不再把 16:9 幻灯片硬塞成一个小盒子
+- 手机横屏时：直接按真实横屏视口渲染舞台，不再继续额外旋转
 
-当前用 `left: 100dvw` 把元素推到屏幕右边、再 `rotate(90deg)` 转回来，这种写法依赖 `100dvw` 精确等于视口宽度，在某些 Safari 状态下会有 1-2px 误差导致出现滚动条/黑边。
+这样可以避免现在这种“已经横了还再被旋一次”的缩小问题。
 
----
+### 2) 修正 ScaledSlide 的测量基准
+改 `src/components/slides/ScaledSlide.tsx`，把缩放计算改成测量“未变换的实际承载容器”，而不是测量 transform 后的视觉盒子。
 
-## 修复方案
+会顺手把现在没真正用上的 `fitTo` 能力接起来：
+- 默认场景继续自适应父容器
+- 伪全屏场景显式传入测量目标
 
-### 改动 1：旋转模式下移除内层 wrapper 的 padding 和 aspectRatio
+并把尺寸读取改为更稳定的 `clientWidth/clientHeight` 逻辑，避免旋转后的 `getBoundingClientRect()` 干扰 scale 计算。
 
-在 `src/pages/Index.tsx` 第 276-280 行，把那层 wrapper 改为**条件渲染**：
-- `forceLandscape = false` 时：保持原样（`p-4 md:p-8` + `aspectRatio: 16/9`）—— 桌面/iPad 体验不变
-- `forceLandscape = true` 时：直接 `<div className="absolute inset-0">` 铺满，让 `SlideRenderer` 内部的 `ScaledSlide` 自己根据父容器 100% × 100% 去算 scale —— 这样旋转后的整个 844×390 区域全部用来显示幻灯片，按 16:9 自动 fit 到最大尺寸
+### 3) 让 SlideRenderer 支持显式传入 fit 容器
+改 `src/components/slides/registry.tsx`：
+- 给 `SlideRenderer` 增加可选的 `fitTo` 参数
+- 伪全屏模式把真实舞台容器传给 `ScaledSlide`
 
-### 改动 2：用更稳的旋转 transform 写法
+这样预览、缩略图、导出三条链路仍然共用同一套 1920×1080 幻灯片 DOM，但全屏缩放会更稳定。
 
-把第 261-274 行的旋转样式从：
-```js
-{ left: "100dvw", transform: "rotate(90deg)", transformOrigin: "top left", width: "100dvh", height: "100dvw" }
-```
-改为更稳定的「中心旋转」写法：
-```js
-{
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  width: "100dvh",
-  height: "100dvw",
-  transform: "translate(-50%, -50%) rotate(90deg)",
-  transformOrigin: "center center",
-  zIndex: 9999,
-}
-```
-中心旋转避免了 `top-left` 模式下对 `100dvw` 像素级精度的依赖，在 iOS Safari 地址栏伸缩时也不会出现黑边/滚动条。
+### 4) 去掉“黑边”观感，但保留内容不裁切
+因为 16:9 和 iPhone 屏幕比例不同，无法无损铺满，所以这次会把“黑边”处理成品牌化背景，而不是纯黑空白：
 
-### 改动 3：进入伪全屏时锁定 body 滚动 + 隐藏溢出
+- 伪全屏背景改为品牌纸张/深色纹理
+- 中间仍然是完整 16:9 幻灯片
+- 不裁切、不拉伸，保证和 PDF/PPT 导出一致
 
-在 `pseudoFullscreen` 的 useEffect 里给 `document.body` 加：
-```js
-document.body.style.overflow = "hidden";
-document.body.style.position = "fixed";
-document.body.style.width = "100%";
-```
-退出时还原。这样可以防止 iOS Safari 出现"被旋转元素撑出页面边界 → 出现可滚动的灰色空白"的现象（你截图里幻灯片上下都是大块黑色其实就是这个）。
+如果你后面坚持“必须真的边到边”，那就只能二选一：
+- 裁切幻灯片内容
+- 或把整套母版从 16:9 改成适配手机的比例
 
-### 改动 4：横屏提示组件也跟随旋转
+### 5) 清理全局根节点限制
+顺手清理 `src/App.css` 里默认 Vite 的：
+- `#root max-width: 1280px`
+- `#root padding: 2rem`
 
-第 367-379 行的"请把手机横过来"提示当前在旋转后的舞台**内部**，所以会跟着一起转——这是对的，用户看时已经是横版方向。**保留现状不动**，只是确认它视觉上正确。
-
----
+虽然它不是这次小框问题的主因，但它本来就不适合全屏演示应用，去掉后整体壳层会更干净。
 
 ## 涉及文件
 
-| 文件 | 改动 |
-|------|------|
-| `src/pages/Index.tsx` | ① 第 276-280 行内层 wrapper 改为条件渲染；② 第 261-274 行 stage 旋转 transform 改成中心旋转写法；③ 第 106-125 行 useEffect 增加 body overflow 锁定与还原 |
-
-**仅改这一个文件，不影响：**
-- 桌面端 / iPad 体验（`forceLandscape = false` 分支完全不变）
-- PDF / PPT 导出（走 `SlideStaticRenderer`，跟伪全屏完全无关）
-- 所有幻灯片内容文件
-
----
+- `src/pages/Index.tsx`
+- `src/components/slides/ScaledSlide.tsx`
+- `src/components/slides/registry.tsx`
+- `src/App.css`
 
 ## 验收标准
 
-- ✅ iPhone Safari 点击全屏 → 幻灯片旋转后**完全铺满整个手机屏幕**（横过来看就是真正的全屏 16:9）
-- ✅ 上下黑边消失，左右无滚动条
-- ✅ 横屏提示"请把手机横过来"3 秒后淡出
-- ✅ 退出按钮在视觉右上角可正常点击退出
-- ✅ 退出后页面恢复正常滚动，体验无任何残留
+- iPhone Safari 点全屏后，不再出现“中间一个缩小小框”的错误状态
+- 手机竖屏时，不再假装已经满屏展示 16:9 内容，而是明确进入正确的横屏查看态
+- 手机横屏时，幻灯片按真实可用区域稳定展示，不会再被二次旋转缩小
+- 预览页中的 16:9 幻灯片内容与 PDF/PPT 导出保持一致，不裁切、不拉伸
+- 原来的纯黑边会被替换成品牌化背景，视觉上不再像故障
+
+## 技术说明
+
+关键结论是：
+
+```text
+iPhone 屏幕比例 ≠ 16:9 幻灯片比例
+```
+
+所以“完整保留 16:9 内容”与“真正物理边到边无留白”不能同时成立。
+
+这次我会优先保证：
+
+```text
+预览 = 导出
+完整内容不丢失
+不再缩成小框
+黑边改成品牌背景
+```
+
+而不是继续在错误前提下反复调 rotate 数值。
