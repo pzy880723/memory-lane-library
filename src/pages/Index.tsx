@@ -218,19 +218,38 @@ const Index = () => {
   }, []);
 
   const handleExport = async (type: "pdf" | "pptx") => {
-    setExporting({ type: type.toUpperCase(), n: 0, total });
+    if (exporting) return;
+    const controller = new AbortController();
+    exportAbortRef.current = controller;
+    const label = type.toUpperCase();
+    setExporting({ type: label, n: 0, total });
+    toast({ title: `开始生成 ${label}`, description: "可继续浏览，下载将在后台进行" });
     try {
       const fn = type === "pdf" ? exportPDF : exportPPTX;
-      const items = await fn((n, t) => setExporting({ type: type.toUpperCase(), n, total: t }));
-      toast({ title: `✓ ${type.toUpperCase()} 已生成`, description: "已开始下载，对比预览即将打开" });
-      // 打开对比预览
-      setExportPreview({ type: type.toUpperCase(), items, activeIndex: current });
+      const items = await fn(
+        (n, t) => setExporting({ type: label, n, total: t }),
+        { signal: controller.signal },
+      );
+      toast({
+        title: `✓ ${label} 已生成`,
+        description: "文件已开始下载，点此查看导出对比预览",
+        onClick: () => setExportPreview({ type: label, items, activeIndex: current }),
+      });
     } catch (err) {
-      console.error(err);
-      toast({ title: "导出失败", description: String(err), variant: "destructive" });
+      if (err instanceof ExportCancelledError) {
+        toast({ title: `${label} 导出已取消` });
+      } else {
+        console.error(err);
+        toast({ title: "导出失败", description: String(err), variant: "destructive" });
+      }
     } finally {
+      exportAbortRef.current = null;
       setExporting(null);
     }
+  };
+
+  const cancelExport = () => {
+    exportAbortRef.current?.abort();
   };
 
   return (
