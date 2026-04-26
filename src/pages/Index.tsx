@@ -314,24 +314,44 @@ const Index = () => {
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">分享</span>
             </Button>
-            <Button
-              size="sm"
-              className="bg-paper-cream text-ink hover:bg-paper-cream/90 gap-2"
-              onClick={() => handleExport("pdf")}
-              disabled={!!exporting}
-            >
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">下载 PDF</span>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-              onClick={() => handleExport("pptx")}
-              disabled={!!exporting}
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">下载 PPT</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+                  disabled={!!exporting}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {exporting ? `生成中 ${exporting.n}/${exporting.total}` : "下载"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => handleExport("pdf")}
+                  disabled={!!exporting}
+                  className="gap-3 cursor-pointer"
+                >
+                  <FileDown className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PDF</span>
+                    <span className="text-xs text-muted-foreground">便于阅读分享</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleExport("pptx")}
+                  disabled={!!exporting}
+                  className="gap-3 cursor-pointer"
+                >
+                  <Presentation className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PPT</span>
+                    <span className="text-xs text-muted-foreground">可二次编辑</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               size="icon"
