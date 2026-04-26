@@ -388,44 +388,24 @@ const Index = () => {
           </div>
           )}
 
-          {/* 伪全屏专属：浮动退出按钮 + 简易翻页 */}
+          {/* 伪全屏：仅在竖屏（需提示横过来）时显示退出按钮；横屏完全沉浸，仅靠左右点击翻页 */}
+          {pseudoFullscreen && isPhonePortrait && (
+            <Button
+              size="icon"
+              className="absolute z-30 h-12 w-12 rounded-full bg-ink/70 text-paper-cream hover:bg-ink/90 backdrop-blur border border-paper-cream/30"
+              style={{
+                top: "max(1rem, env(safe-area-inset-top))",
+                right: "max(1rem, env(safe-area-inset-right))",
+              }}
+              onClick={() => setPseudoFullscreen(false)}
+              aria-label="退出全屏"
+            >
+              <Minimize2 className="w-5 h-5" />
+            </Button>
+          )}
+
           {pseudoFullscreen && (
             <>
-              <Button
-                size="icon"
-                className="absolute top-4 right-4 z-30 h-12 w-12 rounded-full bg-ink/70 text-paper-cream hover:bg-ink/90 backdrop-blur border border-paper-cream/30"
-                style={{
-                  top: "max(1rem, env(safe-area-inset-top))",
-                  right: "max(1rem, env(safe-area-inset-right))",
-                }}
-                onClick={() => setPseudoFullscreen(false)}
-                aria-label="退出全屏"
-              >
-                <Minimize2 className="w-5 h-5" />
-              </Button>
-              <div
-                className="absolute left-1/2 -translate-x-1/2 z-20 bg-ink/70 backdrop-blur text-paper-cream px-4 py-2 rounded-full flex items-center gap-3 border border-paper-cream/20"
-                style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
-              >
-                <Button
-                  variant="ghost" size="icon"
-                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
-                  onClick={() => go(current - 1)} disabled={current === 0}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="font-en text-lg tracking-wider min-w-[70px] text-center">
-                  <span className="text-boomer-red">{String(current + 1).padStart(2, "0")}</span>
-                  <span className="text-paper-cream/50"> / {String(total).padStart(2, "0")}</span>
-                </span>
-                <Button
-                  variant="ghost" size="icon"
-                  className="h-8 w-8 text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
-                  onClick={() => go(current + 1)} disabled={current === total - 1}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
 
               {/* 手机竖屏：「请横过来」提示，3 秒后淡出 */}
               {isPhonePortrait && (
