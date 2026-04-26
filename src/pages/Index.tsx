@@ -27,6 +27,7 @@ const Index = () => {
     activeIndex: number;
   } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const exportAbortRef = useRef<AbortController | null>(null);
 
   const total = SLIDES.length;
 
