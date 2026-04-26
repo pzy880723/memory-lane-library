@@ -8,7 +8,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
-  ChevronLeft, ChevronRight, Download, FileText, Share2,
+  ChevronLeft, ChevronRight, Download, Share2,
   Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
