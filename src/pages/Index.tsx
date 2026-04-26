@@ -289,39 +289,22 @@ const Index = () => {
         {/* 幻灯片舞台 */}
         <div
           ref={stageRef}
-          className="flex-1 relative bg-ink overflow-hidden"
-          style={
-            forceLandscape
-              ? {
-                  position: "fixed",
-                  top: "50%",
-                  left: "50%",
-                  // 用 JS 实测像素值代替 dvh/dvw — 规避 iOS Safari 在 fixed body 下的尺寸 bug
-                  width: `${vh}px`,
-                  height: `${vw}px`,
-                  transform: "translate(-50%, -50%) rotate(90deg)",
-                  transformOrigin: "center center",
-                  zIndex: 9999,
-                }
-              : undefined
-          }
+          className="flex-1 relative overflow-hidden bg-ink"
         >
           <div
             className={
-              forceLandscape
-                ? "absolute inset-0"
+              pseudoFullscreen
+                ? "absolute inset-0 flex items-center justify-center"
                 : "absolute inset-0 flex items-center justify-center p-4 md:p-8"
             }
           >
-            {forceLandscape ? (
-              <div className="w-full h-full">
-                <SlideRenderer index={current} />
-              </div>
-            ) : (
-              <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
-                <SlideRenderer index={current} />
-              </div>
-            )}
+            {/* 16:9 容器：用 aspect-ratio + max-w/h 让幻灯片在任意视口下等比缩放 + 居中 */}
+            <div
+              className="max-w-full max-h-full w-full"
+              style={{ aspectRatio: "16 / 9" }}
+            >
+              <SlideRenderer index={current} />
+            </div>
           </div>
 
           {/* 左右点击区域 */}
@@ -408,8 +391,8 @@ const Index = () => {
                 </Button>
               </div>
 
-              {/* 强制横屏提示 — 3 秒后淡出 */}
-              {forceLandscape && (
+              {/* 手机竖屏：「请横过来」提示，3 秒后淡出 */}
+              {isPhonePortrait && (
                 <div
                   className={`absolute inset-0 z-40 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
                     showRotateHint ? "opacity-100" : "opacity-0"
@@ -418,7 +401,7 @@ const Index = () => {
                   <div className="bg-ink/85 backdrop-blur-md text-paper-cream px-8 py-6 rounded-2xl border-2 border-boomer-red shadow-2xl flex flex-col items-center gap-3">
                     <div className="text-5xl animate-pulse">📱↻</div>
                     <div className="font-display text-xl font-black tracking-wide">请将手机横过来观看</div>
-                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE</div>
+                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE FOR FULLSCREEN</div>
                   </div>
                 </div>
               )}
