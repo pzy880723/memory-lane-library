@@ -16,10 +16,8 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
-  const [forceLandscape, setForceLandscape] = useState(false);
+  const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [vw, setVw] = useState(typeof window !== "undefined" ? window.innerWidth : 0);
-  const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
   const [exportPreview, setExportPreview] = useState<{
     type: string;
     items: ExportPreviewItem[];
@@ -104,57 +102,56 @@ const Index = () => {
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
 
-  // 进入伪全屏 → 手机自动启用强制横屏旋转 + 显示提示 + 锁定 body 滚动
+  // 进入伪全屏 → 锁 body 滚动 + 检测手机方向 + 必要时显示「请横过来」提示
   useEffect(() => {
     if (!pseudoFullscreen) {
-      setForceLandscape(false);
+      setIsPhonePortrait(false);
       setShowRotateHint(false);
-      // 还原 body 样式
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.width = "";
       document.body.style.height = "";
       return;
     }
-    // 锁定 body 防止 iOS Safari 出现可滚动空白
     document.body.style.overflow = "hidden";
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
     document.body.style.height = "100%";
 
-    // 实时同步真实视口尺寸 — 不依赖 dvh/dvw（iOS Safari 在 fixed body 下计算有 bug）
-    const syncSize = () => {
-      const w = window.visualViewport?.width ?? window.innerWidth;
-      const h = window.visualViewport?.height ?? window.innerHeight;
-      setVw(w);
-      setVh(h);
-    };
-    syncSize();
-    window.addEventListener("resize", syncSize);
-    window.visualViewport?.addEventListener("resize", syncSize);
-    window.visualViewport?.addEventListener("scroll", syncSize);
-
     const ua = navigator.userAgent || "";
     const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const isNarrowPortrait =
-      window.innerWidth < 768 && window.innerHeight > window.innerWidth;
-    const isPhone =
-      /iPhone|Android.*Mobile|Mobi/i.test(ua) ||
-      (hasTouch && isNarrowPortrait) ||
-      isNarrowPortrait;
-    const isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    const isIpad =
+      /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    const isPhoneUA = /iPhone|Android.*Mobile|Mobi/i.test(ua);
+    const isLikelyPhone =
+      (isPhoneUA || (hasTouch && Math.min(window.innerWidth, window.innerHeight) < 500)) &&
+      !isIpad;
 
     let hintTimer: number | undefined;
-    if (isPhone && !isIpad) {
-      setForceLandscape(true);
-      setShowRotateHint(true);
-      hintTimer = window.setTimeout(() => setShowRotateHint(false), 3000);
-    }
+
+    const syncOrientation = () => {
+      const w = window.visualViewport?.width ?? window.innerWidth;
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      const portrait = h > w;
+      const phonePortrait = isLikelyPhone && portrait;
+      setIsPhonePortrait(phonePortrait);
+      if (phonePortrait) {
+        setShowRotateHint(true);
+        if (hintTimer) clearTimeout(hintTimer);
+        hintTimer = window.setTimeout(() => setShowRotateHint(false), 3000);
+      } else {
+        setShowRotateHint(false);
+      }
+    };
+    syncOrientation();
+    window.addEventListener("resize", syncOrientation);
+    window.addEventListener("orientationchange", syncOrientation);
+    window.visualViewport?.addEventListener("resize", syncOrientation);
 
     return () => {
-      window.removeEventListener("resize", syncSize);
-      window.visualViewport?.removeEventListener("resize", syncSize);
-      window.visualViewport?.removeEventListener("scroll", syncSize);
+      window.removeEventListener("resize", syncOrientation);
+      window.removeEventListener("orientationchange", syncOrientation);
+      window.visualViewport?.removeEventListener("resize", syncOrientation);
       if (hintTimer) clearTimeout(hintTimer);
     };
   }, [pseudoFullscreen]);
@@ -292,39 +289,22 @@ const Index = () => {
         {/* 幻灯片舞台 */}
         <div
           ref={stageRef}
-          className="flex-1 relative bg-ink overflow-hidden"
-          style={
-            forceLandscape
-              ? {
-                  position: "fixed",
-                  top: "50%",
-                  left: "50%",
-                  // 用 JS 实测像素值代替 dvh/dvw — 规避 iOS Safari 在 fixed body 下的尺寸 bug
-                  width: `${vh}px`,
-                  height: `${vw}px`,
-                  transform: "translate(-50%, -50%) rotate(90deg)",
-                  transformOrigin: "center center",
-                  zIndex: 9999,
-                }
-              : undefined
-          }
+          className="flex-1 relative overflow-hidden bg-ink"
         >
           <div
             className={
-              forceLandscape
-                ? "absolute inset-0"
+              pseudoFullscreen
+                ? "absolute inset-0 flex items-center justify-center"
                 : "absolute inset-0 flex items-center justify-center p-4 md:p-8"
             }
           >
-            {forceLandscape ? (
-              <div className="w-full h-full">
-                <SlideRenderer index={current} />
-              </div>
-            ) : (
-              <div className="w-full h-full max-w-full max-h-full" style={{ aspectRatio: "16/9" }}>
-                <SlideRenderer index={current} />
-              </div>
-            )}
+            {/* 16:9 容器：用 aspect-ratio + max-w/h 让幻灯片在任意视口下等比缩放 + 居中 */}
+            <div
+              className="max-w-full max-h-full w-full"
+              style={{ aspectRatio: "16 / 9" }}
+            >
+              <SlideRenderer index={current} />
+            </div>
           </div>
 
           {/* 左右点击区域 */}
@@ -411,8 +391,8 @@ const Index = () => {
                 </Button>
               </div>
 
-              {/* 强制横屏提示 — 3 秒后淡出 */}
-              {forceLandscape && (
+              {/* 手机竖屏：「请横过来」提示，3 秒后淡出 */}
+              {isPhonePortrait && (
                 <div
                   className={`absolute inset-0 z-40 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
                     showRotateHint ? "opacity-100" : "opacity-0"
@@ -421,7 +401,7 @@ const Index = () => {
                   <div className="bg-ink/85 backdrop-blur-md text-paper-cream px-8 py-6 rounded-2xl border-2 border-boomer-red shadow-2xl flex flex-col items-center gap-3">
                     <div className="text-5xl animate-pulse">📱↻</div>
                     <div className="font-display text-xl font-black tracking-wide">请将手机横过来观看</div>
-                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE</div>
+                    <div className="font-condensed text-xs tracking-widest text-paper-cream/60">ROTATE YOUR PHONE FOR FULLSCREEN</div>
                   </div>
                 </div>
               )}
