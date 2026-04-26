@@ -3,6 +3,7 @@ import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
