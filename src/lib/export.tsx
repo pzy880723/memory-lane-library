@@ -91,8 +91,24 @@ export function getLastExportPreview(): ExportPreviewItem[] {
 
 /* ───────────────────────────────  PDF  ─────────────────────────────── */
 
+export class ExportCancelledError extends Error {
+  constructor() {
+    super("Export cancelled");
+    this.name = "ExportCancelledError";
+  }
+}
+
+export interface ExportOptions {
+  signal?: AbortSignal;
+}
+
+function checkAborted(signal?: AbortSignal) {
+  if (signal?.aborted) throw new ExportCancelledError();
+}
+
 export async function exportPDF(
   onProgress?: (current: number, total: number) => void,
+  options?: ExportOptions,
 ) {
   const pdf = new jsPDF({
     orientation: "landscape",
@@ -104,8 +120,10 @@ export async function exportPDF(
   const previews: ExportPreviewItem[] = [];
 
   for (let i = 0; i < SLIDES.length; i++) {
+    checkAborted(options?.signal);
     onProgress?.(i + 1, SLIDES.length);
     const img = await renderSlideToImage(i, "jpeg");
+    checkAborted(options?.signal);
     if (i > 0) pdf.addPage([1920, 1080], "landscape");
     pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
     previews.push({ index: i, title: SLIDES[i].title, imageDataUrl: img });
@@ -120,6 +138,7 @@ export async function exportPDF(
 
 export async function exportPPTX(
   onProgress?: (current: number, total: number) => void,
+  options?: ExportOptions,
 ) {
   const pptxgen = (await import("pptxgenjs")).default;
   const pres = new pptxgen();
@@ -130,8 +149,10 @@ export async function exportPPTX(
   const previews: ExportPreviewItem[] = [];
 
   for (let i = 0; i < SLIDES.length; i++) {
+    checkAborted(options?.signal);
     onProgress?.(i + 1, SLIDES.length);
     const img = await renderSlideToImage(i, "jpeg");
+    checkAborted(options?.signal);
     const slide = pres.addSlide();
     slide.background = { color: "F5EFE0" };
     slide.addImage({
