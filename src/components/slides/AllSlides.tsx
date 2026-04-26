@@ -1056,7 +1056,14 @@ export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: numb
  * 第 20 页 — VERITAS-CHAIN
  * ============================================================ */
 export function Slide20Veritas({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  const steps = ["源头收购", "鉴定", "清洗", "评级", "上链", "包装"];
+  const steps = [
+    { name: "源头收购", icon: Truck },
+    { name: "鉴定", icon: Search },
+    { name: "清洗", icon: Droplets },
+    { name: "评级", icon: Award },
+    { name: "上链", icon: LinkIcon },
+    { name: "包装", icon: Package },
+  ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="05 · BOVAS 信任体系">
       <div className="absolute inset-0 px-28 pt-36 pb-24">
@@ -1074,12 +1081,12 @@ export function Slide20Veritas({ pageNumber, totalPages }: { pageNumber: number;
         <div className="bg-paper-cream vintage-border p-10 mb-8">
           <div className="flex items-center justify-between gap-3">
             {steps.map((s, i) => (
-              <div key={s} className="flex items-center flex-1">
+              <div key={s.name} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
-                  <div className="w-24 h-24 rounded-full bg-boomer-red text-paper-cream flex items-center justify-center font-en text-4xl mb-3 vintage-border-soft">
-                    {i + 1}
+                  <div className="w-24 h-24 rounded-full bg-boomer-red text-paper-cream flex items-center justify-center mb-3 vintage-border-soft">
+                    <s.icon className="w-12 h-12" strokeWidth={2.5} />
                   </div>
-                  <div className="font-display text-2xl font-bold">{s}</div>
+                  <div className="font-display text-2xl font-bold">{s.name}</div>
                 </div>
                 {i < steps.length - 1 && (
                   <ChevronRight className="w-12 h-12 text-boomer-red flex-shrink-0" strokeWidth={3} />
