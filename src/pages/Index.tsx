@@ -102,12 +102,17 @@ const Index = () => {
   // 任意全屏状态（原生 OR 伪）
   const inAnyFullscreen = isFullscreen || pseudoFullscreen;
   const pseudoFullscreenViewportStyle: CSSProperties | undefined = pseudoFullscreen
-    ? {
-        paddingTop: "max(12px, env(safe-area-inset-top))",
-        paddingRight: "12px",
-        paddingBottom: "max(88px, calc(env(safe-area-inset-bottom) + 76px))",
-        paddingLeft: "12px",
-      }
+    ? isPhonePortrait
+      ? {
+          paddingTop: "max(12px, env(safe-area-inset-top))",
+          paddingRight: "12px",
+          paddingBottom: "max(88px, calc(env(safe-area-inset-bottom) + 76px))",
+          paddingLeft: "12px",
+        }
+      : {
+          // 横屏：完全不留 padding，让 16:9 画面以高度撑满整个屏幕
+          padding: 0,
+        }
     : undefined;
   const pseudoFullscreenSlideStyle: CSSProperties | undefined = pseudoFullscreen
     ? isPhonePortrait
