@@ -240,7 +240,7 @@ const IndexInner = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [current, go, total, toggleFullscreen, pseudoFullscreen, editor.editing]);
 
-  // 复制分享链接
+  // 复制当前页面分享链接
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -250,20 +250,29 @@ const IndexInner = () => {
     }
   }, []);
 
-  const handleExport = async (type: "pdf" | "pptx") => {
-    if (downloading) return; // 防止重复点击
-    const label = type.toUpperCase();
-    setDownloading(type);
+  // 复制 PDF 直链：对方点开即开始下载
+  const copyPdfLink = useCallback(async () => {
+    const url = `${window.location.origin}/exports/BOOMER-OFF-Vintage-品牌手册.pdf`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "✓ PDF 下载链接已复制", description: "对方点开即可下载" });
+    } catch {
+      toast({ title: "复制失败", description: "请手动复制链接", variant: "destructive" });
+    }
+  }, []);
+
+  const handleExport = async () => {
+    if (downloading) return;
+    setDownloading(true);
     const t = toast({
-      title: `正在准备 ${label}`,
-      description: "已开始拉取文件，下载条会自动出现…",
+      title: "正在准备 PDF",
+      description: "已开始拉取文件,下载条会自动出现…",
     });
     try {
-      if (type === "pdf") await downloadPDF();
-      else await downloadPPTX();
+      await downloadPDF();
       t.update({
         id: t.id,
-        title: `✓ ${label} 下载已开始`,
+        title: "✓ PDF 下载已开始",
         description: "文件正在保存到本地",
       });
     } catch (err) {
@@ -271,11 +280,11 @@ const IndexInner = () => {
       t.update({
         id: t.id,
         title: "下载失败",
-        description: "请稍后重试，或检查网络后再试一次",
+        description: "请稍后重试,或检查网络后再试一次",
         variant: "destructive",
       });
     } finally {
-      setDownloading(null);
+      setDownloading(false);
     }
   };
 
