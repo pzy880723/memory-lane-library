@@ -135,6 +135,7 @@ async function renderSlideToJpeg(index: number, quality = 0.9): Promise<Blob> {
   await new Promise((r) => setTimeout(r, 150));
 
   const target = (container.firstElementChild as HTMLElement) || container;
+  const html2canvas = await loadHtml2Canvas();
   const canvas = await html2canvas(target, {
     width: 1920,
     height: 1080,
@@ -169,6 +170,7 @@ async function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
 /* ─────────────── PDF / PPTX 打包 ─────────────── */
 
 async function buildPdf(jpegs: Blob[]): Promise<Blob> {
+  const { PDFDocument } = await loadPdfLib();
   const pdf = await PDFDocument.create();
   pdf.setTitle("BOOMER OFF Vintage 品牌手册");
   pdf.setAuthor("宝暮（上海）品牌管理有限公司");
@@ -183,6 +185,7 @@ async function buildPdf(jpegs: Blob[]): Promise<Blob> {
 }
 
 async function buildPptx(jpegs: Blob[]): Promise<Blob> {
+  const pptxgen = await loadPptxgen();
   const pres = new pptxgen();
   pres.layout = "LAYOUT_WIDE"; // 13.333 x 7.5 inches (16:9)
   pres.title = "BOOMER OFF Vintage 品牌手册";
