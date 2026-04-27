@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { ScaledSlide } from "./ScaledSlide";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
+import { ASSETS } from "@/lib/preloadImages";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
   Slide05Traffic, Slide05bUGC, Slide05cKOL, Slide06Media, Slide07Keywords, Slide07bDianping, Slide08Engine,
@@ -18,25 +19,41 @@ export interface SlideMeta {
   id: string;
   title: string;
   chapter: string;
+  /** 该页用到的图片 src 列表，用于翻页时按需 decode */
+  images?: string[];
   render: (props: { pageNumber: number; totalPages: number }) => JSX.Element;
 }
 
+const A = ASSETS;
+
 export const SLIDES: SlideMeta[] = [
-  { id: "cover", title: "封面", chapter: "00", render: () => <Slide01Cover /> },
+  { id: "cover", title: "封面", chapter: "00",
+    images: [A.logo, A.photoSatoDetail, A.photoVinyl],
+    render: () => <Slide01Cover /> },
   { id: "toc", title: "目录", chapter: "00", render: (p) => <Slide02TOC {...p} /> },
-  { id: "exec", title: "核心摘要", chapter: "00", render: (p) => <Slide03Executive {...p} /> },
+  { id: "exec", title: "核心摘要", chapter: "00",
+    images: [A.photoCeramics],
+    render: (p) => <Slide03Executive {...p} /> },
 
   { id: "ch1", title: "第一章 · 市场表现", chapter: "01", render: (p) => (
     <SlideChapter {...p} num="01" en="MARKET PROOF" title="已验证的市场表现"
       desc="中信泰富首店实绩 · 零投放的自然流量奇迹 · 媒体背书 · 用户口碑" />
   )},
   { id: "traffic", title: "自然流量奇迹", chapter: "01", render: (p) => <Slide05Traffic {...p} /> },
-  { id: "ugc", title: "素人种草传播", chapter: "01", render: (p) => <Slide05bUGC {...p} /> },
-  { id: "kol", title: "明星网红种草", chapter: "01", render: (p) => <Slide05cKOL {...p} /> },
+  { id: "ugc", title: "素人种草传播", chapter: "01",
+    images: [A.xhs1, A.xhs2, A.xhs3, A.xhs4, A.dy2],
+    render: (p) => <Slide05bUGC {...p} /> },
+  { id: "kol", title: "明星网红种草", chapter: "01",
+    images: [A.celebWenqi, A.celebHuye],
+    render: (p) => <Slide05cKOL {...p} /> },
   { id: "keywords", title: "用户评价关键词", chapter: "01", render: (p) => <Slide07Keywords {...p} /> },
-  { id: "media", title: "SmartShanghai 报道", chapter: "01", render: (p) => <Slide06Media {...p} /> },
-  { id: "dianping", title: "大众点评优质评价", chapter: "01", render: (p) => <Slide07bDianping {...p} /> },
-  
+  { id: "media", title: "SmartShanghai 报道", chapter: "01",
+    images: [A.photoDiatone],
+    render: (p) => <Slide06Media {...p} /> },
+  { id: "dianping", title: "大众点评优质评价", chapter: "01",
+    images: [A.dp1, A.dp2, A.dp3, A.dp4, A.dp5],
+    render: (p) => <Slide07bDianping {...p} /> },
+
 
   { id: "ch2", title: "第二章 · 品牌定位", chapter: "02", render: (p) => (
     <SlideChapter {...p} num="02" en="WHO WE ARE" title="品牌定位与愿景"
@@ -57,10 +74,18 @@ export const SLIDES: SlideMeta[] = [
     <SlideChapter {...p} num="04" en="BUSINESS MODEL" title="核心商业模式与空间规划"
       desc="超高密度陈列 · 沉浸式体验设计 · 四大核心品类 · 翻筐乐杀手锏" />
   )},
-  { id: "space", title: "空间概念", chapter: "04", render: (p) => <Slide16Space {...p} /> },
-  { id: "experience", title: "空间体验设计", chapter: "04", render: (p) => <Slide17Experience {...p} /> },
-  { id: "categories", title: "四大核心品类", chapter: "04", render: (p) => <Slide18Categories {...p} /> },
-  { id: "flipper", title: "翻筐乐", chapter: "04", render: (p) => <Slide19FlipperFun {...p} /> },
+  { id: "space", title: "空间概念", chapter: "04",
+    images: [A.photoCeramics],
+    render: (p) => <Slide16Space {...p} /> },
+  { id: "experience", title: "空间体验设计", chapter: "04",
+    images: [A.photoVinyl, A.photoDIY, A.photoSato, A.photoUltraman],
+    render: (p) => <Slide17Experience {...p} /> },
+  { id: "categories", title: "四大核心品类", chapter: "04",
+    images: [A.photoVinyl, A.photoTeapot, A.photoUltraman, A.photoPikachu],
+    render: (p) => <Slide18Categories {...p} /> },
+  { id: "flipper", title: "翻筐乐", chapter: "04",
+    images: [A.photoCups, A.photoPikachu, A.photoUltraman],
+    render: (p) => <Slide19FlipperFun {...p} /> },
 
   { id: "ch5", title: "第五章 · BOVAS 体系", chapter: "05", render: (p) => (
     <SlideChapter {...p} num="05" en="TRUST SYSTEM" title="核心壁垒：BOVAS 信任体系"
@@ -87,7 +112,9 @@ export const SLIDES: SlideMeta[] = [
   { id: "flywheel", title: "增长飞轮", chapter: "08", render: (p) => <Slide28Flywheel {...p} /> },
 
   { id: "stores", title: "门店地址", chapter: "09", render: (p) => <Slide30Stores {...p} /> },
-  { id: "contact", title: "联系我们", chapter: "09", render: (p) => <Slide29Contact {...p} /> },
+  { id: "contact", title: "联系我们", chapter: "09",
+    images: [A.wechatQR],
+    render: (p) => <Slide29Contact {...p} /> },
 ];
 
 export function SlideRenderer({ index }: { index: number }) {
