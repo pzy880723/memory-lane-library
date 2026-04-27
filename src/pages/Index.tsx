@@ -375,7 +375,7 @@ const IndexInner = () => {
                   <Presentation className="w-4 h-4 text-boomer-red" />
                   <div className="flex flex-col">
                     <span className="font-bold">下载 PPT</span>
-                    <span className="text-xs text-muted-foreground">可二次编辑</span>
+                    <span className="text-xs text-muted-foreground">可方便演示</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
