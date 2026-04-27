@@ -1,5 +1,5 @@
-import { useCallback, useRef } from "react";
-import { ScaledSlide, type ScaledSlideHandle } from "./ScaledSlide";
+import { useCallback, useRef, useState } from "react";
+import { ScaledSlide } from "./ScaledSlide";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
