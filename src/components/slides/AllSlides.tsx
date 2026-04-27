@@ -6,6 +6,7 @@ import {
   Package, Coffee, Headphones, Gift, Store, Home as HomeIcon,
   ShoppingBag, Smartphone, Warehouse, MessageCircle, BadgeCheck, Disc3,
   Check, X, Truck, Search, Droplets, Link as LinkIcon,
+  Cat, Backpack, Camera, Music,
 } from "lucide-react";
 
 // 店铺实拍图
@@ -367,9 +368,9 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
                 <div className="px-1 pt-2">
                   <div className="font-body text-lg leading-tight line-clamp-2 mb-1 text-ink/85">{p.title}</div>
                   <div className="flex items-center gap-2 font-en text-base text-ink/65">
-                    <span className="text-boomer-red">♥ {p.likes}</span>
-                    <span className="text-vintage-gold-dark">★ {p.stars}</span>
-                    <span>💬 {p.comments}</span>
+                    <span className="text-boomer-red inline-flex items-center gap-1"><Heart className="w-4 h-4 fill-current" /> {p.likes}</span>
+                    <span className="text-vintage-gold-dark inline-flex items-center gap-1"><Star className="w-4 h-4 fill-current" /> {p.stars}</span>
+                    <span className="inline-flex items-center gap-1"><MessageCircle className="w-4 h-4" /> {p.comments}</span>
                   </div>
                 </div>
               </div>
@@ -952,12 +953,12 @@ export function Slide11Story({ pageNumber, totalPages }: { pageNumber: number; t
  * 第 12 页 — 用户画像
  * ============================================================ */
 export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  const personas = [
-    { age: "儿童", icon: "🧸", pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏" },
-    { age: "青少年", icon: "🎒", pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片" },
-    { age: "都市白领", icon: "📷", pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到" },
-    { age: "中年群体", icon: "🎵", pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱" },
-    { age: "老年群体", icon: "🍵", pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具" },
+  const personas: { age: string; Icon: typeof Cat; pref: string; case: string }[] = [
+    { age: "儿童", Icon: Cat, pref: "玩具 IP（哆啦A梦、面包超人、三丽鸥）", case: "在翻筐乐中淘到童年宝藏" },
+    { age: "青少年", Icon: Backpack, pref: "毛绒挂件、卡通瓷器、二次元周边", case: "初中生专程来淘黑胶唱片" },
+    { age: "都市白领", Icon: Camera, pref: "CCD 相机、随身听、复古配饰", case: "白领收藏日本瓷器，每周必到" },
+    { age: "中年群体", Icon: Music, pref: "黑胶唱片、数码设备、铁壶摆件", case: "父母带孩子一起来，各有所爱" },
+    { age: "老年群体", Icon: Coffee, pref: "瓷器、线香、丝巾手帕", case: "70 多岁老奶奶每周来买毛绒玩具" },
   ];
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="02 · 品牌定位与愿景">
@@ -973,9 +974,11 @@ export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number;
         </div>
 
         <div className="grid grid-cols-5 gap-5">
-          {personas.map((p, i) => (
+          {personas.map((p, i) => {
+            const Icon = p.Icon;
+            return (
             <div key={p.age} className={`vintage-border p-7 flex flex-col bg-paper-cream ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
-              <div className="text-8xl mb-4 leading-none">{p.icon}</div>
+              <div className="mb-4 text-boomer-red"><Icon className="w-20 h-20" strokeWidth={1.5} /></div>
               <div className="font-display text-4xl font-black text-boomer-red mb-4">{p.age}</div>
               <div className="font-body text-2xl leading-snug mb-5 flex-1 text-ink/85">{p.pref}</div>
               <div className="border-t-2 border-dashed border-ink/25 pt-4">
