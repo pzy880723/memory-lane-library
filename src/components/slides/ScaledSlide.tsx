@@ -1,30 +1,17 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ScaledSlideProps {
   children: React.ReactNode;
   className?: string;
-}
-
-export interface ScaledSlideHandle {
-  getContent: () => HTMLDivElement | null;
+  contentRef?: (el: HTMLDivElement | null) => void;
 }
 
 /**
  * 1920x1080 fixed-resolution slide that scales to fit its parent.
- *
- * 重要：用 clientWidth/clientHeight 测「未变换」的承载盒，
- * 避免父级被 rotate / transform 后 getBoundingClientRect()
- * 给出旋转后的视觉宽高，导致 scale 算错。
  */
-export const ScaledSlide = forwardRef<ScaledSlideHandle, ScaledSlideProps>(function ScaledSlide(
-  { children, className = "" }: ScaledSlideProps,
-  ref,
-) {
+export function ScaledSlide({ children, className = "", contentRef }: ScaledSlideProps) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-
-  useImperativeHandle(ref, () => ({ getContent: () => contentRef.current }), []);
 
   useEffect(() => {
     const update = () => {
@@ -59,4 +46,4 @@ export const ScaledSlide = forwardRef<ScaledSlideHandle, ScaledSlideProps>(funct
       </div>
     </div>
   );
-});
+}
