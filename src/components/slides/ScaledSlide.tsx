@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface ScaledSlideProps {
   children: React.ReactNode;
   className?: string;
+}
+
+export interface ScaledSlideHandle {
+  getContent: () => HTMLDivElement | null;
 }
 
 /**
@@ -12,9 +16,15 @@ interface ScaledSlideProps {
  * 避免父级被 rotate / transform 后 getBoundingClientRect()
  * 给出旋转后的视觉宽高，导致 scale 算错。
  */
-export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
+export const ScaledSlide = forwardRef<ScaledSlideHandle, ScaledSlideProps>(function ScaledSlide(
+  { children, className = "" }: ScaledSlideProps,
+  ref,
+) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+
+  useImperativeHandle(ref, () => ({ getContent: () => contentRef.current }), []);
 
   useEffect(() => {
     const update = () => {
@@ -41,6 +51,7 @@ export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
   return (
     <div ref={stageRef} className={`slide-stage ${className}`}>
       <div
+        ref={contentRef}
         className="slide-wrapper slide-content"
         style={{ ["--scale" as string]: scale } as React.CSSProperties}
       >
@@ -48,4 +59,4 @@ export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
       </div>
     </div>
   );
-}
+});
