@@ -18,7 +18,7 @@ export interface OverlayApi {
 export function useApplyOverrides(
   slideIndex: number,
   containerRef: React.RefObject<HTMLDivElement>,
-  onSelectImage: (key: string, currentSrc: string) => void,
+  onSelectImage: (key: string, currentSrc: string, el?: HTMLElement) => void,
   onSelectText: (key: string, el: HTMLElement) => void,
   containerEl?: HTMLElement | null,
 ) {
@@ -102,7 +102,7 @@ export function useApplyOverrides(
         const handleClick = (e: MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          onSelectImage(key, img.src);
+          onSelectImage(key, img.src, img);
         };
         img.addEventListener("click", handleClick);
         imgCleanup.push(() => {
