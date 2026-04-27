@@ -62,7 +62,7 @@
     --font-body: 'Noto Sans SC', system-ui, sans-serif;
     --font-en-display: 'Anton', 'Bebas Neue', sans-serif;
     --font-en-condensed: 'Bebas Neue', sans-serif;
-    --font-handwrite: 'Caveat', 'Permanent Marker', 'Ma Shan Zheng', 'Liu Jian Mao Cao', cursive;
+    --font-handwrite: 'Caveat', 'Permanent Marker', 'Ma Shan Zheng', 'Liu Jian Mao Cao', 'Noto Sans SC', 'Noto Serif SC', cursive;
 
     /* ============ 渐变与阴影 ============ */
     --gradient-paper: linear-gradient(135deg, hsl(var(--paper-cream)) 0%, hsl(var(--paper)) 100%);
