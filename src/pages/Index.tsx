@@ -259,11 +259,27 @@ const IndexInner = () => {
     setDownloading(type);
     const t = toast({
       title: `正在准备 ${label}`,
-      description: "已开始拉取文件，下载条会自动出现…",
+      description: "正在检查云端缓存…",
     });
     try {
-      if (type === "pdf") await downloadPDF();
-      else await downloadPPTX();
+      const fn = type === "pdf" ? downloadPDF : downloadPPTX;
+      await fn((p) => {
+        if (p.phase === "checking") {
+          t.update({ id: t.id, title: `准备 ${label}`, description: "正在检查云端缓存…" });
+        } else if (p.phase === "rendering") {
+          t.update({
+            id: t.id,
+            title: `首次生成 ${label}（约 30-60 秒）`,
+            description: `正在渲染第 ${p.current}/${p.total} 页…`,
+          });
+        } else if (p.phase === "packing") {
+          t.update({ id: t.id, title: `打包 ${label}`, description: p.message });
+        } else if (p.phase === "uploading") {
+          t.update({ id: t.id, title: `${label} 已生成`, description: "上传到云端缓存…（下次秒下）" });
+        } else if (p.phase === "downloading") {
+          t.update({ id: t.id, title: `${label} 下载已开始`, description: p.message ?? "保存到本地…" });
+        }
+      });
       t.update({
         id: t.id,
         title: `✓ ${label} 下载已开始`,
@@ -274,7 +290,7 @@ const IndexInner = () => {
       t.update({
         id: t.id,
         title: "下载失败",
-        description: "请稍后重试，或检查网络后再试一次",
+        description: err instanceof Error ? err.message : "请稍后重试",
         variant: "destructive",
       });
     } finally {
