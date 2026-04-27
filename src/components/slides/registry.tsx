@@ -104,7 +104,7 @@ export function SlideRenderer({ index }: { index: number }) {
     setContainerEl((prev) => (prev === el ? prev : el));
   }, []);
 
-  useApplyOverrides(index, containerRef, onSelectImage, onSelectText);
+  useApplyOverrides(index, containerRef, onSelectImage, onSelectText, containerEl);
 
   if (!slide) return null;
   return (
