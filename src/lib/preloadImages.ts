@@ -68,12 +68,13 @@ export function preloadAllImages() {
 
   // 用 fetch 而不是 new Image()，避免触发自动 decode
   // priority: "low" 让首屏关键资源（JS/CSS）先走
+  // priority 在 RequestInit 上还不是标准类型，但 Chrome 已支持
+  const init: RequestInit & { priority?: "high" | "low" | "auto" } = {
+    priority: "low",
+    cache: "force-cache",
+  };
   for (const src of ALL_SRCS) {
-    fetch(src, {
-      // @ts-expect-error  priority 是较新的 fetch 选项
-      priority: "low",
-      cache: "force-cache",
-    })
+    fetch(src, init)
       .then(() => downloadedSrcs.add(src))
       .catch(() => { /* ignore */ });
   }
