@@ -363,6 +363,7 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </SlideShell>
