@@ -158,7 +158,7 @@ export function EditorPanel() {
             <Loader2 className="w-3 h-3 animate-spin" /> 保存中
           </span>
         ) : (
-          <span className="text-[10px] text-emerald-600 inline-flex items-center gap-1">
+          <span className="text-[10px] text-primary inline-flex items-center gap-1">
             <Check className="w-3 h-3" /> 已保存
           </span>
         )}
