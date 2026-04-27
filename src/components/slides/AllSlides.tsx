@@ -328,24 +328,6 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
           </div>
         </div>
 
-        {/* 数据条 */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          {[
-            { num: "3,000+", label: "全网累计点赞", color: "bg-paper-cream" },
-            { num: "1,800+", label: "收藏 / 想去", color: "bg-vintage-gold" },
-            { num: "500+", label: "评论互动", color: "bg-paper-cream" },
-            { num: "0 ¥", label: "投放预算", color: "bg-boomer-red text-paper-cream" },
-          ].map((d, i) => (
-            <div
-              key={d.label}
-              className={`vintage-border p-4 ${d.color} ${i % 2 === 0 ? "rotate-[-0.4deg]" : "rotate-[0.4deg]"}`}
-            >
-              <div className="font-display text-5xl font-black leading-none">{d.num}</div>
-              <div className="font-body text-2xl mt-2 opacity-75">{d.label}</div>
-            </div>
-          ))}
-        </div>
-
         {/* 9 张截图拼贴墙 */}
         <div className="grid grid-cols-5 gap-5">
           {posts.map((p, i) => {
