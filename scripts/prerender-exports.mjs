@@ -38,6 +38,7 @@ const TOTAL_SLIDES = 35; // 上限（实际由 Print 路由 clamp）；多截会
 function findChromium() {
   const candidates = [
     process.env.CHROME_BIN,
+    "/bin/chromium",
     "/usr/bin/chromium",
     "/usr/bin/chromium-browser",
     "/usr/bin/google-chrome",
