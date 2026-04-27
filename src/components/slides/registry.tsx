@@ -3,7 +3,7 @@ import { ScaledSlide } from "./ScaledSlide";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
-  Slide05Traffic, Slide05bUGC, Slide05cKOL, Slide06Media, Slide07Keywords, Slide08Engine,
+  Slide05Traffic, Slide05bUGC, Slide05cKOL, Slide06Media, Slide07Keywords, Slide07bDianping, Slide08Engine,
   Slide10Problem, Slide11Story, Slide12Persona,
   Slide13Market, Slide14Japan,
   Slide16Space, Slide17Experience, Slide18Categories, Slide19FlipperFun,
