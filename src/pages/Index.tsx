@@ -344,48 +344,32 @@ const IndexInner = () => {
               size="sm"
               className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
               onClick={copyLink}
+              title="复制当前页面链接"
             >
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">分享</span>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-                  disabled={!!downloading}
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">
-                    {downloading ? "准备中…" : "下载"}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={() => handleExport("pdf")}
-                  disabled={!!downloading}
-                  className="gap-3 cursor-pointer"
-                >
-                  <FileDown className="w-4 h-4 text-boomer-red" />
-                  <div className="flex flex-col">
-                    <span className="font-bold">下载 PDF</span>
-                    <span className="text-xs text-muted-foreground">便于阅读分享</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleExport("pptx")}
-                  disabled={!!downloading}
-                  className="gap-3 cursor-pointer"
-                >
-                  <Presentation className="w-4 h-4 text-boomer-red" />
-                  <div className="flex flex-col">
-                    <span className="font-bold">下载 PPT</span>
-                    <span className="text-xs text-muted-foreground">可二次编辑</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
+              onClick={copyPdfLink}
+              title="复制 PDF 下载直链"
+            >
+              <Link2 className="w-4 h-4" />
+              <span className="hidden sm:inline">PDF 链接</span>
+            </Button>
+            <Button
+              size="sm"
+              className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+              disabled={downloading}
+              onClick={handleExport}
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {downloading ? "准备中…" : "下载 PDF"}
+              </span>
+            </Button>
             <Button
               variant="ghost"
               size="icon"
