@@ -16,12 +16,14 @@
  * 不依赖任何静态预生成文件。
  */
 import { createRoot } from "react-dom/client";
-import html2canvas from "html2canvas";
-import { PDFDocument } from "pdf-lib";
-import pptxgen from "pptxgenjs";
 import { SLIDES, SlideStaticRenderer } from "@/components/slides/registry";
 import { supabase } from "@/integrations/supabase/client";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
+
+// 大依赖按需懒加载，避免拖累首屏 bundle
+const loadHtml2Canvas = () => import("html2canvas").then((m) => m.default);
+const loadPdfLib = () => import("pdf-lib");
+const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
 const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
 
