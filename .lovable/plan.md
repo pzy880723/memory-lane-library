@@ -1,74 +1,117 @@
-## 诊断结论（已用工具实测）
+## 目标（你确认过的）
 
-幻灯片总共 27 张图，**总像素 40.4 megapixels**，但实际显示尺寸只需要 ~1/20。这就是翻页卡几秒的根本原因：
+1. **导出的 PDF/PPTX 跟网页看到的一模一样**（用 1920×1080 高清截图，逐页拼成）
+2. **构建时预生成**，文件直接放在 `public/exports/` 下，用户点"下载"= 浏览器直接 GET 静态文件，**0 等待**
+3. **删除"导出对比预览"功能**（无意义）
+4. 编辑器修改不需要反映到导出（你已确认）— 导出的就是"线上发布版本"
 
-| 问题 | 现状 | 影响 |
+---
+
+## 方案概览
+
+```
+你执行 npm run build 时：
+  ├─ 1. vite build           （正常构建网页）
+  ├─ 2. 启动 Headless Chromium（puppeteer）
+  ├─ 3. 打开刚 build 出来的页面，逐页截 1920×1080 高清 PNG
+  ├─ 4. 把 PNG 拼成 PDF 和 PPTX
+  └─ 5. 输出到 dist/exports/BOOMER-OFF-Vintage-品牌手册.pdf / .pptx
+
+用户点"下载 PDF"：
+  └─ <a href="/exports/BOOMER-OFF-Vintage-品牌手册.pdf" download> → 瞬间下载
+```
+
+为什么用 puppeteer 而不是当前的 html2canvas：
+- html2canvas 是"模拟渲染"，复杂 CSS（阴影、滤镜、字体）会有误差 → 这就是为什么之前需要"对比预览"
+- puppeteer 是真 Chromium，**所见即所得，100% 一致**，再也不需要对比
+
+---
+
+## 详细实施步骤
+
+### 1. 新增构建脚本 `scripts/prerender-exports.mjs`
+
+- 用 `puppeteer-core` + `@sparticuz/chromium`（或本地 Chrome）
+- 启动 `vite preview` 服务（端口 4173）作为静态服务器
+- 打开 `http://localhost:4173/#slide-1` … `#slide-N`，每页等字体/图片 ready
+- 用 `page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 2 })` 拿到 **2x 高清**截图
+- 用 `pdf-lib` 把所有 PNG 拼成 1920×1080 的 PDF（无损 JPEG quality 95）
+- 用 `pptxgenjs`（已有依赖）把同样的 PNG 拼成 PPTX，每张图铺满整页
+- 输出到 `public/exports/BOOMER-OFF-Vintage-品牌手册.pdf` 和 `.pptx`
+- **关键**：放 `public/exports/` 而不是 `dist/exports/`，这样 vite build 会自动复制到 `dist/`，下次开发也能用
+
+### 2. 修改 `package.json` build 脚本
+
+```json
+"build": "vite build && node scripts/prerender-exports.mjs",
+"build:exports": "node scripts/prerender-exports.mjs"   // 单独跑导出（不重新 build）
+```
+
+新增依赖：`puppeteer`（约 170MB，仅 devDependencies，不进生产 bundle）和 `pdf-lib`。
+
+### 3. 改写 `src/lib/export.tsx` → 极简版
+
+```ts
+export function downloadPDF() {
+  const a = document.createElement("a");
+  a.href = "/exports/BOOMER-OFF-Vintage-品牌手册.pdf";
+  a.download = "BOOMER-OFF-Vintage-品牌手册.pdf";
+  a.click();
+}
+export function downloadPPTX() { /* 同理 */ }
+```
+
+**删除**：`renderSlideToImage`、`html2canvas`、`jsPDF` 相关代码、`ExportPreviewItem`、`getLastExportPreview`、`ExportCancelledError`、进度回调 — 全部不再需要。
+
+### 4. 移除 `package.json` 里不再用的依赖
+
+- `html2canvas`（导出用，删）
+- `jspdf`（导出用，删）
+- `pptxgenjs` 改为 devDependencies（只构建时用）
+- 这能让生产 bundle **小约 800KB**（jspdf + html2canvas 都很大），网页打开更快
+
+### 5. 改写 `src/pages/Index.tsx`
+
+- `handleExport(type)` → 改成 `downloadPDF()` / `downloadPPTX()`，瞬间触发
+- 删除：`exporting` state、`exportPreview` state、`exportAbortRef`、`cancelExport`、所有"对比预览" JSX（约 130 行，对应 line 633-760 那块）、"生成中 N/Total" 进度文案
+- 下拉菜单的"下载 PDF / 下载 PPT"按钮保留，但点击后**立即下载，无 loading**
+
+### 6. 关于编辑器
+
+由于你确认"编辑器修改不需要进导出"：
+- 编辑器的功能保留（5 击 logo 仍能进入），但导出按钮在编辑模式下可以**显示一个小提示**："下载的是线上版本，编辑内容仅本地预览"
+- 或者直接不管，让用户知道下载 = 线上发布版
+
+### 7. 部署流程对你来说会变成
+
+1. 在 Lovable 改完内容
+2. 点 Publish（Lovable 会跑 `npm run build`，自动生成新的 pdf/pptx 进 `dist/exports/`）
+3. 部署完成后，`https://你的域名/exports/xxx.pdf` 就是最新版
+
+> ⚠️ **关键确认点**：Lovable 的构建环境**能不能跑 puppeteer**？这取决于 Lovable 的 build sandbox 是否预装了 Chromium 或允许 npm 装 puppeteer（170MB 二进制）。我下一步实施时会先验证；如果 Lovable build 环境不支持，备选方案是：
+> - **备选 A**：用 `playwright-core` + 系统已有的 Chrome
+> - **备选 B**：你**本地手动跑 `npm run build:exports` 一次，把生成的两个文件 commit 进 `public/exports/`**，之后 Lovable 每次部署都直接复制这两个静态文件。这种最稳，缺点是内容更新后要本地再跑一次。
+
+---
+
+## 删改清单一览
+
+| 文件 | 操作 |
+|---|---|
+| `scripts/prerender-exports.mjs` | **新增**（核心构建脚本） |
+| `src/lib/export.tsx` | **重写**（从 200 行 → ~20 行） |
+| `src/pages/Index.tsx` | 删除导出进度/对比预览 UI（~150 行） |
+| `package.json` | 改 build 脚本；加 puppeteer/pdf-lib；删 html2canvas/jspdf |
+| `public/exports/.gitkeep` | 新增占位 |
+
+---
+
+## 你能拿到的效果
+
+| 项目 | 现在 | 改造后 |
 |---|---|---|
-| UGC 截图 (xhs/dy/celeb) | 883×1920 像素 → 显示 ~200×435 | 解码 20× 冗余像素 |
-| 大众点评 (dp-*) | 1279×1991 像素 → 显示 ~280×435 | 解码 20× 冗余像素，单图 ~270KB |
-| 店铺照 | 768×1024 像素 → 显示 ~280×370 | 解码 7× 冗余像素 |
-| 当前预加载 | 一次性 27 张 decode() | 主线程被批量解码任务卡住 |
-
-> **关键认知**：浏览器需要把 webp 解压成 RGBA 位图存到内存。40MP × 4 字节 = **160MB 内存压力 + 100~300ms/张主线程占用**。换 CDN 解决的是下载快慢，**解决不了解码卡顿**。
-
----
-
-## 优化方案（三步）
-
-### 1. 把所有图 resize 到"显示尺寸 ×2"（核心收益）
-
-用 `sharp` 批量处理 `src/assets/ugc/` 和 `src/assets/store/`：
-
-| 图类 | 当前 | 目标尺寸（按 2× DPR） | 预期单张大小 |
-|---|---|---|---|
-| UGC 竖图 (xhs/dy/celeb) | 883×1920 | **560×1218** | ~50KB |
-| 大众点评 (dp-*) | 1279×1991 | **640×996** | ~70KB |
-| 店铺照 | 768×1024 | **560×747** | ~45KB |
-
-**预期**：总体积 4.5MB → **~1.3MB**，总像素 40MP → **~10MP**，单张解码时间 200ms → **20ms**。
-
-文件名保持不变（依然是 `.webp`），不需要改任何 import。
-
-### 2. 重写预加载策略：下载与解码解耦
-
-改写 `src/lib/preloadImages.ts`：
-
-- **下载阶段**（启动后立即）：用 `fetch()` + `priority: "low"` 把所有 webp 全部并行下到浏览器 HTTP 缓存
-- **解码阶段**（按需触发）：暴露一个 `decodeForSlide(images: string[])` 函数；每次翻页时，只 decode 当前页 + 后两页的图，且用 `requestIdleCallback` 串行执行
-- 这样**主线程永远不会被批量解码堵住**，翻页时图已经在内存里了
-
-### 3. 让 `Index.tsx` 在翻页时调用 `decodeForSlide`
-
-- 在 `src/components/slides/registry.tsx` 给每个 SlideMeta 加一个 `images?: string[]` 字段
-- 在 `src/pages/Index.tsx` 监听 `current` 变化 → 调用 `decodeForSlide(SLIDES[current+1].images, SLIDES[current+2].images)`
-- 已经看过的页不会重复 decode（用 Set 去重）
-
----
-
-## 预期效果
-
-| 场景 | 现状 | 优化后 |
-|---|---|---|
-| 首屏封面 | ~1.5s | **~0.3s** |
-| 翻到下一页（图未缓存） | 1~3s（下载+解码卡顿） | **~50ms** |
-| 翻到下一页（图已缓存） | 200~500ms（解码卡顿） | **<20ms** |
-| 主线程长任务 | 100~300ms/图 | **<20ms/图** |
-| 总下载量 | 4.5MB | **~1.3MB** |
-
----
-
-## 不会动的部分
-
-- 不改任何幻灯片视觉/文案/布局
-- 不改图片文件名，所有 `import xxx from "@/assets/..."` 不变
-- 不引入任何新 npm 依赖（`sharp` 在 sandbox 里跑一次性脚本即可，不进生产 bundle）
-
----
-
-## 实施步骤
-
-1. 写一次性脚本，用 `sharp` 把 `src/assets/ugc/*.webp` 和 `src/assets/store/*.webp` resize 到目标尺寸（覆盖原文件，quality 80）
-2. 重写 `src/lib/preloadImages.ts`：下载与解码解耦，导出 `preloadAllImages()` 和 `decodeForSlide(srcs)`
-3. 在 `src/components/slides/registry.tsx` 的每个 SlideMeta 上加 `images: string[]`
-4. 在 `src/pages/Index.tsx` 监听 `current` 变化触发 `decodeForSlide` for N、N+1、N+2
-5. 验证：跑 `ls -la` 确认体积下降，并截屏 spot-check 几张图视觉无明显损失
+| 用户点下载到拿到文件 | 30~90 秒（在线渲染） | **<1 秒** |
+| 文件画质 | html2canvas 模拟，有偏差 | **真 Chromium 渲染，像素级一致** |
+| 网页 bundle 体积 | 含 html2canvas+jspdf ~800KB | **小 800KB，首屏更快** |
+| 对比预览功能 | 占代码 150 行 | **删除** |
+| 导出失败概率 | 偶发（用户设备性能差时） | **0**（构建时已生成好） |

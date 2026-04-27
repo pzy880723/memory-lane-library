@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { decodeForSlide } from "@/lib/preloadImages";
-import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
+import { downloadPDF, downloadPPTX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronLeft, ChevronRight, Download, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
@@ -21,18 +20,11 @@ const IndexInner = () => {
   const [current, setCurrent] = useState(0);
   const [showThumbs, setShowThumbs] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [exportPreview, setExportPreview] = useState<{
-    type: string;
-    items: ExportPreviewItem[];
-    activeIndex: number;
-  } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const exportAbortRef = useRef<AbortController | null>(null);
 
   // 编辑器入口：5 击 logo
   const [showPwd, setShowPwd] = useState(false);
@@ -260,46 +252,11 @@ const IndexInner = () => {
     }
   }, []);
 
-  const handleExport = async (type: "pdf" | "pptx") => {
-    if (exporting) return;
-    const controller = new AbortController();
-    exportAbortRef.current = controller;
+  const handleExport = (type: "pdf" | "pptx") => {
     const label = type.toUpperCase();
-    setExporting({ type: label, n: 0, total });
-    toast({ title: `开始生成 ${label}`, description: "可继续浏览，下载将在后台进行" });
-    try {
-      const fn = type === "pdf" ? exportPDF : exportPPTX;
-      const items = await fn(
-        (n, t) => setExporting({ type: label, n, total: t }),
-        { signal: controller.signal },
-      );
-      toast({
-        title: `✓ ${label} 已生成`,
-        description: "文件已开始下载，可点击查看导出对比预览",
-        action: (
-          <ToastAction
-            altText="查看对比"
-            onClick={() => setExportPreview({ type: label, items, activeIndex: current })}
-          >
-            查看对比
-          </ToastAction>
-        ),
-      });
-    } catch (err) {
-      if (err instanceof ExportCancelledError) {
-        toast({ title: `${label} 导出已取消` });
-      } else {
-        console.error(err);
-        toast({ title: "导出失败", description: String(err), variant: "destructive" });
-      }
-    } finally {
-      exportAbortRef.current = null;
-      setExporting(null);
-    }
-  };
-
-  const cancelExport = () => {
-    exportAbortRef.current?.abort();
+    if (type === "pdf") downloadPDF();
+    else downloadPPTX();
+    toast({ title: `${label} 下载已开始`, description: "正在保存到本地..." });
   };
 
   return (
@@ -367,18 +324,14 @@ const IndexInner = () => {
                 <Button
                   size="sm"
                   className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-                  disabled={!!exporting}
                 >
                   <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">
-                    {exporting ? `生成中 ${exporting.n}/${exporting.total}` : "下载"}
-                  </span>
+                  <span className="hidden sm:inline">下载</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={() => handleExport("pdf")}
-                  disabled={!!exporting}
                   className="gap-3 cursor-pointer"
                 >
                   <FileDown className="w-4 h-4 text-boomer-red" />
@@ -389,7 +342,6 @@ const IndexInner = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleExport("pptx")}
-                  disabled={!!exporting}
                   className="gap-3 cursor-pointer"
                 >
                   <Presentation className="w-4 h-4 text-boomer-red" />
@@ -592,159 +544,6 @@ const IndexInner = () => {
           </div>
         )}
 
-        {/* 导出进度浮窗（可继续浏览，可随时取消） */}
-        {exporting && (
-          <div className="fixed bottom-6 right-6 z-[100] w-80 bg-paper-cream vintage-border-red shadow-2xl p-5 animate-in slide-in-from-bottom-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-boomer-red animate-pulse" />
-                <h3 className="font-display text-lg font-black">
-                  正在生成 {exporting.type}
-                </h3>
-              </div>
-              <button
-                onClick={cancelExport}
-                className="text-ink/50 hover:text-boomer-red transition-colors"
-                aria-label="取消下载"
-                title="取消下载"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="w-full bg-paper-deep rounded-full h-2 overflow-hidden mb-2">
-              <div
-                className="bg-boomer-red h-full transition-all"
-                style={{ width: `${(exporting.n / exporting.total) * 100}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-en text-sm">
-                <span className="text-boomer-red font-bold">{exporting.n}</span>
-                <span className="text-ink/50"> / {exporting.total} 页</span>
-              </span>
-              <span className="font-body text-xs text-ink/60">
-                后台运行 · 可继续浏览
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* 导出后对比预览：左=网页预览  右=导出成品 */}
-        {exportPreview && (
-          <div className="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[110] flex flex-col">
-            {/* 顶栏 */}
-            <div className="flex items-center justify-between px-6 py-3 bg-ink text-paper-cream border-b-4 border-boomer-red">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-6 h-6 text-boomer-red" />
-                <div>
-                  <div className="font-display text-xl font-black">
-                    {exportPreview.type} 导出成功 · 对比预览
-                  </div>
-                  <div className="font-condensed text-xs tracking-widest text-paper-cream/60">
-                    左侧为网页预览　·　右侧为导出文件实际效果（含圆角等所有样式）
-                  </div>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream"
-                onClick={() => setExportPreview(null)}
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-
-            {/* 主体：左右对比 */}
-            <div className="flex-1 grid grid-cols-2 gap-4 p-4 overflow-hidden">
-              {/* 左：网页预览（实时渲染） */}
-              <div className="flex flex-col min-h-0">
-                <div className="text-paper-cream/80 font-display text-sm mb-2 px-2">
-                  📺 网页预览（实时 DOM）
-                </div>
-                <div className="flex-1 bg-ink rounded overflow-hidden border-2 border-paper-cream/20 flex items-center justify-center">
-                  <div className="w-full h-full" style={{ aspectRatio: "16/9" }}>
-                    <SlideRenderer index={exportPreview.activeIndex} />
-                  </div>
-                </div>
-              </div>
-              {/* 右：导出图片 */}
-              <div className="flex flex-col min-h-0">
-                <div className="text-paper-cream/80 font-display text-sm mb-2 px-2">
-                  📄 {exportPreview.type} 文件实际页面（栅格化成品）
-                </div>
-                <div className="flex-1 bg-ink rounded overflow-hidden border-2 border-boomer-red flex items-center justify-center">
-                  <img
-                    src={exportPreview.items[exportPreview.activeIndex]?.imageDataUrl}
-                    alt={`导出第 ${exportPreview.activeIndex + 1} 页`}
-                    className="w-full h-full object-contain"
-                    style={{ aspectRatio: "16/9" }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 底栏：缩略图横向导航 */}
-            <div className="bg-ink border-t border-paper-cream/20 px-4 py-3 flex items-center gap-3">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream flex-shrink-0"
-                onClick={() =>
-                  setExportPreview((p) =>
-                    p ? { ...p, activeIndex: Math.max(0, p.activeIndex - 1) } : p,
-                  )
-                }
-                disabled={exportPreview.activeIndex === 0}
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex-1 overflow-x-auto">
-                <div className="flex gap-2">
-                  {exportPreview.items.map((it) => (
-                    <button
-                      key={it.index}
-                      onClick={() =>
-                        setExportPreview((p) => (p ? { ...p, activeIndex: it.index } : p))
-                      }
-                      className={`relative flex-shrink-0 w-28 aspect-video rounded overflow-hidden border-2 transition-all ${
-                        it.index === exportPreview.activeIndex
-                          ? "border-boomer-red ring-2 ring-boomer-red/40"
-                          : "border-paper-cream/20 hover:border-boomer-red/60"
-                      }`}
-                    >
-                      <img src={it.imageDataUrl} alt={it.title} className="w-full h-full object-cover" />
-                      <span className="absolute bottom-0 left-0 right-0 bg-ink/80 text-paper-cream text-[10px] font-en text-center py-0.5">
-                        {String(it.index + 1).padStart(2, "0")}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream flex-shrink-0"
-                onClick={() =>
-                  setExportPreview((p) =>
-                    p
-                      ? { ...p, activeIndex: Math.min(p.items.length - 1, p.activeIndex + 1) }
-                      : p,
-                  )
-                }
-                disabled={exportPreview.activeIndex === exportPreview.items.length - 1}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-              <div className="flex-shrink-0 font-en text-paper-cream text-lg pl-4 border-l border-paper-cream/20">
-                <span className="text-boomer-red">
-                  {String(exportPreview.activeIndex + 1).padStart(2, "0")}
-                </span>
-                <span className="text-paper-cream/50"> / {String(exportPreview.items.length).padStart(2, "0")}</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 编辑器入口 + 面板 */}
