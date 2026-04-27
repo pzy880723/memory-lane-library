@@ -21,7 +21,7 @@ const IndexInner = () => {
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [downloading, setDownloading] = useState<"pdf" | "pptx" | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
   // 编辑器入口：5 击 logo
