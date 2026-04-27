@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Pencil, Download, Upload, RotateCcw, LogOut, X, Image as ImageIcon,
-  Settings, Move, Loader2, Check,
+  Settings, Move, Loader2, Check, GripVertical,
 } from "lucide-react";
 import { useEditor } from "@/lib/editor/EditorContext";
 import { exportJSON, importJSON, uploadImageToCloud } from "@/lib/editor/storage";
