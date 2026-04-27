@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { decodeForSlide } from "@/lib/preloadImages";
-import { downloadPDF } from "@/lib/export";
+import { downloadPDF, downloadPPTX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
-  ChevronLeft, ChevronRight, Download, Share2, Link2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  ChevronLeft, ChevronRight, Download, Share2,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
@@ -21,7 +24,7 @@ const IndexInner = () => {
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [downloading, setDownloading] = useState<"pdf" | "pptx" | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
   // 编辑器入口：5 击 logo
@@ -240,7 +243,7 @@ const IndexInner = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [current, go, total, toggleFullscreen, pseudoFullscreen, editor.editing]);
 
-  // 复制当前页面分享链接
+  // 复制分享链接
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -250,29 +253,20 @@ const IndexInner = () => {
     }
   }, []);
 
-  // 复制 PDF 直链：对方点开即开始下载
-  const copyPdfLink = useCallback(async () => {
-    const url = `${window.location.origin}/exports/BOOMER-OFF-Vintage-品牌手册.pdf`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: "✓ PDF 下载链接已复制", description: "对方点开即可下载" });
-    } catch {
-      toast({ title: "复制失败", description: "请手动复制链接", variant: "destructive" });
-    }
-  }, []);
-
-  const handleExport = async () => {
-    if (downloading) return;
-    setDownloading(true);
+  const handleExport = async (type: "pdf" | "pptx") => {
+    if (downloading) return; // 防止重复点击
+    const label = type.toUpperCase();
+    setDownloading(type);
     const t = toast({
-      title: "正在准备 PDF",
-      description: "已开始拉取文件,下载条会自动出现…",
+      title: `正在准备 ${label}`,
+      description: "已开始拉取文件，下载条会自动出现…",
     });
     try {
-      await downloadPDF();
+      if (type === "pdf") await downloadPDF();
+      else await downloadPPTX();
       t.update({
         id: t.id,
-        title: "✓ PDF 下载已开始",
+        title: `✓ ${label} 下载已开始`,
         description: "文件正在保存到本地",
       });
     } catch (err) {
@@ -280,11 +274,11 @@ const IndexInner = () => {
       t.update({
         id: t.id,
         title: "下载失败",
-        description: "请稍后重试,或检查网络后再试一次",
+        description: "请稍后重试，或检查网络后再试一次",
         variant: "destructive",
       });
     } finally {
-      setDownloading(false);
+      setDownloading(null);
     }
   };
 
@@ -344,32 +338,48 @@ const IndexInner = () => {
               size="sm"
               className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
               onClick={copyLink}
-              title="复制当前页面链接"
             >
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">分享</span>
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
-              onClick={copyPdfLink}
-              title="复制 PDF 下载直链"
-            >
-              <Link2 className="w-4 h-4" />
-              <span className="hidden sm:inline">PDF 链接</span>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-              disabled={downloading}
-              onClick={handleExport}
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {downloading ? "准备中…" : "下载 PDF"}
-              </span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+                  disabled={!!downloading}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {downloading ? "准备中…" : "下载"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => handleExport("pdf")}
+                  disabled={!!downloading}
+                  className="gap-3 cursor-pointer"
+                >
+                  <FileDown className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PDF</span>
+                    <span className="text-xs text-muted-foreground">便于阅读分享</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleExport("pptx")}
+                  disabled={!!downloading}
+                  className="gap-3 cursor-pointer"
+                >
+                  <Presentation className="w-4 h-4 text-boomer-red" />
+                  <div className="flex flex-col">
+                    <span className="font-bold">下载 PPT</span>
+                    <span className="text-xs text-muted-foreground">可二次编辑</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               size="icon"

@@ -11,6 +11,7 @@
  */
 
 const PDF_PATH = "/exports/BOOMER-OFF-Vintage-品牌手册.pdf";
+const PPTX_PATH = "/exports/BOOMER-OFF-Vintage-品牌手册.pptx";
 
 async function downloadAsBlob(url: string, filename: string): Promise<void> {
   // 1. 拉取静态文件二进制
@@ -28,12 +29,13 @@ async function downloadAsBlob(url: string, filename: string): Promise<void> {
   a.href = blobUrl;
   a.download = filename;
   a.style.display = "none";
+  // rel=noopener 防止任何意外的 opener 引用
   a.rel = "noopener";
   document.body.appendChild(a);
   a.click();
   a.remove();
 
-  // 4. 释放 blob URL
+  // 4. 释放 blob URL（延迟一点，确保浏览器已经开始下载）
   setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
 }
 
@@ -41,3 +43,6 @@ export function downloadPDF(): Promise<void> {
   return downloadAsBlob(PDF_PATH, "BOOMER-OFF-Vintage-品牌手册.pdf");
 }
 
+export function downloadPPTX(): Promise<void> {
+  return downloadAsBlob(PPTX_PATH, "BOOMER-OFF-Vintage-品牌手册.pptx");
+}
