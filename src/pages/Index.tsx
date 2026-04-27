@@ -218,6 +218,11 @@ const IndexInner = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
+      if (e.target instanceof HTMLTextAreaElement) return;
+      // 编辑模式下，可编辑元素拥有焦点时不响应快捷键
+      if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
+      // 编辑模式下完全禁用方向键翻页，避免误触
+      if (editor.editing && ["ArrowRight", "ArrowLeft", " ", "PageDown", "PageUp"].includes(e.key)) return;
       if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
       else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
       else if (e.key === "Home") go(0);
@@ -232,7 +237,7 @@ const IndexInner = () => {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [current, go, total, toggleFullscreen, pseudoFullscreen]);
+  }, [current, go, total, toggleFullscreen, pseudoFullscreen, editor.editing]);
 
   // 复制分享链接
   const copyLink = useCallback(async () => {
@@ -419,23 +424,27 @@ const IndexInner = () => {
             </div>
           </div>
 
-          {/* 左右点击区域 */}
-          <button
-            onClick={() => go(current - 1)}
-            disabled={current === 0}
-            className="absolute left-0 top-0 bottom-0 w-1/4 z-10 cursor-w-resize disabled:cursor-default group"
-            aria-label="上一页"
-          >
-            <ChevronLeft className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
-          </button>
-          <button
-            onClick={() => go(current + 1)}
-            disabled={current === total - 1}
-            className="absolute right-0 top-0 bottom-0 w-1/4 z-10 cursor-e-resize disabled:cursor-default group"
-            aria-label="下一页"
-          >
-            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
-          </button>
+          {/* 左右点击区域（编辑模式下禁用，避免与选中元素冲突） */}
+          {!editor.editing && (
+            <>
+              <button
+                onClick={() => go(current - 1)}
+                disabled={current === 0}
+                className="absolute left-0 top-0 bottom-0 w-1/4 z-10 cursor-w-resize disabled:cursor-default group"
+                aria-label="上一页"
+              >
+                <ChevronLeft className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
+              </button>
+              <button
+                onClick={() => go(current + 1)}
+                disabled={current === total - 1}
+                className="absolute right-0 top-0 bottom-0 w-1/4 z-10 cursor-e-resize disabled:cursor-default group"
+                aria-label="下一页"
+              >
+                <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
+              </button>
+            </>
+          )}
 
           {/* 底部页码控制（伪全屏时隐藏） */}
           {!pseudoFullscreen && (
