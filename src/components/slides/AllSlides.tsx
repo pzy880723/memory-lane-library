@@ -36,6 +36,14 @@ import xhs7 from "@/assets/ugc/xhs-7.jpg";
 import dy1 from "@/assets/ugc/dy-1.jpg";
 import dy2 from "@/assets/ugc/dy-2.jpg";
 
+// 大众点评优质评价截图
+import dp1 from "@/assets/ugc/dp-1.jpg";
+import dp2 from "@/assets/ugc/dp-2.jpg";
+import dp3 from "@/assets/ugc/dp-3.jpg";
+import dp4 from "@/assets/ugc/dp-4.jpg";
+import dp5 from "@/assets/ugc/dp-5.jpg";
+import dp6 from "@/assets/ugc/dp-6.jpg";
+
 /* ============================================================
  * 第 1 页 — 封面（拼贴风 + 真实照片）
  * ============================================================ */
