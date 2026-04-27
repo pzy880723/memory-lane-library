@@ -33,9 +33,55 @@ export function EditorPanel() {
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const [showTools, setShowTools] = useState(false); // 设置面板(导出/重置/退出)
   const [uploading, setUploading] = useState(false);
+  const [floatPos, setFloatPos] = useState<{ left: number; top: number }>(() => {
+    if (typeof window === "undefined") return { left: 0, top: 0 };
+    try {
+      const saved = localStorage.getItem("editor.floatPos");
+      if (saved) {
+        const p = JSON.parse(saved);
+        if (typeof p?.left === "number" && typeof p?.top === "number") return p;
+      }
+    } catch { /* ignore */ }
+    return { left: window.innerWidth - 60, top: Math.round(window.innerHeight / 2) - 22 };
+  });
+  const [floatExpanded, setFloatExpanded] = useState(false);
+  const [floatDragged, setFloatDragged] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importJsonRef = useRef<HTMLInputElement>(null);
   const dragStateRef = useRef<{ dx: number; dy: number } | null>(null);
+  const floatDragRef = useRef<{ dx: number; dy: number; moved: boolean } | null>(null);
+
+  // 浮标拖拽
+  const onFloatDragStart = useCallback((e: React.MouseEvent) => {
+    floatDragRef.current = { dx: e.clientX - floatPos.left, dy: e.clientY - floatPos.top, moved: false };
+    setFloatDragged(false);
+    const onMove = (ev: MouseEvent) => {
+      const ds = floatDragRef.current;
+      if (!ds) return;
+      ds.moved = true;
+      setFloatDragged(true);
+      const left = Math.max(4, Math.min(window.innerWidth - 48, ev.clientX - ds.dx));
+      const top = Math.max(4, Math.min(window.innerHeight - 48, ev.clientY - ds.dy));
+      setFloatPos({ left, top });
+    };
+    const onUp = () => {
+      const ds = floatDragRef.current;
+      floatDragRef.current = null;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      if (ds?.moved) {
+        try { localStorage.setItem("editor.floatPos", JSON.stringify(floatPos)); } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [floatPos]);
+
+  // 持久化浮标位置
+  useEffect(() => {
+    try { localStorage.setItem("editor.floatPos", JSON.stringify(floatPos)); } catch { /* ignore */ }
+  }, [floatPos]);
+
 
   // 计算自动避让位置
   const computeAutoPos = useCallback((rect?: Selected["rect"]) => {
