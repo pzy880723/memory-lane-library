@@ -150,7 +150,7 @@ export function EditorPanel() {
 
   if (showFloatingBar) {
     return (
-      <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-2 bg-background border-2 border-primary/40 rounded-full shadow-2xl px-3 py-2">
+      <div className="fixed bottom-4 left-4 z-[60] flex items-center gap-2 bg-background border-2 border-primary/40 rounded-full shadow-2xl px-3 py-2">
         <Pencil className="w-4 h-4 text-primary" />
         <span className="text-xs font-medium">编辑模式 · 第 {currentSlide + 1} 页 · 点击文字或图片</span>
         {saving ? (
@@ -172,10 +172,10 @@ export function EditorPanel() {
     );
   }
 
-  // 工具面板（导出/重置）—— 位于右下角
+  // 工具面板（导出/重置）—— 位于左下角，避免与底部居中翻页条遮挡
   if (showTools && selected.kind === null) {
     return (
-      <aside className="fixed bottom-4 right-4 w-80 z-[60] bg-background border-2 border-primary/30 rounded-lg shadow-2xl text-foreground">
+      <aside className="fixed bottom-4 left-4 w-80 z-[60] bg-background border-2 border-primary/30 rounded-lg shadow-2xl text-foreground">
         <header className="flex items-center justify-between px-4 py-3 border-b bg-primary/5">
           <div className="flex items-center gap-2">
             <Settings className="w-4 h-4 text-primary" />
