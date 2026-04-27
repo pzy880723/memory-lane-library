@@ -18,7 +18,7 @@ export interface OverlayApi {
 export function useApplyOverrides(
   slideIndex: number,
   containerRef: React.RefObject<HTMLDivElement>,
-  onSelectImage: (key: string, currentSrc: string) => void,
+  onSelectImage: (key: string, currentSrc: string, el?: HTMLElement) => void,
   onSelectText: (key: string, el: HTMLElement) => void,
   containerEl?: HTMLElement | null,
 ) {
