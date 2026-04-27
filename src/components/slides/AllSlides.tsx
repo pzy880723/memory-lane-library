@@ -9,40 +9,40 @@ import {
 } from "lucide-react";
 
 // 店铺实拍图
-import photoVinyl from "@/assets/store/vinyl-player.jpeg";
-import photoCeramics from "@/assets/store/ceramics-shelf.jpeg";
-import photoDIY from "@/assets/store/diy-zone.jpeg";
-import photoSato from "@/assets/store/sato-elephant.jpeg";
-import photoSatoDetail from "@/assets/store/sato-detail.jpeg";
-import photoCups from "@/assets/store/cup-collection.jpeg";
-import photoUltraman from "@/assets/store/ultraman-toys.jpeg";
-import photoTeapot from "@/assets/store/iron-teapot.jpeg";
-import photoPikachu from "@/assets/store/pikachu-mug.jpeg";
-import photoDiatone from "@/assets/store/diatone-spinning.jpeg";
+import photoVinyl from "@/assets/store/vinyl-player.webp";
+import photoCeramics from "@/assets/store/ceramics-shelf.webp";
+import photoDIY from "@/assets/store/diy-zone.webp";
+import photoSato from "@/assets/store/sato-elephant.webp";
+import photoSatoDetail from "@/assets/store/sato-detail.webp";
+import photoCups from "@/assets/store/cup-collection.webp";
+import photoUltraman from "@/assets/store/ultraman-toys.webp";
+import photoTeapot from "@/assets/store/iron-teapot.webp";
+import photoPikachu from "@/assets/store/pikachu-mug.webp";
+import photoDiatone from "@/assets/store/diatone-spinning.webp";
 import wechatQR from "@/assets/wechat-qr.png";
 
 // 头部明星 / 网红
-import celebWenqi from "@/assets/ugc/celeb-wenqi.jpg";
-import celebHuye from "@/assets/ugc/celeb-huye.jpg";
+import celebWenqi from "@/assets/ugc/celeb-wenqi.webp";
+import celebHuye from "@/assets/ugc/celeb-huye.webp";
 
 // 小红书 / 抖音 素人种草截图
-import xhs1 from "@/assets/ugc/xhs-1.jpg";
-import xhs2 from "@/assets/ugc/xhs-2.jpg";
-import xhs3 from "@/assets/ugc/xhs-3.jpg";
-import xhs4 from "@/assets/ugc/xhs-4.jpg";
-import xhs5 from "@/assets/ugc/xhs-5.jpg";
-import xhs6 from "@/assets/ugc/xhs-6.jpg";
-import xhs7 from "@/assets/ugc/xhs-7.jpg";
-import dy1 from "@/assets/ugc/dy-1.jpg";
-import dy2 from "@/assets/ugc/dy-2.jpg";
+import xhs1 from "@/assets/ugc/xhs-1.webp";
+import xhs2 from "@/assets/ugc/xhs-2.webp";
+import xhs3 from "@/assets/ugc/xhs-3.webp";
+import xhs4 from "@/assets/ugc/xhs-4.webp";
+import xhs5 from "@/assets/ugc/xhs-5.webp";
+import xhs6 from "@/assets/ugc/xhs-6.webp";
+import xhs7 from "@/assets/ugc/xhs-7.webp";
+import dy1 from "@/assets/ugc/dy-1.webp";
+import dy2 from "@/assets/ugc/dy-2.webp";
 
 // 大众点评优质评价截图
-import dp1 from "@/assets/ugc/dp-1.jpg";
-import dp2 from "@/assets/ugc/dp-2.jpg";
-import dp3 from "@/assets/ugc/dp-3.jpg";
-import dp4 from "@/assets/ugc/dp-4.jpg";
-import dp5 from "@/assets/ugc/dp-5.jpg";
-import dp6 from "@/assets/ugc/dp-6.jpg";
+import dp1 from "@/assets/ugc/dp-1.webp";
+import dp2 from "@/assets/ugc/dp-2.webp";
+import dp3 from "@/assets/ugc/dp-3.webp";
+import dp4 from "@/assets/ugc/dp-4.webp";
+import dp5 from "@/assets/ugc/dp-5.webp";
+import dp6 from "@/assets/ugc/dp-6.webp";
 
 /* ============================================================
  * 第 1 页 — 封面（拼贴风 + 真实照片）
