@@ -102,7 +102,7 @@ export function useApplyOverrides(
         const handleClick = (e: MouseEvent) => {
           e.preventDefault();
           e.stopPropagation();
-          onSelectImage(key, img.src);
+          onSelectImage(key, img.src, img);
         };
         img.addEventListener("click", handleClick);
         imgCleanup.push(() => {
