@@ -3,7 +3,7 @@ import { ScaledSlide } from "./ScaledSlide";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
-  Slide05Traffic, Slide06Media, Slide07Keywords, Slide08Engine,
+  Slide05Traffic, Slide05bUGC, Slide06Media, Slide07Keywords, Slide08Engine,
   Slide10Problem, Slide11Story, Slide12Persona,
   Slide13Market, Slide14Japan,
   Slide16Space, Slide17Experience, Slide18Categories, Slide19FlipperFun,
@@ -31,6 +31,7 @@ export const SLIDES: SlideMeta[] = [
       desc="中信泰富首店实绩 · 零投放的自然流量奇迹 · 媒体背书 · 用户口碑" />
   )},
   { id: "traffic", title: "自然流量奇迹", chapter: "01", render: (p) => <Slide05Traffic {...p} /> },
+  { id: "ugc", title: "素人种草传播", chapter: "01", render: (p) => <Slide05bUGC {...p} /> },
   { id: "media", title: "SmartShanghai 报道", chapter: "01", render: (p) => <Slide06Media {...p} /> },
   { id: "keywords", title: "用户评价关键词", chapter: "01", render: (p) => <Slide07Keywords {...p} /> },
   

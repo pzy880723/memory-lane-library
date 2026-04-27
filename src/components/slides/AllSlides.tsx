@@ -21,6 +21,17 @@ import photoPikachu from "@/assets/store/pikachu-mug.jpeg";
 import photoDiatone from "@/assets/store/diatone-spinning.jpeg";
 import wechatQR from "@/assets/wechat-qr.png";
 
+// 小红书 / 抖音 素人种草截图
+import xhs1 from "@/assets/ugc/xhs-1.jpg";
+import xhs2 from "@/assets/ugc/xhs-2.jpg";
+import xhs3 from "@/assets/ugc/xhs-3.jpg";
+import xhs4 from "@/assets/ugc/xhs-4.jpg";
+import xhs5 from "@/assets/ugc/xhs-5.jpg";
+import xhs6 from "@/assets/ugc/xhs-6.jpg";
+import xhs7 from "@/assets/ugc/xhs-7.jpg";
+import dy1 from "@/assets/ugc/dy-1.jpg";
+import dy2 from "@/assets/ugc/dy-2.jpg";
+
 /* ============================================================
  * 第 1 页 — 封面（拼贴风 + 真实照片）
  * ============================================================ */
@@ -271,6 +282,108 @@ export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number;
               <div className="font-body text-2xl mt-1 opacity-65">{d.sub}</div>
             </div>
           ))}
+        </div>
+      </div>
+    </SlideShell>
+  );
+}
+
+/* ============================================================
+ * 第 5b 页 — 小红书 / 抖音 素人自发种草
+ * ============================================================ */
+export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  // 9 张截图 + 标签 + 互动数据
+  const posts = [
+    { src: xhs1, platform: "小红书", title: "小老淇 shanghai vlog 同款", likes: "199", stars: "160", comments: "3", rotate: "-2.5deg" },
+    { src: xhs2, platform: "小红书", title: "上海这么好逛的 vintage 店咋没人说！", likes: "290", stars: "290", comments: "15", rotate: "1.8deg" },
+    { src: xhs3, platform: "小红书", title: "中信泰富复古 OFF 中古杂货店", likes: "535", stars: "563", comments: "55", rotate: "-1.2deg" },
+    { src: xhs4, platform: "小红书", title: "不在东京在上海！宝藏中古玩具店", likes: "167", stars: "98", comments: "8", rotate: "2.2deg" },
+    { src: xhs5, platform: "小红书", title: "新店！Boomer Off 中古手办店", likes: "35", stars: "5", comments: "—", rotate: "-1.8deg" },
+    { src: xhs6, platform: "小红书", title: "不是在日本到感觉已经到了", likes: "1053", stars: "176", comments: "41", rotate: "1.5deg" },
+    { src: xhs7, platform: "小红书", title: "如果全世界都指责你 那姐姐就抱抱你", likes: "590", stars: "8", comments: "12", rotate: "-2deg" },
+    { src: dy1, platform: "抖音", title: "Boomer off 中古店是我见过最有趣的", likes: "432", stars: "279", comments: "22", rotate: "1.2deg" },
+    { src: dy2, platform: "抖音", title: "BOOMER·OFF Vintage · 中信泰富", likes: "37", stars: "10", comments: "4", rotate: "-1.5deg" },
+  ];
+
+  return (
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="01 · 中信泰富首店实绩">
+      <div className="absolute inset-0 px-20 pt-32 pb-20">
+        {/* 顶部标题 + 数据胶囊 */}
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <div className="font-handwrite text-4xl text-boomer-red mb-2">— UGC · 素人自发种草 —</div>
+            <h1 className="font-display text-7xl font-black leading-tight">
+              小红书 · 抖音<span className="text-boomer-red highlight-yellow">全网刷屏</span>
+            </h1>
+          </div>
+          <div className="flex gap-4">
+            <div className="vintage-border bg-boomer-red text-paper-cream px-6 py-3 rotate-[-2deg]">
+              <div className="font-en text-2xl tracking-wider opacity-80">XIAOHONGSHU</div>
+              <div className="font-display text-4xl font-black">300+ 篇笔记</div>
+            </div>
+            <div className="vintage-border bg-ink text-paper-cream px-6 py-3 rotate-[1.5deg]">
+              <div className="font-en text-2xl tracking-wider opacity-80">DOUYIN</div>
+              <div className="font-display text-4xl font-black">百万+ 播放</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 数据条 */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          {[
+            { num: "3,000+", label: "全网累计点赞", color: "bg-paper-cream" },
+            { num: "1,800+", label: "收藏 / 想去", color: "bg-vintage-gold" },
+            { num: "500+", label: "评论互动", color: "bg-paper-cream" },
+            { num: "0 ¥", label: "投放预算", color: "bg-boomer-red text-paper-cream" },
+          ].map((d, i) => (
+            <div
+              key={d.label}
+              className={`vintage-border p-4 ${d.color} ${i % 2 === 0 ? "rotate-[-0.4deg]" : "rotate-[0.4deg]"}`}
+            >
+              <div className="font-display text-5xl font-black leading-none">{d.num}</div>
+              <div className="font-body text-2xl mt-2 opacity-75">{d.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* 9 张截图拼贴墙 */}
+        <div className="grid grid-cols-5 gap-5">
+          {posts.map((p, i) => {
+            const isXHS = p.platform === "小红书";
+            return (
+              <div
+                key={i}
+                className="relative bg-paper-cream vintage-border p-2 pb-3"
+                style={{ transform: `rotate(${p.rotate})` }}
+              >
+                {/* 平台标签 */}
+                <div className={`absolute -top-3 -left-3 z-10 px-3 py-1 vintage-border font-display text-xl font-black ${isXHS ? "bg-boomer-red text-paper-cream" : "bg-ink text-paper-cream"}`}>
+                  {p.platform}
+                </div>
+                {/* 胶带 */}
+                <div className={`${i % 2 === 0 ? "tape-gold" : "tape-red"} -top-2 right-6 z-10 rotate-[6deg]`} />
+
+                {/* 图片框 */}
+                <div className="relative overflow-hidden bg-ink/5" style={{ aspectRatio: "9 / 16" }}>
+                  <img
+                    src={p.src}
+                    alt={p.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* 文案 + 互动 */}
+                <div className="px-1 pt-2">
+                  <div className="font-body text-lg leading-tight line-clamp-2 mb-1 text-ink/85">{p.title}</div>
+                  <div className="flex items-center gap-2 font-en text-base text-ink/65">
+                    <span className="text-boomer-red">♥ {p.likes}</span>
+                    <span className="text-vintage-gold-dark">★ {p.stars}</span>
+                    <span>💬 {p.comments}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </SlideShell>
