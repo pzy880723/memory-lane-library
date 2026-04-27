@@ -1,8 +1,10 @@
 /**
- * 编辑数据本地存储层
- * 数据按 slide index + 元素 key 存放在 localStorage
- * 支持文字内容、字号、颜色、图片 URL 的覆盖
+ * 编辑数据持久化层
+ * - 主存储:Lovable Cloud 数据库 `content_overrides` 表(单条 scope='default')
+ * - 本地缓存:localStorage(离线兜底 + 启动加速)
+ * - 图片:Lovable Cloud Storage `editor-images` bucket
  */
+import { supabase } from "@/integrations/supabase/client";
 
 export interface TextOverride {
   text?: string;
@@ -11,21 +13,23 @@ export interface TextOverride {
 }
 
 export interface ImageOverride {
-  src?: string; // URL 或 base64
+  src?: string; // 公开 URL(Storage)或 https:// 外链
 }
 
 export interface SlideOverrides {
-  texts: Record<string, TextOverride>;   // key = 元素稳定 ID
-  images: Record<string, ImageOverride>; // key = 元素稳定 ID
+  texts: Record<string, TextOverride>;
+  images: Record<string, ImageOverride>;
 }
 
 export interface AllOverrides {
   version: 1;
   updatedAt: string;
-  slides: Record<number, SlideOverrides>; // slide index → overrides
+  slides: Record<number, SlideOverrides>;
 }
 
 const STORAGE_KEY = "boomer_off_editor_overrides_v1";
+const SCOPE = "default";
+const IMAGE_BUCKET = "editor-images";
 
 const empty = (): AllOverrides => ({
   version: 1,
@@ -33,7 +37,9 @@ const empty = (): AllOverrides => ({
   slides: {},
 });
 
-export function loadOverrides(): AllOverrides {
+/* ─────────────── 本地缓存(同步,启动时立刻可用)─────────────── */
+
+export function loadOverridesLocal(): AllOverrides {
   if (typeof window === "undefined") return empty();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -46,14 +52,103 @@ export function loadOverrides(): AllOverrides {
   }
 }
 
-export function saveOverrides(data: AllOverrides) {
-  data.updatedAt = new Date().toISOString();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+export function saveOverridesLocal(data: AllOverrides) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // 容量超限不影响主流程,云端是真源
+  }
 }
 
-export function clearOverrides() {
-  localStorage.removeItem(STORAGE_KEY);
+export function clearOverridesLocal() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
 }
+
+/* ─────────────── 云端读写(异步,真源)─────────────── */
+
+export async function loadOverridesRemote(): Promise<AllOverrides | null> {
+  const { data, error } = await supabase
+    .from("content_overrides")
+    .select("data")
+    .eq("scope", SCOPE)
+    .maybeSingle();
+  if (error) {
+    console.warn("[storage] load remote failed:", error.message);
+    return null;
+  }
+  if (!data) return null;
+  const parsed = data.data as unknown;
+  if (parsed && typeof parsed === "object" && (parsed as AllOverrides).version === 1) {
+    return parsed as AllOverrides;
+  }
+  return null;
+}
+
+export async function saveOverridesRemote(data: AllOverrides): Promise<void> {
+  data.updatedAt = new Date().toISOString();
+  const row = { scope: SCOPE, data: data as unknown as never };
+  const { error } = await supabase
+    .from("content_overrides")
+    .upsert(row, { onConflict: "scope" });
+  if (error) {
+    console.warn("[storage] save remote failed:", error.message);
+    throw error;
+  }
+}
+
+export async function clearOverridesRemote(): Promise<void> {
+  const row = { scope: SCOPE, data: empty() as unknown as never };
+  const { error } = await supabase
+    .from("content_overrides")
+    .upsert(row, { onConflict: "scope" });
+  if (error) console.warn("[storage] clear remote failed:", error.message);
+}
+
+/* ─────────────── 图片上传到 Storage ─────────────── */
+
+/**
+ * 上传一张图片到 editor-images bucket,返回公开 URL。
+ * 路径形如 slide-12/abc123-1738000000.jpg
+ */
+export async function uploadImageToCloud(
+  file: File,
+  slideIndex: number,
+  key: string,
+): Promise<string> {
+  // 文件名清理,只保留扩展名
+  const m = /\.([a-z0-9]{1,5})$/i.exec(file.name);
+  const ext = (m ? m[1] : (file.type.split("/")[1] ?? "bin")).toLowerCase();
+  // key 可能包含 / 等,做安全替换
+  const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 60);
+  const path = `slide-${slideIndex}/${safeKey}-${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, file, {
+      cacheControl: "31536000",
+      upsert: false,
+      contentType: file.type || undefined,
+    });
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/* ─────────────── 兼容旧 API(部分组件还在用)─────────────── */
+
+/** @deprecated 请改用 loadOverridesLocal + loadOverridesRemote */
+export const loadOverrides = loadOverridesLocal;
+
+/** @deprecated 请改用 saveOverridesLocal + saveOverridesRemote */
+export function saveOverrides(data: AllOverrides) {
+  saveOverridesLocal(data);
+}
+
+/** @deprecated 请改用 clearOverridesLocal + clearOverridesRemote */
+export const clearOverrides = clearOverridesLocal;
+
+/* ─────────────── 不可变更新工具(纯函数)─────────────── */
 
 export function setText(
   data: AllOverrides,
@@ -64,7 +159,6 @@ export function setText(
   const slide = data.slides[slideIndex] ?? { texts: {}, images: {} };
   const prev = slide.texts[key] ?? {};
   const merged: TextOverride = { ...prev, ...patch };
-  // 清掉空值
   (Object.keys(merged) as (keyof TextOverride)[]).forEach((k) => {
     if (merged[k] === "" || merged[k] == null) delete merged[k];
   });
