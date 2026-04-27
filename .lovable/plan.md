@@ -1,97 +1,127 @@
-## 问题诊断
+## 🎯 目标
 
-**现象**:编辑模式下替换图片,刷新后图片恢复为原图,修改丢失。
+让"下载 PDF / PPT"在 **任何部署环境**（Lovable 预览、腾讯云 COS+CDN、自己服务器）下都稳定可用，不再依赖本地构建是否产出了静态文件。
 
-**根本原因**:
-1. 当前实现 (`src/lib/editor/storage.ts`) 把上传的图片转成 **base64 dataURL** 后,跟其他文字 overrides 一起写入 **localStorage** 同一个 key (`boomer_off_editor_overrides_v1`)。
-2. 一张图片 base64 化后通常 1-3MB,而浏览器对单个 origin 的 localStorage 总容量限制通常只有 **5-10MB**。
-3. `saveOverrides` 中的 `localStorage.setItem(...)` 没有 try/catch — 一旦超容量抛出 `QuotaExceededError`,**整个** JSON(包含其他文字修改)都写入失败,但 UI 上看不到任何报错。刷新后从 localStorage 读到的还是旧数据,所以"修改全部消失"。
-4. 即使写入成功,base64 dataURL 也无法被预生成的 PDF/PPT 用到(因为预生成在构建期跑,读不到用户浏览器里的 localStorage)。
+## 🔍 当前问题根因
 
----
+1. **`public/exports/` 在 git 仓库里只有 `.gitkeep`**，没有真实的 PDF/PPTX 文件
+2. `scripts/prerender-exports.mjs` 需要 puppeteer + chromium，**只能在你本地 `npm run build` 时跑**，腾讯云 COS 是纯静态托管不会跑构建脚本
+3. 部署到腾讯云后，前端去 fetch `/exports/xxx.pdf` → **404** → 报"网络问题"
 
-## 解决方案
+另外即便每次本地都构建并上传，也有这些痛点：
+- 用户在编辑器里改了文字/图片后，导出的还是旧版本
+- 中文文件名在某些 CDN 节点不稳定
+- 文件大（几十 MB），上传 COS 慢
 
-启用 **Lovable Cloud**,把图片放到 Storage Bucket(永久持久化、有 CDN URL),把 overrides JSON 放到数据库表里(永久 + 跨设备同步)。文字 overrides 也一起迁移过去,这样所有编辑都不会因为浏览器限制丢失。
+## 🏗️ 解决方案架构
 
-### 1. 启用 Lovable Cloud 后端
-- 自动生成 Supabase 项目 + 客户端配置 (`src/integrations/supabase/client.ts`)。
-
-### 2. 创建 Storage Bucket
-- Bucket 名:`editor-images`,设为 **public**(图片需要直接 URL 加载,且预生成 PDF 时也要能访问)。
-- RLS 策略:
-  - 所有人可 SELECT(读图)。
-  - 仅"已解锁编辑器"的用户可 INSERT(为简化,我们会让前端使用 anon key 上传到固定路径前缀;真正的写权限通过密码门控+只允许 `slide-{n}/{key}-{timestamp}.{ext}` 这种命名约束)。
-
-### 3. 创建数据库表存放 overrides
-```sql
-create table public.content_overrides (
-  id uuid primary key default gen_random_uuid(),
-  -- 单租户场景:用一个固定 key 'default' 存全局唯一一份内容
-  scope text not null unique default 'default',
-  data jsonb not null,                 -- 即原 AllOverrides
-  updated_at timestamptz not null default now()
-);
-alter table public.content_overrides enable row level security;
--- 所有人可读(因为前端要展示)
-create policy "anyone can read content" on public.content_overrides
-  for select using (true);
--- 所有人可 upsert(写权限通过前端密码门控保护;后续可以加 has_role 收紧)
-create policy "anyone can write content" on public.content_overrides
-  for insert with check (true);
-create policy "anyone can update content" on public.content_overrides
-  for update using (true);
 ```
-> 说明:由于编辑模式已通过密码本地门控(880723 等),且这是一个内部演示工具,本期先用宽松策略保证功能可用。如果你之后想接 Lovable Auth,我们再加 `has_role()` 收紧。
+┌─────────────────┐     ┌────────────────────────┐     ┌──────────────────┐
+│ 前端（腾讯云）   │ →  │ Edge Function          │ →  │ Lovable Cloud    │
+│ 点击"下载"       │     │ generate-export        │     │ Storage          │
+│                 │     │ (Deno + Puppeteer-less)│     │ exports/ 桶      │
+└─────────────────┘     └────────────────────────┘     └──────────────────┘
+        ↑                                                       │
+        └──────────  返回永久 CDN URL，浏览器直接下载  ──────────┘
+```
 
-### 4. 改造存储层 `src/lib/editor/storage.ts`
-- 新增:`loadOverridesRemote()` — 从 `content_overrides` 表读取。
-- 新增:`saveOverridesRemote(data)` — upsert 到表。
-- 新增:`uploadImageToCloud(file, slideIndex, key)` — 上传到 Storage,返回 public URL。
-- 保留 localStorage 作为离线兜底缓存(读不到云端时用本地)。
+### 核心思路：**云端按需生成，缓存到 Storage**
 
-### 5. 改造 `src/lib/editor/EditorContext.tsx`
-- 启动时 `useEffect` 异步从云端拉取 → setState。
-- 数据变更时,debounce 600ms 后写云端(同时写一份到 localStorage 兜底)。
-- 增加 `saving` / `loaded` 状态供 UI 显示"已保存 ✓"。
+- 把 PDF/PPTX 生成逻辑从本地构建脚本搬到 **Lovable Cloud Edge Function**
+- 第一次有人点"下载"时，Edge Function 渲染并把文件存到 Storage 桶
+- 之后所有人下载，直接命中 Storage 永久 URL（CDN 加速、永不 404）
+- 内容编辑过后，让缓存失效并重新生成
 
-### 6. 改造 `src/components/editor/EditorPanel.tsx`
-- `handleImageFile`:不再 `FileReader.readAsDataURL`,改为调用 `uploadImageToCloud(file, ...)` → 拿到 URL → `updateImage(slideIndex, key, { src: url })`。
-- 加上传中 loading 提示。
-- 移除 4MB 容量警告(Storage 没这个限制)。
+## 📋 实施步骤
 
-### 7. 预生成脚本兼容
-- `scripts/prerender-exports.mjs` 在 Puppeteer 内打开页面前,Print 页 (`src/pages/Print.tsx`) 已经会从云端拉 overrides → 自动应用最新内容。无需手动同步。
-- 如果你希望"管理员触发重新生成 PDF/PPT",我们可以另起一个按钮(本期不做)。
+### 1. 创建 Storage 桶 `exports`（公开读）
 
-### 8. 数据迁移(一次性)
-- EditorContext 初始化时检测:如果云端是空的、但 localStorage 有数据,自动把 localStorage 的 overrides upsert 到云端(图片如果是 dataURL 就跳过,其他原样上传),让你之前的文字修改不丢失。
+存生成好的 PDF/PPTX，文件名按内容哈希区分版本。
 
----
+### 2. 创建 `export_cache` 数据表
 
-## 涉及的文件
+```
+- id (uuid)
+- type ('pdf' | 'pptx')
+- content_hash (text)        // 基于 content_overrides 的哈希
+- file_path (text)           // Storage 中的路径
+- file_url (text)            // 公开下载 URL
+- status ('pending'|'ready'|'failed')
+- created_at, updated_at
+```
 
-**新建**
-- 数据库 migration:`content_overrides` 表 + RLS + Storage Bucket `editor-images` + Bucket 策略
-- `src/integrations/supabase/client.ts`(Lovable Cloud 自动生成)
+启用 RLS：所有人可读，只有服务端可写。
 
-**修改**
-- `src/lib/editor/storage.ts` — 增加云端读写 + 图片上传
-- `src/lib/editor/EditorContext.tsx` — 启动拉取、debounce 写云端、迁移逻辑
-- `src/components/editor/EditorPanel.tsx` — 图片走 Storage 上传
-- `src/pages/Print.tsx` — 确保预生成时也从云端读 overrides(只读路径)
+### 3. 新建 Edge Function `generate-export`
 
-**不动**
-- 现有 `useApplyOverrides.ts`、各 Slide 组件、PDF/PPT 预生成脚本主体逻辑
+参数：`{ type: 'pdf' | 'pptx' }`
 
----
+逻辑：
+1. 读取最新的 `content_overrides` → 计算 hash
+2. 查 `export_cache` 是否已有 (type, hash) 的 ready 记录 → 有就直接返回 URL
+3. 否则插入 pending 记录、立即返回 `{ status: 'pending', jobId }`
+4. 后台异步执行：
+   - **PDF**：直接用 `pdf-lib` 在 Deno 中拼接（不需要 chromium）
+     - 把每张幻灯片渲染成 SVG → 用 `pdf-lib` 嵌入；或者
+     - 调用 Lovable AI Gateway 的 `gemini-3-pro-image-preview` 或外部 API 把渲染好的 HTML/data 转成截图
+   - **更稳的方案**：调用 **Browserless / Bright Data / ScreenshotOne** 这类「云端无头浏览器即服务」（每月有免费额度）截图，再拼 PDF/PPTX。这个最匹配现有 puppeteer 逻辑，质量 100% 一致。
+5. 完成后上传到 Storage，更新 `export_cache.status = ready`
 
-## 预期效果
+### 4. 前端 `src/lib/export.tsx` 改造
 
-1. ✅ 图片上传后立即获得 CDN URL,刷新、换浏览器、换设备都还在。
-2. ✅ 不再受 localStorage 5-10MB 限制,可以放高清大图。
-3. ✅ 文字修改也持久化到云端,不会因图片超容量被一锅端丢失。
-4. ✅ 编辑面板会显示"已保存 ✓",不再有"以为保存了其实没保存"的隐患。
-5. ✅ 离线场景下仍可使用 localStorage 兜底浏览。
+```ts
+async function downloadExport(type: 'pdf' | 'pptx') {
+  // 1. 调 Edge Function
+  const { data } = await supabase.functions.invoke('generate-export', { body: { type } });
+  
+  // 2. 如果 ready 直接下载
+  if (data.status === 'ready') return downloadAsBlob(data.url, filename);
+  
+  // 3. 如果 pending，轮询数据库（或用 Realtime 订阅）
+  await pollUntilReady(data.jobId);
+  // ... 拉到 url 后 downloadAsBlob
+}
+```
 
-需要你点击 Approve 后,我会启用 Lovable Cloud 并执行上述改造。
+UI 上显示进度："正在生成中…（首次约 60 秒，之后秒下）"
+
+### 5. 缓存失效
+
+在 `EditorContext` 保存 overrides 后，可选地把 `export_cache` 中所有 ready 记录标记为 stale，下次下载触发重新生成。
+
+### 6. 兼容老逻辑（可选保留）
+
+保留 `public/exports/` 作为本地预览的 fallback：先 fetch 本地静态文件，404 再走 Edge Function。这样在 Lovable 自身的预览环境（已经有打包好的文件）依然秒下载。
+
+## 🌐 关于云端截图方案的选择
+
+需要你拍板用哪个：
+
+| 方案 | 成本 | 画质 | 复杂度 |
+|---|---|---|---|
+| **A. Browserless.io（推荐）** | 免费额度 1000 截图/月，超出按量 | ⭐⭐⭐⭐⭐ 与本地完全一致 | 低 |
+| **B. ScreenshotOne** | 免费 100/月 | ⭐⭐⭐⭐⭐ | 低 |
+| **C. 纯 pdf-lib 重绘** | 免费 | ⭐⭐⭐ 需要重写所有幻灯片为矢量 PDF 元素 | 高 |
+| **D. 用户本地浏览器渲染**（html2canvas + jsPDF） | 免费 | ⭐⭐⭐ 中文字体/图标可能丢 | 中，但部署到任何地方都能用 |
+
+我推荐 **A 或 D**：
+- **A** 画质最佳，但需要你注册 browserless 账号并提供 API token
+- **D** 完全免费、零依赖，但首次下载要等 30-60 秒（用户的浏览器渲染 35 张高清幻灯片）
+
+## ⚡ 立即可用的应急方案（不用等大改）
+
+如果你想**今天就让腾讯云能下载**，最快路径是：
+
+1. 我**不**改架构，只改 `package.json` 的 `build` 脚本，确保本地 `npm run build` 总是产出 `dist/exports/*` 和 `public/exports/*`
+2. 你本地 build 一次，把 `dist/` 整个上传到 COS
+3. **同时** 把生成好的 PDF/PPTX 也直接传一份到 COS 根目录的 `/exports/`，并把文件名改成纯英文（`brand-book.pdf` / `brand-book.pptx`），代码里同步改路径
+
+这只是临时绷带，不解决"用户编辑后导出还是旧版本"的问题。
+
+## 🤔 需要你回答
+
+1. **截图方案选 A / B / C / D 的哪个？**（强烈推荐 D，完全自包含，无需额外服务）
+2. **是否要先用「应急方案」**让腾讯云上的下载今天就能用，然后再上正式架构？
+3. **编辑后的内容**是否需要反映到导出文件里？（如果只是给你内部看，每次本地 build 上传 COS 也能接受）
+
+确认后我会按你的选择落地。
