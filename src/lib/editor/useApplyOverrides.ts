@@ -20,6 +20,7 @@ export function useApplyOverrides(
   containerRef: React.RefObject<HTMLDivElement>,
   onSelectImage: (key: string, currentSrc: string) => void,
   onSelectText: (key: string, el: HTMLElement) => void,
+  containerEl?: HTMLElement | null,
 ) {
   const { data, editing, updateText } = useEditor();
   const dataRef = useRef(data);
