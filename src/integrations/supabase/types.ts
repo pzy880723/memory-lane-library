@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      export_cache: {
+        Row: {
+          content_hash: string
+          content_updated_at: string
+          created_at: string
+          file_path: string
+          file_url: string
+          id: string
+          type: string
+        }
+        Insert: {
+          content_hash: string
+          content_updated_at?: string
+          created_at?: string
+          file_path: string
+          file_url: string
+          id?: string
+          type: string
+        }
+        Update: {
+          content_hash?: string
+          content_updated_at?: string
+          created_at?: string
+          file_path?: string
+          file_url?: string
+          id?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
