@@ -89,8 +89,9 @@ export const SLIDES: SlideMeta[] = [
 
 export function SlideRenderer({ index }: { index: number }) {
   const slide = SLIDES[index];
+  const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [, force] = useState(0);
+  containerRef.current = containerEl;
 
   const onSelectImage = useCallback((key: string, src: string) => {
     (window as unknown as { __editorSelectImage?: (k: string, s: string) => void }).__editorSelectImage?.(key, src);
@@ -99,19 +100,15 @@ export function SlideRenderer({ index }: { index: number }) {
     (window as unknown as { __editorSelectText?: (k: string, e: HTMLElement) => void }).__editorSelectText?.(key, el);
   }, []);
 
-  useApplyOverrides(index, containerRef, onSelectImage, onSelectText);
+  const setContentRef = useCallback((el: HTMLDivElement | null) => {
+    setContainerEl((prev) => (prev === el ? prev : el));
+  }, []);
+
+  useApplyOverrides(index, containerRef, onSelectImage, onSelectText, containerEl);
 
   if (!slide) return null;
   return (
-    <ScaledSlide
-      contentRef={(el) => {
-        if (containerRef.current !== el) {
-          containerRef.current = el;
-          // 强制再渲染一次以触发 useApplyOverrides effect 重新读取 ref
-          if (el) force((n) => n + 1);
-        }
-      }}
-    >
+    <ScaledSlide contentRef={setContentRef}>
       {slide.render({ pageNumber: index + 1, totalPages: SLIDES.length })}
     </ScaledSlide>
   );
