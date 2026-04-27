@@ -21,6 +21,10 @@ import photoPikachu from "@/assets/store/pikachu-mug.jpeg";
 import photoDiatone from "@/assets/store/diatone-spinning.jpeg";
 import wechatQR from "@/assets/wechat-qr.png";
 
+// 头部明星 / 网红
+import celebWenqi from "@/assets/ugc/celeb-wenqi.jpg";
+import celebHuye from "@/assets/ugc/celeb-huye.jpg";
+
 // 小红书 / 抖音 素人种草截图
 import xhs1 from "@/assets/ugc/xhs-1.jpg";
 import xhs2 from "@/assets/ugc/xhs-2.jpg";
@@ -364,6 +368,126 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
             );
           })}
           </div>
+        </div>
+      </div>
+    </SlideShell>
+  );
+}
+
+/* ============================================================
+ * 第 5c 页 — 头部明星 / 头部网红 自发种草
+ * ============================================================ */
+export function Slide05cKOL({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  const kols = [
+    {
+      src: celebWenqi,
+      tag: "头部明星",
+      tagColor: "bg-boomer-red text-paper-cream",
+      name: "文 淇",
+      enName: "WEN QI",
+      role: "新生代实力派演员",
+      quote: "实在是很喜欢这些美丽的废物",
+      hashtag: "#老淇的一天",
+      stats: [
+        { num: "10万+", label: "点赞" },
+        { num: "5,806", label: "收藏" },
+        { num: "3,649", label: "评论" },
+      ],
+      effect: "粉丝同款打卡 · 单日客流翻 3 倍",
+      rotate: "-1.5deg",
+    },
+    {
+      src: celebHuye,
+      tag: "头部网红",
+      tagColor: "bg-ink text-paper-cream",
+      name: "沪爷出击",
+      enName: "HU YE",
+      role: "上海本地百万粉博主",
+      quote: "没想到现在还有",
+      hashtag: "#93岁男孩在上海的一日账单",
+      stats: [
+        { num: "1,917", label: "点赞" },
+        { num: "462", label: "收藏" },
+        { num: "76", label: "评论" },
+      ],
+      effect: "中老年客群破圈 · 全家三代到店",
+      rotate: "1.5deg",
+    },
+  ];
+
+  return (
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="paper" chapter="01 · 中信泰富首店实绩">
+      <div className="absolute inset-0 px-20 pt-36 pb-24 flex flex-col">
+        {/* 顶部标题 */}
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <div className="font-handwrite text-4xl text-boomer-red mb-2">— Celebrity & KOL —</div>
+            <h1 className="font-display text-7xl font-black leading-tight">
+              头部明星 · 网红<span className="text-boomer-red highlight-yellow">自发墙裂种草</span>
+            </h1>
+            <p className="font-body text-2xl text-ink/65 mt-3">
+              零商务合作 · 真实路过 · 自来水传播 · 引爆全网流量
+            </p>
+          </div>
+          <div className="vintage-border bg-vintage-gold text-ink px-7 py-4 rotate-[-2deg]">
+            <div className="font-en text-2xl tracking-wider opacity-70">FAN EFFECT</div>
+            <div className="font-display text-4xl font-black">粉丝疯狂到店拔草</div>
+          </div>
+        </div>
+
+        {/* 两位 KOL 卡片 */}
+        <div className="flex-1 grid grid-cols-2 gap-12 items-center">
+          {kols.map((k, i) => (
+            <div
+              key={k.name}
+              className="relative bg-paper-cream vintage-border p-6 flex gap-6"
+              style={{ transform: `rotate(${k.rotate})` }}
+            >
+              {/* 胶带 */}
+              <div className={`${i === 0 ? "tape-red" : "tape-gold"} -top-3 left-16 z-10 rotate-[-4deg]`} />
+
+              {/* 左侧竖屏图 */}
+              <div className="relative shrink-0" style={{ width: "260px" }}>
+                <div className="relative overflow-hidden bg-ink/5" style={{ aspectRatio: "9 / 16" }}>
+                  <img src={k.src} alt={k.name} className="w-full h-full object-cover" />
+                </div>
+                <div className={`absolute -top-3 -left-3 z-10 px-3 py-1 vintage-border font-display text-xl font-black ${k.tagColor}`}>
+                  {k.tag}
+                </div>
+              </div>
+
+              {/* 右侧文案 */}
+              <div className="flex-1 flex flex-col justify-between py-2 min-w-0">
+                <div>
+                  <div className="font-en text-xl tracking-[0.3em] text-ink/55">{k.enName}</div>
+                  <div className="font-display text-6xl font-black leading-tight mt-1">{k.name}</div>
+                  <div className="font-body text-2xl text-ink/65 mt-2">{k.role}</div>
+
+                  <div className="mt-5 relative">
+                    <Quote className="absolute -top-3 -left-2 w-8 h-8 text-boomer-red opacity-60" />
+                    <p className="font-display text-3xl leading-snug pl-7 text-ink/90">"{k.quote}"</p>
+                  </div>
+
+                  <div className="font-handwrite text-2xl text-boomer-red mt-3">{k.hashtag}</div>
+                </div>
+
+                {/* 数据 */}
+                <div className="mt-5">
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    {k.stats.map((s) => (
+                      <div key={s.label} className="bg-paper-warm vintage-border px-2 py-2 text-center">
+                        <div className="font-display text-3xl font-black leading-none">{s.num}</div>
+                        <div className="font-body text-lg text-ink/65 mt-1">{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-boomer-red text-paper-cream px-4 py-2 font-display text-xl font-bold text-center vintage-border">
+                    → {k.effect}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </SlideShell>
