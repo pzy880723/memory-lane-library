@@ -15,7 +15,7 @@
  */
 import { spawn } from "node:child_process";
 import { mkdir, writeFile, readFile, access, copyFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
@@ -47,7 +47,12 @@ function findChromium() {
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
   ].filter(Boolean);
   for (const p of candidates) {
-    if (p && existsSync(p)) return p;
+    if (!p) continue;
+    try {
+      // realpathSync 会解析符号链接（处理 nix store 的情况）
+      const real = realpathSync(p);
+      if (existsSync(real)) return real;
+    } catch { /* not exist */ }
   }
   throw new Error(
     "找不到 Chromium 可执行文件。请安装 chromium / google-chrome，或设置环境变量 CHROME_BIN。",
