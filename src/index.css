@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Anton&family=Bebas+Neue&family=Caveat:wght@400;700&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Anton&family=Bebas+Neue&family=Caveat:wght@400;700&family=Permanent+Marker&family=Ma+Shan+Zheng&family=Liu+Jian+Mao+Cao&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -60,9 +60,9 @@
     /* ============ 字体栈 ============ */
     --font-display: 'Noto Serif SC', 'Songti SC', serif;
     --font-body: 'Noto Sans SC', system-ui, sans-serif;
-    --font-en-display: 'Anton', 'Bebas Neue', sans-serif;
-    --font-en-condensed: 'Bebas Neue', sans-serif;
-    --font-handwrite: 'Caveat', 'Permanent Marker', cursive;
+    --font-en-display: 'Anton', 'Bebas Neue', 'Noto Sans SC', sans-serif;
+    --font-en-condensed: 'Bebas Neue', 'Noto Sans SC', sans-serif;
+    --font-handwrite: 'Caveat', 'Permanent Marker', 'Ma Shan Zheng', 'Liu Jian Mao Cao', 'Noto Sans SC', 'Noto Serif SC', cursive;
 
     /* ============ 渐变与阴影 ============ */
     --gradient-paper: linear-gradient(135deg, hsl(var(--paper-cream)) 0%, hsl(var(--paper)) 100%);
