@@ -35,6 +35,7 @@ export const SLIDES: SlideMeta[] = [
   { id: "kol", title: "明星网红种草", chapter: "01", render: (p) => <Slide05cKOL {...p} /> },
   { id: "media", title: "SmartShanghai 报道", chapter: "01", render: (p) => <Slide06Media {...p} /> },
   { id: "keywords", title: "用户评价关键词", chapter: "01", render: (p) => <Slide07Keywords {...p} /> },
+  { id: "dianping", title: "大众点评优质评价", chapter: "01", render: (p) => <Slide07bDianping {...p} /> },
   
 
   { id: "ch2", title: "第二章 · 品牌定位", chapter: "02", render: (p) => (
