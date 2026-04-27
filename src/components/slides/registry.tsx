@@ -93,8 +93,8 @@ export function SlideRenderer({ index }: { index: number }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   containerRef.current = containerEl;
 
-  const onSelectImage = useCallback((key: string, src: string) => {
-    (window as unknown as { __editorSelectImage?: (k: string, s: string) => void }).__editorSelectImage?.(key, src);
+  const onSelectImage = useCallback((key: string, src: string, el?: HTMLElement) => {
+    (window as unknown as { __editorSelectImage?: (k: string, s: string, e?: HTMLElement) => void }).__editorSelectImage?.(key, src, el);
   }, []);
   const onSelectText = useCallback((key: string, el: HTMLElement) => {
     (window as unknown as { __editorSelectText?: (k: string, e: HTMLElement) => void }).__editorSelectText?.(key, el);
