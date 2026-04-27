@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { decodeForSlide } from "@/lib/preloadImages";
-import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
+import { downloadPDF, downloadPPTX } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronLeft, ChevronRight, Download, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
@@ -21,18 +20,11 @@ const IndexInner = () => {
   const [current, setCurrent] = useState(0);
   const [showThumbs, setShowThumbs] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [exporting, setExporting] = useState<{ type: string; n: number; total: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
-  const [exportPreview, setExportPreview] = useState<{
-    type: string;
-    items: ExportPreviewItem[];
-    activeIndex: number;
-  } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const exportAbortRef = useRef<AbortController | null>(null);
 
   // 编辑器入口：5 击 logo
   const [showPwd, setShowPwd] = useState(false);
