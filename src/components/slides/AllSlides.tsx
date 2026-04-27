@@ -70,12 +70,12 @@ export function Slide01Cover() {
       </div>
 
       {/* 实拍照片拼贴 */}
-      <img
+      <img decoding="async" loading="eager"
         src={photoSatoDetail}
         alt="Sato"
         className="absolute top-32 right-20 w-[340px] h-[460px] object-cover photo-vintage rotate-[6deg] z-[3]"
       />
-      <img
+      <img decoding="async" loading="eager"
         src={photoVinyl}
         alt="Vinyl"
         className="absolute bottom-24 left-16 w-[320px] h-[420px] object-cover photo-vintage rotate-[-5deg] z-[3]"
@@ -85,7 +85,7 @@ export function Slide01Cover() {
 
       {/* 中央 Logo 与文案 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-32 z-[6]">
-        <img src={logo} alt="BOOMER OFF Vintage" className="w-[1000px] mb-12 drop-shadow-2xl" />
+        <img decoding="async" loading="eager" src={logo} alt="BOOMER OFF Vintage" className="w-[1000px] mb-12 drop-shadow-2xl" />
 
         <div className="vintage-border bg-paper-cream px-20 py-8 mb-10 rotate-[-1.5deg]">
           <p className="font-display text-6xl font-black tracking-wider">
@@ -192,7 +192,7 @@ export function Slide03Executive({ pageNumber, totalPages }: { pageNumber: numbe
         </div>
 
         <div className="col-span-5 relative">
-          <img
+          <img decoding="async" loading="eager"
             src={photoCeramics}
             alt="店铺陈列"
             className="absolute inset-0 w-full h-full object-cover photo-vintage rotate-[2deg]"
@@ -356,7 +356,7 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
 
                 {/* 图片框 */}
                 <div className="relative overflow-hidden bg-ink/5" style={{ aspectRatio: "9 / 16" }}>
-                  <img
+                  <img decoding="async" loading="eager"
                     src={p.src}
                     alt={p.title}
                     className="w-full h-full object-cover"
@@ -457,7 +457,7 @@ export function Slide05cKOL({ pageNumber, totalPages }: { pageNumber: number; to
               {/* 左侧竖屏图 */}
               <div className="relative shrink-0" style={{ width: "260px" }}>
                 <div className="relative overflow-hidden bg-ink/5" style={{ aspectRatio: "9 / 16" }}>
-                  <img src={k.src} alt={k.name} className="w-full h-full object-cover" />
+                  <img decoding="async" loading="eager" src={k.src} alt={k.name} className="w-full h-full object-cover" />
                 </div>
                 <div className={`absolute -top-3 -left-3 z-10 px-3 py-1 vintage-border font-display text-xl font-black ${k.tagColor}`}>
                   {k.tag}
@@ -528,7 +528,7 @@ export function Slide06Media({ pageNumber, totalPages }: { pageNumber: number; t
         <div className="col-span-7 flex flex-col justify-center gap-8">
           {/* 实拍图 */}
           <div className="relative">
-            <img
+            <img decoding="async" loading="eager"
               src={photoDiatone}
               alt="Diatone 唱片机"
               className="w-full h-[280px] object-cover photo-vintage"
@@ -687,7 +687,7 @@ export function Slide07bDianping({ pageNumber, totalPages }: { pageNumber: numbe
             {reviews.map((r, i) => (
               <div key={i} className={`relative ${r.rotate}`}>
                 <div className="bg-paper-cream vintage-border p-3 shadow-2xl">
-                  <img
+                  <img decoding="async" loading="eager"
                     src={r.img}
                     alt={`${r.user} 评价`}
                     className="w-full h-[440px] object-cover object-top"
@@ -1164,7 +1164,7 @@ export function Slide16Space({ pageNumber, totalPages }: { pageNumber: number; t
                 <div className="font-display text-5xl font-black leading-tight">上层 · 精品区</div>
                 <div className="font-body text-xl text-paper-cream/85 mt-3">视线及以上 · 高价值精选</div>
               </div>
-              <img
+              <img decoding="async" loading="eager"
                 src={photoCeramics}
                 alt="精品瓷器"
                 className="col-span-4 w-full h-[280px] object-cover"
@@ -1270,7 +1270,7 @@ export function Slide17Experience({ pageNumber, totalPages }: { pageNumber: numb
         <div className="grid grid-cols-2 gap-7">
           {items.map((it) => (
             <div key={it.title} className={`vintage-border ${it.color} ${it.rotate} overflow-hidden flex`}>
-              <img src={it.photo} alt={it.title} className="w-[260px] h-[320px] object-cover flex-shrink-0" />
+              <img decoding="async" loading="eager" src={it.photo} alt={it.title} className="w-[260px] h-[320px] object-cover flex-shrink-0" />
               <div className="p-7 flex-1 flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
                   <it.icon className="w-12 h-12" strokeWidth={2.5} />
@@ -1318,7 +1318,7 @@ export function Slide18Categories({ pageNumber, totalPages }: { pageNumber: numb
           {cats.map((c, i) => (
             <div key={c.name} className={`vintage-border bg-paper-cream overflow-hidden flex flex-col ${i % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}>
               <div className="relative aspect-square">
-                <img src={c.photo} alt={c.name} className="absolute inset-0 w-full h-full object-cover" />
+                <img decoding="async" loading="eager" src={c.photo} alt={c.name} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute top-4 right-4 bg-boomer-red text-paper-cream w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
                   <c.icon className="w-8 h-8" strokeWidth={2.5} />
                 </div>
@@ -1390,9 +1390,9 @@ export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: numb
         </div>
 
         <div className="col-span-5 flex flex-col gap-4 justify-center">
-          <img src={photoCups} alt="翻筐乐" className="w-full h-[260px] object-cover photo-vintage rotate-[2deg]" />
-          <img src={photoPikachu} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[-2deg]" />
-          <img src={photoUltraman} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[1deg]" />
+          <img decoding="async" loading="eager" src={photoCups} alt="翻筐乐" className="w-full h-[260px] object-cover photo-vintage rotate-[2deg]" />
+          <img decoding="async" loading="eager" src={photoPikachu} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[-2deg]" />
+          <img decoding="async" loading="eager" src={photoUltraman} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[1deg]" />
         </div>
       </div>
     </SlideShell>
@@ -1826,7 +1826,7 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
               </div>
               <div className="flex flex-col items-center gap-2">
                 <div className="bg-paper-cream/10 border-2 border-paper-cream/60 p-3 rounded-2xl">
-                  <img src={wechatQR} alt="微信二维码" className="w-44 h-44 object-contain" />
+                  <img decoding="async" loading="eager" src={wechatQR} alt="微信二维码" className="w-44 h-44 object-contain" />
                 </div>
                 <div className="font-handwrite text-2xl text-paper-cream/90">Scan WeChat</div>
               </div>
@@ -1899,7 +1899,7 @@ export function Slide31Slogan({ pageNumber, totalPages }: { pageNumber: number; 
         <div className="absolute bottom-0 left-0 w-full h-1/3 lines-pattern opacity-30" />
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-32">
-        <img src={logo} alt="BOOMER OFF" className="w-[760px] mb-14 brightness-0 invert" />
+        <img decoding="async" loading="eager" src={logo} alt="BOOMER OFF" className="w-[760px] mb-14 brightness-0 invert" />
         <div className="border-y-[6px] border-paper-cream py-12 px-24">
           <div className="font-display text-[10rem] font-black text-paper-cream text-center leading-none">
             虽 古 但 新
@@ -1947,7 +1947,7 @@ export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; 
             </div>
           </div>
 
-          <img src={logo} alt="BOOMER OFF" className="w-[260px] mt-10 opacity-85" />
+          <img decoding="async" loading="eager" src={logo} alt="BOOMER OFF" className="w-[260px] mt-10 opacity-85" />
         </div>
 
         {/* 右侧：红色二维码卡片 */}
@@ -1958,7 +1958,7 @@ export function Slide32Thanks({ pageNumber, totalPages }: { pageNumber: number; 
             <div className="font-display text-3xl font-black text-center mb-6">扫 码 添 加 微 信</div>
 
             <div className="bg-boomer-red p-4 rounded-xl">
-              <img
+              <img decoding="async" loading="eager"
                 src={wechatQR}
                 alt="微信二维码"
                 className="w-[420px] h-[420px] block"
