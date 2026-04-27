@@ -153,6 +153,15 @@ export function EditorPanel() {
       <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-2 bg-background border-2 border-primary/40 rounded-full shadow-2xl px-3 py-2">
         <Pencil className="w-4 h-4 text-primary" />
         <span className="text-xs font-medium">编辑模式 · 第 {currentSlide + 1} 页 · 点击文字或图片</span>
+        {saving ? (
+          <span className="text-[10px] text-muted-foreground inline-flex items-center gap-1">
+            <Loader2 className="w-3 h-3 animate-spin" /> 保存中
+          </span>
+        ) : (
+          <span className="text-[10px] text-emerald-600 inline-flex items-center gap-1">
+            <Check className="w-3 h-3" /> 已保存
+          </span>
+        )}
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowTools(true)} title="工具">
           <Settings className="w-4 h-4" />
         </Button>
@@ -331,8 +340,18 @@ export function EditorPanel() {
                   e.target.value = "";
                 }}
               />
-              <Button variant="outline" size="sm" className="w-full" onClick={() => fileInputRef.current?.click()}>
-                <Upload className="w-3 h-3 mr-2" /> 选择图片
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <><Loader2 className="w-3 h-3 mr-2 animate-spin" /> 上传中…</>
+                ) : (
+                  <><Upload className="w-3 h-3 mr-2" /> 选择图片</>
+                )}
               </Button>
             </div>
             <Button variant="outline" size="sm" className="w-full"
