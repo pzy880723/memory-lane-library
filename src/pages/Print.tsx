@@ -23,7 +23,18 @@ const Print = () => {
 
     let cancelled = false;
     const ready = async () => {
-      // 等字体
+      // 等字体（多次等待，确保 @import 级联加载的中文字体也就绪）
+      try { await document.fonts?.ready; } catch { /* noop */ }
+      // 主动加载关键字体面（防止 ready 提前 resolve）
+      const fontProbes = [
+        '700 48px "Noto Serif SC"',
+        '400 48px "Noto Sans SC"',
+        '400 48px "Ma Shan Zheng"',
+        '400 48px "Caveat"',
+      ];
+      try {
+        await Promise.all(fontProbes.map((f) => document.fonts.load(f, "测试中文 Test")));
+      } catch { /* noop */ }
       try { await document.fonts?.ready; } catch { /* noop */ }
       // 等所有图片
       const imgs = Array.from(document.querySelectorAll("img"));
@@ -35,9 +46,9 @@ const Print = () => {
               img.addEventListener("error", () => res(), { once: true });
             })
       ));
-      // 多 wait 一帧让浏览器布局稳定
+      // 多 wait 几帧让浏览器布局稳定
       await new Promise((r) => requestAnimationFrame(() => r(null)));
-      await new Promise((r) => setTimeout(r, 80));
+      await new Promise((r) => setTimeout(r, 200));
       if (!cancelled) document.body.setAttribute("data-ready", "1");
     };
     ready();
