@@ -252,46 +252,11 @@ const IndexInner = () => {
     }
   }, []);
 
-  const handleExport = async (type: "pdf" | "pptx") => {
-    if (exporting) return;
-    const controller = new AbortController();
-    exportAbortRef.current = controller;
+  const handleExport = (type: "pdf" | "pptx") => {
     const label = type.toUpperCase();
-    setExporting({ type: label, n: 0, total });
-    toast({ title: `开始生成 ${label}`, description: "可继续浏览，下载将在后台进行" });
-    try {
-      const fn = type === "pdf" ? exportPDF : exportPPTX;
-      const items = await fn(
-        (n, t) => setExporting({ type: label, n, total: t }),
-        { signal: controller.signal },
-      );
-      toast({
-        title: `✓ ${label} 已生成`,
-        description: "文件已开始下载，可点击查看导出对比预览",
-        action: (
-          <ToastAction
-            altText="查看对比"
-            onClick={() => setExportPreview({ type: label, items, activeIndex: current })}
-          >
-            查看对比
-          </ToastAction>
-        ),
-      });
-    } catch (err) {
-      if (err instanceof ExportCancelledError) {
-        toast({ title: `${label} 导出已取消` });
-      } else {
-        console.error(err);
-        toast({ title: "导出失败", description: String(err), variant: "destructive" });
-      }
-    } finally {
-      exportAbortRef.current = null;
-      setExporting(null);
-    }
-  };
-
-  const cancelExport = () => {
-    exportAbortRef.current?.abort();
+    if (type === "pdf") downloadPDF();
+    else downloadPPTX();
+    toast({ title: `${label} 下载已开始`, description: "正在保存到本地..." });
   };
 
   return (
