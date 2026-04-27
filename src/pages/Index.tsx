@@ -324,18 +324,14 @@ const IndexInner = () => {
                 <Button
                   size="sm"
                   className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
-                  disabled={!!exporting}
                 >
                   <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">
-                    {exporting ? `生成中 ${exporting.n}/${exporting.total}` : "下载"}
-                  </span>
+                  <span className="hidden sm:inline">下载</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={() => handleExport("pdf")}
-                  disabled={!!exporting}
                   className="gap-3 cursor-pointer"
                 >
                   <FileDown className="w-4 h-4 text-boomer-red" />
@@ -346,7 +342,6 @@ const IndexInner = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleExport("pptx")}
-                  disabled={!!exporting}
                   className="gap-3 cursor-pointer"
                 >
                   <Presentation className="w-4 h-4 text-boomer-red" />
