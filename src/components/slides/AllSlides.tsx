@@ -406,9 +406,9 @@ export function Slide05cKOL({ pageNumber, totalPages }: { pageNumber: number; to
       quote: "没想到现在还有",
       hashtag: "#93岁男孩在上海的一日账单",
       stats: [
-        { num: "1,917", label: "点赞" },
-        { num: "462", label: "收藏" },
-        { num: "76", label: "评论" },
+        { num: "3.6万", label: "点赞" },
+        { num: "2,940", label: "收藏" },
+        { num: "2,649", label: "评论" },
       ],
       effect: "中老年客群破圈 · 全家三代到店",
       rotate: "1.5deg",
