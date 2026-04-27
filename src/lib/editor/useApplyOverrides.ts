@@ -117,5 +117,5 @@ export function useApplyOverrides(
       textCleanup.forEach((fn) => fn());
       imgCleanup.forEach((fn) => fn());
     };
-  }, [slideIndex, editing, data, containerRef, onSelectImage, onSelectText, updateText]);
+  }, [slideIndex, editing, data, containerRef, onSelectImage, onSelectText, updateText, containerEl]);
 }
