@@ -177,7 +177,7 @@ async function buildPdf(jpegs: Blob[]): Promise<Blob> {
     page.drawImage(img, { x: 0, y: 0, width: 1920, height: 1080 });
   }
   const bytes = await pdf.save();
-  return new Blob([bytes], { type: "application/pdf" });
+  return new Blob([bytes as BlobPart], { type: "application/pdf" });
 }
 
 async function buildPptx(jpegs: Blob[]): Promise<Blob> {
