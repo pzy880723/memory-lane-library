@@ -1,4 +1,6 @@
-import { ScaledSlide } from "./ScaledSlide";
+import { useCallback, useRef } from "react";
+import { ScaledSlide, type ScaledSlideHandle } from "./ScaledSlide";
+import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
   Slide05Traffic, Slide06Media, Slide07Keywords, Slide08Engine,
@@ -87,9 +89,27 @@ export const SLIDES: SlideMeta[] = [
 
 export function SlideRenderer({ index }: { index: number }) {
   const slide = SLIDES[index];
+  const ref = useRef<ScaledSlideHandle>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  // 把 ScaledSlide 内部的 contentRef 同步到本地 containerRef
+  const setContainer = useCallback(() => {
+    containerRef.current = ref.current?.getContent() ?? null;
+  }, []);
+
+  const onSelectImage = useCallback((key: string, src: string) => {
+    (window as unknown as { __editorSelectImage?: (k: string, s: string) => void }).__editorSelectImage?.(key, src);
+  }, []);
+  const onSelectText = useCallback((key: string, el: HTMLElement) => {
+    (window as unknown as { __editorSelectText?: (k: string, e: HTMLElement) => void }).__editorSelectText?.(key, el);
+  }, []);
+
+  // 每次渲染后同步 ref
+  setContainer();
+  useApplyOverrides(index, containerRef, onSelectImage, onSelectText);
+
   if (!slide) return null;
   return (
-    <ScaledSlide>
+    <ScaledSlide ref={ref}>
       {slide.render({ pageNumber: index + 1, totalPages: SLIDES.length })}
     </ScaledSlide>
   );
