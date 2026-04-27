@@ -602,6 +602,128 @@ export function Slide07Keywords({ pageNumber, totalPages }: { pageNumber: number
 }
 
 /* ============================================================
+ * 第 7b 页 — 大众点评 V7/V8 高等级用户优质评价
+ * ============================================================ */
+export function Slide07bDianping({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  const reviews = [
+    {
+      img: dp4,
+      user: "NaNa_1021",
+      level: "Lv7",
+      rating: "超预期",
+      quote: "中信泰富 B1 宝藏复古玩具小店，东西堆得满满当当，琳琅满目",
+      rotate: "rotate-[-2deg]",
+      tape: "tape-red",
+    },
+    {
+      img: dp2,
+      user: "赵川之",
+      level: "Lv5",
+      rating: "超预期 ★★★★★",
+      quote: "非常非常宝藏的一家店铺！惊艳了双眼，这种中古店真的很难找，强烈安利",
+      rotate: "rotate-[1.5deg]",
+      tape: "tape-gold",
+    },
+    {
+      img: dp3,
+      user: "南德胡图地瓜",
+      level: "Lv8",
+      rating: "很棒 ★★★★½",
+      quote: "店内东西超级多，各个角落都不能放过，仔细看的话可以看好久哦！",
+      rotate: "rotate-[-1deg]",
+      tape: "tape-red",
+    },
+    {
+      img: dp1,
+      user: "敛凰鬼",
+      level: "Lv7",
+      rating: "很棒 ★★★★½",
+      quote: "无意中发现地下一层开了家有意思的店，脑海中琢磨就是我喜欢的那种小店",
+      rotate: "rotate-[2deg]",
+      tape: "tape-gold",
+    },
+    {
+      img: dp5,
+      user: "油盐不进四季豆",
+      level: "Lv7",
+      rating: "超预期 ★★★★★",
+      quote: "有千禧年杂货铺的感觉，超可爱的中古小店，分类很全，可以在里面掏很久",
+      rotate: "rotate-[-1.5deg]",
+      tape: "tape-red",
+    },
+  ];
+
+  return (
+    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="01 · 中信泰富首店实绩">
+      <div className="absolute inset-0 px-24 pt-32 pb-24 flex flex-col">
+        {/* 标题区 */}
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <span className="font-handwrite text-4xl text-boomer-red">Dianping · Verified Reviews</span>
+            <h1 className="font-display text-7xl font-black mt-2 leading-tight">
+              大众点评 <span className="text-boomer-red highlight-yellow">V7 / V8 资深用户</span>自发好评
+            </h1>
+            <p className="font-body text-2xl text-ink/65 mt-3">
+              零投放推广 · 高等级老饕级用户主动种草 · 清一色「超预期 / 很棒」五星评价
+            </p>
+          </div>
+          {/* 关键数据胶囊 */}
+          <div className="flex flex-col gap-3 shrink-0">
+            <div className="vintage-border bg-boomer-red text-paper-cream px-7 py-3 rotate-[2deg] flex items-center gap-3">
+              <Star className="w-8 h-8 fill-current" />
+              <span className="font-display text-3xl font-black">4.8</span>
+              <span className="font-body text-xl">/ 5.0</span>
+            </div>
+            <div className="vintage-border bg-vintage-gold px-7 py-3 rotate-[-1deg] flex items-center gap-3">
+              <BadgeCheck className="w-8 h-8 text-boomer-red" />
+              <span className="font-display text-2xl font-black text-ink">100% V5+ 高级用户</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 评价拼贴 — 5 张截图 */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="grid grid-cols-5 gap-6 w-full max-w-[1750px]">
+            {reviews.map((r, i) => (
+              <div key={i} className={`relative ${r.rotate}`}>
+                <div className="bg-paper-cream vintage-border p-3 shadow-2xl">
+                  <img
+                    src={r.img}
+                    alt={`${r.user} 评价`}
+                    className="w-full h-[440px] object-cover object-top"
+                  />
+                  <div className="pt-3 pb-1 px-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-display text-lg font-black text-ink">{r.user}</span>
+                      <span className="bg-boomer-red text-paper-cream font-en text-xs px-2 py-0.5 rounded">
+                        {r.level}
+                      </span>
+                    </div>
+                    <div className="font-handwrite text-xl text-boomer-red leading-tight">
+                      {r.rating}
+                    </div>
+                  </div>
+                </div>
+                <div className={`${r.tape} -top-3 left-1/2 -translate-x-1/2 z-10`} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 底部金句条 */}
+        <div className="mt-8 bg-boomer-red text-paper-cream vintage-border px-10 py-5 flex items-center gap-6 rotate-[-0.3deg]">
+          <Quote className="w-12 h-12 shrink-0" />
+          <p className="font-display text-3xl leading-snug">
+            <span className="font-black">"国内第一家这种店"、"上海少见"、"这种中古店真的很难找"</span>
+            <span className="text-paper-cream/80 ml-3">— 资深用户们的共同评价</span>
+          </p>
+        </div>
+      </div>
+    </SlideShell>
+  );
+}
+
+/* ============================================================
  * 第 8 页 — 内容生产机器（数字戏剧化）
  * ============================================================ */
 export function Slide08Engine({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
