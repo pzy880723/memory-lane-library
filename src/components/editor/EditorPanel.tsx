@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Pencil, Download, Upload, RotateCcw, LogOut, X, Image as ImageIcon,
-  Settings, Move,
+  Settings, Move, Loader2, Check,
 } from "lucide-react";
 import { useEditor } from "@/lib/editor/EditorContext";
-import { exportJSON, importJSON } from "@/lib/editor/storage";
+import { exportJSON, importJSON, uploadImageToCloud } from "@/lib/editor/storage";
 import { toast } from "@/hooks/use-toast";
 
 interface Selected {
@@ -25,13 +25,14 @@ const MARGIN = 16;
 
 export function EditorPanel() {
   const {
-    editing, toggleEditing, lock, data, currentSlide,
+    editing, lock, data, currentSlide, saving,
     updateText, updateImage, resetAll, reload,
   } = useEditor();
 
   const [selected, setSelected] = useState<Selected>({ kind: null, key: "" });
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
-  const [showTools, setShowTools] = useState(false); // 设置面板（导出/重置/退出）
+  const [showTools, setShowTools] = useState(false); // 设置面板(导出/重置/退出)
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importJsonRef = useRef<HTMLInputElement>(null);
   const dragStateRef = useRef<{ dx: number; dy: number } | null>(null);
@@ -120,16 +121,28 @@ export function EditorPanel() {
   const slideOv = data.slides[currentSlide] ?? { texts: {}, images: {} };
   const currentTextOv = selected.kind === "text" ? slideOv.texts[selected.key] : undefined;
 
-  const handleImageFile = (file: File) => {
-    if (file.size > 4 * 1024 * 1024) {
-      toast({ title: "图片过大", description: "建议小于 4MB，否则浏览器存储会满", variant: "destructive" });
+  const handleImageFile = async (file: File) => {
+    if (!selected.key) return;
+    if (file.size > 20 * 1024 * 1024) {
+      toast({ title: "图片过大", description: "请选择小于 20MB 的图片", variant: "destructive" });
+      return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      updateImage(currentSlide, selected.key, { src: reader.result as string });
-      setSelected((s) => ({ ...s, imageSrc: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      const url = await uploadImageToCloud(file, currentSlide, selected.key);
+      updateImage(currentSlide, selected.key, { src: url });
+      setSelected((s) => ({ ...s, imageSrc: url }));
+      toast({ title: "✓ 图片已上传", description: "已保存到云端,刷新也不会丢失" });
+    } catch (err) {
+      console.error("上传失败:", err);
+      toast({
+        title: "上传失败",
+        description: err instanceof Error ? err.message : "请稍后重试",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   // 浮动小按钮（无选中且未打开工具时）
