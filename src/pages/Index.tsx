@@ -218,6 +218,11 @@ const IndexInner = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
+      if (e.target instanceof HTMLTextAreaElement) return;
+      // 编辑模式下，可编辑元素拥有焦点时不响应快捷键
+      if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
+      // 编辑模式下完全禁用方向键翻页，避免误触
+      if (editor.editing && ["ArrowRight", "ArrowLeft", " ", "PageDown", "PageUp"].includes(e.key)) return;
       if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); go(current + 1); }
       else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(current - 1); }
       else if (e.key === "Home") go(0);
@@ -232,7 +237,7 @@ const IndexInner = () => {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [current, go, total, toggleFullscreen, pseudoFullscreen]);
+  }, [current, go, total, toggleFullscreen, pseudoFullscreen, editor.editing]);
 
   // 复制分享链接
   const copyLink = useCallback(async () => {
