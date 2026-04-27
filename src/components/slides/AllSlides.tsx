@@ -986,7 +986,8 @@ export function Slide12Persona({ pageNumber, totalPages }: { pageNumber: number;
                 <div className="font-body text-xl leading-snug text-ink/75">{p.case}</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-8 bg-boomer-red text-paper-cream p-8 vintage-border rotate-[-0.5deg]">
