@@ -313,7 +313,13 @@ const IndexInner = () => {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <img src={logo} alt="BOOMER OFF" className="h-8 brightness-0 invert" />
+            <img
+              src={logo}
+              alt="BOOMER OFF"
+              onClick={onLogoClick}
+              className="h-8 brightness-0 invert cursor-pointer select-none"
+              draggable={false}
+            />
             <div className="hidden md:block h-8 w-[2px] bg-paper-cream/20" />
             <div className="hidden md:block">
               <div className="font-display text-base font-bold leading-tight">品牌手册 Brand Book</div>
@@ -720,8 +726,18 @@ const IndexInner = () => {
           </div>
         )}
       </div>
+
+      {/* 编辑器入口 + 面板 */}
+      <PasswordDialog open={showPwd} onOpenChange={setShowPwd} />
+      <EditorPanel />
     </>
   );
 };
+
+const Index = () => (
+  <EditorProvider>
+    <IndexInner />
+  </EditorProvider>
+);
 
 export default Index;
