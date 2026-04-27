@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
+import { decodeForSlide } from "@/lib/preloadImages";
 import { exportPDF, exportPPTX, ExportCancelledError, type ExportPreviewItem } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -40,6 +41,16 @@ const IndexInner = () => {
 
   // 同步 currentSlide 到 editor context
   useEffect(() => { editor.setCurrentSlide(current); }, [current, editor]);
+
+  // 翻页时按需解码：当前页 + 后两页 + 前一页（已解码的会跳过）
+  useEffect(() => {
+    decodeForSlide(
+      SLIDES[current]?.images,
+      SLIDES[current + 1]?.images,
+      SLIDES[current + 2]?.images,
+      SLIDES[current - 1]?.images,
+    );
+  }, [current]);
 
   const onLogoClick = useCallback(() => {
     if (editor.unlocked) {
