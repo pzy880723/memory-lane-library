@@ -191,37 +191,96 @@ export function EditorPanel() {
     }
   };
 
-  // 浮动小按钮（无选中且未打开工具时）
+  // 浮动小浮标（无选中时显示）
   const showFloatingBar = selected.kind === null && !showTools;
 
   if (showFloatingBar) {
+    // 收起：圆形小浮标
+    if (!floatExpanded) {
+      return (
+        <div
+          className="fixed z-[60] select-none"
+          style={{ left: floatPos.left, top: floatPos.top }}
+        >
+          <button
+            type="button"
+            onMouseDown={onFloatDragStart}
+            onClick={(e) => {
+              // 拖动后不触发展开
+              if (floatDragged) { e.preventDefault(); setFloatDragged(false); return; }
+              setFloatExpanded(true);
+            }}
+            className="relative h-11 w-11 rounded-full bg-background border-2 border-primary/50 shadow-2xl flex items-center justify-center cursor-grab active:cursor-grabbing hover:border-primary transition-colors"
+            title="编辑模式 · 拖动可移动 · 点击展开"
+            aria-label="编辑工具浮标"
+          >
+            <Pencil className="w-4 h-4 text-primary" />
+            {saving ? (
+              <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-background border border-primary/50 flex items-center justify-center">
+                <Loader2 className="w-2.5 h-2.5 animate-spin text-primary" />
+              </span>
+            ) : (
+              <span className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-primary flex items-center justify-center">
+                <Check className="w-2.5 h-2.5 text-primary-foreground" />
+              </span>
+            )}
+          </button>
+        </div>
+      );
+    }
+
+    // 展开：紧凑卡片
+    const cardW = 200;
+    const cardLeft = Math.max(4, Math.min(window.innerWidth - cardW - 4, floatPos.left - cardW + 44));
+    const cardTop = Math.max(4, Math.min(window.innerHeight - 120, floatPos.top));
     return (
-      <div className="fixed bottom-4 left-4 z-[60] flex items-center gap-2 bg-background border-2 border-primary/40 rounded-full shadow-2xl px-3 py-2">
-        <Pencil className="w-4 h-4 text-primary" />
-        <span className="text-xs font-medium">编辑模式 · 第 {currentSlide + 1} 页 · 点击文字或图片</span>
-        {saving ? (
-          <span className="text-[10px] text-muted-foreground inline-flex items-center gap-1">
-            <Loader2 className="w-3 h-3 animate-spin" /> 保存中
-          </span>
-        ) : (
-          <span className="text-[10px] text-primary inline-flex items-center gap-1">
-            <Check className="w-3 h-3" /> 已保存
-          </span>
-        )}
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowTools(true)} title="工具">
-          <Settings className="w-4 h-4" />
-        </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={lock} title="退出编辑">
-          <LogOut className="w-4 h-4" />
-        </Button>
+      <div
+        className="fixed z-[60] bg-background border-2 border-primary/40 rounded-lg shadow-2xl select-none"
+        style={{ left: cardLeft, top: cardTop, width: cardW }}
+      >
+        <div
+          className="flex items-center gap-1.5 px-2 py-1.5 border-b bg-primary/5 cursor-grab active:cursor-grabbing"
+          onMouseDown={onFloatDragStart}
+        >
+          <GripVertical className="w-3 h-3 text-muted-foreground" />
+          <Pencil className="w-3 h-3 text-primary" />
+          <span className="text-[11px] font-medium flex-1">第 {currentSlide + 1} 页</span>
+          {saving ? (
+            <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+          ) : (
+            <Check className="w-3 h-3 text-primary" />
+          )}
+          <button
+            onClick={() => setFloatExpanded(false)}
+            className="h-5 w-5 rounded hover:bg-muted flex items-center justify-center"
+            title="收起"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+        <div className="flex items-center justify-around p-1.5">
+          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => { setShowTools(true); setFloatExpanded(false); }}>
+            <Settings className="w-3.5 h-3.5 mr-1" /> 工具
+          </Button>
+          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={lock}>
+            <LogOut className="w-3.5 h-3.5 mr-1" /> 退出
+          </Button>
+        </div>
       </div>
     );
   }
 
-  // 工具面板（导出/重置）—— 位于左下角，避免与底部居中翻页条遮挡
+  // 工具面板（导出/重置）—— 跟随浮标位置
   if (showTools && selected.kind === null) {
+    const toolsW = 320;
+    const toolsH = 240;
+    const toolsLeft = Math.max(4, Math.min(window.innerWidth - toolsW - 4, floatPos.left - toolsW + 44));
+    const toolsTop = Math.max(4, Math.min(window.innerHeight - toolsH - 4, floatPos.top));
     return (
-      <aside className="fixed bottom-4 left-4 w-80 z-[60] bg-background border-2 border-primary/30 rounded-lg shadow-2xl text-foreground">
+      <aside
+        className="fixed z-[60] bg-background border-2 border-primary/30 rounded-lg shadow-2xl text-foreground"
+        style={{ left: toolsLeft, top: toolsTop, width: toolsW }}
+      >
         <header className="flex items-center justify-between px-4 py-3 border-b bg-primary/5">
           <div className="flex items-center gap-2">
             <Settings className="w-4 h-4 text-primary" />
