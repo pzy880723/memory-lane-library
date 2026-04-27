@@ -419,23 +419,27 @@ const IndexInner = () => {
             </div>
           </div>
 
-          {/* 左右点击区域 */}
-          <button
-            onClick={() => go(current - 1)}
-            disabled={current === 0}
-            className="absolute left-0 top-0 bottom-0 w-1/4 z-10 cursor-w-resize disabled:cursor-default group"
-            aria-label="上一页"
-          >
-            <ChevronLeft className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
-          </button>
-          <button
-            onClick={() => go(current + 1)}
-            disabled={current === total - 1}
-            className="absolute right-0 top-0 bottom-0 w-1/4 z-10 cursor-e-resize disabled:cursor-default group"
-            aria-label="下一页"
-          >
-            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
-          </button>
+          {/* 左右点击区域（编辑模式下禁用，避免与选中元素冲突） */}
+          {!editor.editing && (
+            <>
+              <button
+                onClick={() => go(current - 1)}
+                disabled={current === 0}
+                className="absolute left-0 top-0 bottom-0 w-1/4 z-10 cursor-w-resize disabled:cursor-default group"
+                aria-label="上一页"
+              >
+                <ChevronLeft className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
+              </button>
+              <button
+                onClick={() => go(current + 1)}
+                disabled={current === total - 1}
+                className="absolute right-0 top-0 bottom-0 w-1/4 z-10 cursor-e-resize disabled:cursor-default group"
+                aria-label="下一页"
+              >
+                <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 text-paper-cream opacity-0 group-hover:opacity-60 transition-opacity bg-ink/40 rounded-full p-2" />
+              </button>
+            </>
+          )}
 
           {/* 底部页码控制（伪全屏时隐藏） */}
           {!pseudoFullscreen && (
