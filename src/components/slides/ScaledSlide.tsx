@@ -3,16 +3,13 @@ import { useEffect, useRef, useState } from "react";
 interface ScaledSlideProps {
   children: React.ReactNode;
   className?: string;
+  contentRef?: (el: HTMLDivElement | null) => void;
 }
 
 /**
  * 1920x1080 fixed-resolution slide that scales to fit its parent.
- *
- * 重要：用 clientWidth/clientHeight 测「未变换」的承载盒，
- * 避免父级被 rotate / transform 后 getBoundingClientRect()
- * 给出旋转后的视觉宽高，导致 scale 算错。
  */
-export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
+export function ScaledSlide({ children, className = "", contentRef }: ScaledSlideProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -41,6 +38,7 @@ export function ScaledSlide({ children, className = "" }: ScaledSlideProps) {
   return (
     <div ref={stageRef} className={`slide-stage ${className}`}>
       <div
+        ref={contentRef}
         className="slide-wrapper slide-content"
         style={{ ["--scale" as string]: scale } as React.CSSProperties}
       >

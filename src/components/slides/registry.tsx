@@ -1,4 +1,6 @@
+import { useCallback, useRef, useState } from "react";
 import { ScaledSlide } from "./ScaledSlide";
+import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
   Slide05Traffic, Slide06Media, Slide07Keywords, Slide08Engine,
@@ -87,9 +89,29 @@ export const SLIDES: SlideMeta[] = [
 
 export function SlideRenderer({ index }: { index: number }) {
   const slide = SLIDES[index];
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [, force] = useState(0);
+
+  const onSelectImage = useCallback((key: string, src: string) => {
+    (window as unknown as { __editorSelectImage?: (k: string, s: string) => void }).__editorSelectImage?.(key, src);
+  }, []);
+  const onSelectText = useCallback((key: string, el: HTMLElement) => {
+    (window as unknown as { __editorSelectText?: (k: string, e: HTMLElement) => void }).__editorSelectText?.(key, el);
+  }, []);
+
+  useApplyOverrides(index, containerRef, onSelectImage, onSelectText);
+
   if (!slide) return null;
   return (
-    <ScaledSlide>
+    <ScaledSlide
+      contentRef={(el) => {
+        if (containerRef.current !== el) {
+          containerRef.current = el;
+          // 强制再渲染一次以触发 useApplyOverrides effect 重新读取 ref
+          if (el) force((n) => n + 1);
+        }
+      }}
+    >
       {slide.render({ pageNumber: index + 1, totalPages: SLIDES.length })}
     </ScaledSlide>
   );

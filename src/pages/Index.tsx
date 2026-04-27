@@ -12,8 +12,11 @@ import {
   Maximize2, Minimize2, LayoutGrid, X, Menu, CheckCircle2, FileDown, Presentation,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
+import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
+import { PasswordDialog } from "@/components/editor/PasswordDialog";
+import { EditorPanel } from "@/components/editor/EditorPanel";
 
-const Index = () => {
+const IndexInner = () => {
   const [current, setCurrent] = useState(0);
   const [showThumbs, setShowThumbs] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -29,6 +32,29 @@ const Index = () => {
   } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const exportAbortRef = useRef<AbortController | null>(null);
+
+  // 编辑器入口：5 击 logo
+  const [showPwd, setShowPwd] = useState(false);
+  const logoClicksRef = useRef<{ count: number; timer: number | null }>({ count: 0, timer: null });
+  const editor = useEditor();
+
+  // 同步 currentSlide 到 editor context
+  useEffect(() => { editor.setCurrentSlide(current); }, [current, editor]);
+
+  const onLogoClick = useCallback(() => {
+    if (editor.unlocked) {
+      editor.toggleEditing();
+      return;
+    }
+    const ref = logoClicksRef.current;
+    ref.count += 1;
+    if (ref.timer) window.clearTimeout(ref.timer);
+    ref.timer = window.setTimeout(() => { ref.count = 0; }, 1500);
+    if (ref.count >= 5) {
+      ref.count = 0;
+      setShowPwd(true);
+    }
+  }, [editor]);
 
   const total = SLIDES.length;
 
@@ -287,7 +313,13 @@ const Index = () => {
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <img src={logo} alt="BOOMER OFF" className="h-8 brightness-0 invert" />
+            <img
+              src={logo}
+              alt="BOOMER OFF"
+              onClick={onLogoClick}
+              className="h-8 brightness-0 invert cursor-pointer select-none"
+              draggable={false}
+            />
             <div className="hidden md:block h-8 w-[2px] bg-paper-cream/20" />
             <div className="hidden md:block">
               <div className="font-display text-base font-bold leading-tight">品牌手册 Brand Book</div>
@@ -694,8 +726,18 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {/* 编辑器入口 + 面板 */}
+      <PasswordDialog open={showPwd} onOpenChange={setShowPwd} />
+      <EditorPanel />
     </>
   );
 };
+
+const Index = () => (
+  <EditorProvider>
+    <IndexInner />
+  </EditorProvider>
+);
 
 export default Index;
