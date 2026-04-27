@@ -1,5 +1,0 @@
-# 预生成的导出文件
-# pdf 和 pptx 由 npm run build 时自动生成（见 scripts/prerender-exports.mjs）
-*.pdf
-*.pptx
-!.gitkeep
