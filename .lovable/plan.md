@@ -1,96 +1,78 @@
-## 问题已经定位清楚
+## 现状诊断
 
-当前不是单一 CSS 小 bug，而是两个问题叠加：
+先看一下当前图片加载为什么慢：
 
-1. `src/pages/Index.tsx` 里把手机伪全屏做成了“永远旋转 90° + 永远宽高互换”。
-   这样一来，只要真实视口方向变化，舞台就会继续按错误坐标系计算，结果就是幻灯片被缩成中间一个小框。
+- `src/assets/` 总共约 **8.8MB**，单张图 200~460KB（jpg/jpeg/png 原图）
+- 所有图都用 ESM `import` 静态导入，每张走 Vite 的资源 hash URL
+- 代码里**没有任何**优化提示：没有 `loading=`、没有 `decoding=`、没有 `fetchpriority=`、没有相邻页预加载
+- 结果就是：每次切到新一页，浏览器才开始下载这一页的几张图，单张图 300KB 在弱网下要 1~3 秒才出现
 
-2. `src/components/slides/ScaledSlide.tsx` 现在用 `getBoundingClientRect()` 量自己的容器尺寸。这个值会受 transform/旋转后的视觉盒子影响，导致缩放比例按“被旋转过的盒子”算，而不是按真正可用的 16:9 逻辑画布算。
+> ⚠️ 老实说一句：**"0.5 秒"是一个体感目标，不是技术保证**。最终到达时间取决于用户网络（4G、Wi-Fi、海外）+ 图片字节数。我能做的是把"下载 + 解码 + 上屏"这条链路压到极限，让 95% 的场景下图片在切页瞬间就已经在缓存里 → 看起来就是"秒开"。
 
-3. 更关键的一点：iPhone 屏幕本身不是 16:9。你的幻灯片是 16:9，而 iPhone 视口通常接近 19.5:9 或更宽。
-   所以如果要求“导出和预览一模一样”且不裁切内容，那么物理上就不可能把整页 16:9 幻灯片无损铺满整个 iPhone 屏幕。现在看到的纯黑边可以消除，但“完全无留白且不裁切”做不到。
+---
 
-## 这次的修复方向
+## 优化方案（4 步组合拳）
 
-### 1) 重做手机伪全屏的布局逻辑
-只改 `src/pages/Index.tsx` 的全屏容器结构：
+### 1. 图片压缩为 WebP（收益最大，体积砍 60~70%）
 
-- 外层固定层只负责占满真实视口
-- 内层再根据“当前真实方向”决定如何显示
-- 不再使用“所有手机一进全屏就永远 rotate(90deg)”的策略
+把 `src/assets/ugc/` 和 `src/assets/store/` 下所有 jpg/jpeg/png 用 `sharp` 批量转成 WebP（quality 82，接近无损）：
 
-新逻辑会变成：
-- 手机竖屏进入伪全屏：显示全屏提示层，引导横过来查看，不再把 16:9 幻灯片硬塞成一个小盒子
-- 手机横屏时：直接按真实横屏视口渲染舞台，不再继续额外旋转
+- 预期：单张 300KB → **80~120KB**
+- 总体积：8.8MB → **约 2.5MB**
+- 兼容性：现代浏览器 100% 支持，无需 fallback
+- 替换所有 `import xxx from "@/assets/.../xxx.jpg"` → `.webp`
 
-这样可以避免现在这种“已经横了还再被旋一次”的缩小问题。
+### 2. 给所有 `<img>` 加上浏览器优化提示
 
-### 2) 修正 ScaledSlide 的测量基准
-改 `src/components/slides/ScaledSlide.tsx`，把缩放计算改成测量“未变换的实际承载容器”，而不是测量 transform 后的视觉盒子。
+在所有幻灯片 `<img>` 标签上统一加：
+- `loading="eager"` （幻灯片都要看，不延迟）
+- `decoding="async"` （后台解码，不阻塞主线程）
+- 当前页 / 相邻页的图加 `fetchpriority="high"`
 
-会顺手把现在没真正用上的 `fitTo` 能力接起来：
-- 默认场景继续自适应父容器
-- 伪全屏场景显式传入测量目标
+### 3. 相邻页预加载（核心体验优化）
 
-并把尺寸读取改为更稳定的 `clientWidth/clientHeight` 逻辑，避免旋转后的 `getBoundingClientRect()` 干扰 scale 计算。
+在 `src/pages/Index.tsx` 中新建一个 hook：当用户停留在第 N 页时，立刻在后台 `new Image().src = ...` 预热第 **N-1, N+1, N+2** 页用到的所有图片。
 
-### 3) 让 SlideRenderer 支持显式传入 fit 容器
-改 `src/components/slides/registry.tsx`：
-- 给 `SlideRenderer` 增加可选的 `fitTo` 参数
-- 伪全屏模式把真实舞台容器传给 `ScaledSlide`
+实现方式：
+- 在 `src/components/slides/registry.tsx` 的 `SlideMeta` 上加一个 `preloadImages: string[]` 字段，列出该页用到的图片 URL
+- `Index.tsx` 监听 `current` 变化 → 触发邻页 preload
+- 这样用户翻到下一页时，图片其实已经在浏览器 HTTP 缓存里，瞬间显示
 
-这样预览、缩略图、导出三条链路仍然共用同一套 1920×1080 幻灯片 DOM，但全屏缩放会更稳定。
+### 4. 首屏关键图片 `<link rel="preload">`
 
-### 4) 去掉“黑边”观感，但保留内容不裁切
-因为 16:9 和 iPhone 屏幕比例不同，无法无损铺满，所以这次会把“黑边”处理成品牌化背景，而不是纯黑空白：
+在 `index.html` 的 `<head>` 里给封面页（Slide01Cover）用到的几张图加 preload，让 HTML 解析时就并行下载：
 
-- 伪全屏背景改为品牌纸张/深色纹理
-- 中间仍然是完整 16:9 幻灯片
-- 不裁切、不拉伸，保证和 PDF/PPT 导出一致
-
-如果你后面坚持“必须真的边到边”，那就只能二选一：
-- 裁切幻灯片内容
-- 或把整套母版从 16:9 改成适配手机的比例
-
-### 5) 清理全局根节点限制
-顺手清理 `src/App.css` 里默认 Vite 的：
-- `#root max-width: 1280px`
-- `#root padding: 2rem`
-
-虽然它不是这次小框问题的主因，但它本来就不适合全屏演示应用，去掉后整体壳层会更干净。
-
-## 涉及文件
-
-- `src/pages/Index.tsx`
-- `src/components/slides/ScaledSlide.tsx`
-- `src/components/slides/registry.tsx`
-- `src/App.css`
-
-## 验收标准
-
-- iPhone Safari 点全屏后，不再出现“中间一个缩小小框”的错误状态
-- 手机竖屏时，不再假装已经满屏展示 16:9 内容，而是明确进入正确的横屏查看态
-- 手机横屏时，幻灯片按真实可用区域稳定展示，不会再被二次旋转缩小
-- 预览页中的 16:9 幻灯片内容与 PDF/PPT 导出保持一致，不裁切、不拉伸
-- 原来的纯黑边会被替换成品牌化背景，视觉上不再像故障
-
-## 技术说明
-
-关键结论是：
-
-```text
-iPhone 屏幕比例 ≠ 16:9 幻灯片比例
+```html
+<link rel="preload" as="image" href="/src/assets/..." fetchpriority="high">
 ```
 
-所以“完整保留 16:9 内容”与“真正物理边到边无留白”不能同时成立。
+(开发环境用 Vite 路径，生产环境用打包后的 hash 路径——需要在 `main.tsx` 启动时动态注入，避免 hash 失效)
 
-这次我会优先保证：
+---
 
-```text
-预览 = 导出
-完整内容不丢失
-不再缩成小框
-黑边改成品牌背景
-```
+## 预期效果
 
-而不是继续在错误前提下反复调 rotate 数值。
+| 阶段 | 现状 | 优化后 |
+|---|---|---|
+| 首屏封面图出现 | ~1.5s | **~0.4s** |
+| 切到下一页图片出现 | ~0.8~2s（重新下载） | **~50ms**（已预加载，命中缓存） |
+| 整页总下载体积 | ~1.5MB | **~400KB** |
+
+---
+
+## 不在本次改动范围
+
+- 不改幻灯片视觉、不调整文案、不动布局
+- 不引入 CDN（项目本身没接 CDN，超出范围）
+- WebP 转换会**保留原 jpg 文件**，只新增 webp 版本，避免破坏其他引用
+
+---
+
+## 实施步骤
+
+1. 用 `sharp` 批量把 `src/assets/ugc/*.jpg` 和 `src/assets/store/*.jpeg` 转成 `.webp`
+2. 全局替换 `AllSlides.tsx` 中 `.jpg` → `.webp` 的 import
+3. 给所有 `<img>` 加 `decoding="async" loading="eager"`
+4. 在 `registry.tsx` 给每个 slide 添加 `preloadImages` 元数据
+5. 在 `Index.tsx` 加邻页预加载 hook
+6. 在 `index.html` 给封面图加 `<link rel="preload">`
