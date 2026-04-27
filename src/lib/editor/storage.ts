@@ -86,9 +86,10 @@ export async function loadOverridesRemote(): Promise<AllOverrides | null> {
 
 export async function saveOverridesRemote(data: AllOverrides): Promise<void> {
   data.updatedAt = new Date().toISOString();
+  const row = { scope: SCOPE, data: data as unknown as never };
   const { error } = await supabase
     .from("content_overrides")
-    .upsert({ scope: SCOPE, data: data as unknown as Record<string, unknown> }, { onConflict: "scope" });
+    .upsert(row, { onConflict: "scope" });
   if (error) {
     console.warn("[storage] save remote failed:", error.message);
     throw error;
@@ -96,9 +97,10 @@ export async function saveOverridesRemote(data: AllOverrides): Promise<void> {
 }
 
 export async function clearOverridesRemote(): Promise<void> {
+  const row = { scope: SCOPE, data: empty() as unknown as never };
   const { error } = await supabase
     .from("content_overrides")
-    .upsert({ scope: SCOPE, data: empty() as unknown as Record<string, unknown> }, { onConflict: "scope" });
+    .upsert(row, { onConflict: "scope" });
   if (error) console.warn("[storage] clear remote failed:", error.message);
 }
 
