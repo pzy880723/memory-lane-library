@@ -292,24 +292,20 @@ export function Slide05Traffic({ pageNumber, totalPages }: { pageNumber: number;
  * 第 5b 页 — 小红书 / 抖音 素人自发种草
  * ============================================================ */
 export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  // 9 张截图 + 标签 + 互动数据
+  // 5 张截图 + 标签 + 互动数据
   const posts = [
     { src: xhs1, platform: "小红书", title: "小老淇 shanghai vlog 同款", likes: "199", stars: "160", comments: "3", rotate: "-2.5deg" },
     { src: xhs2, platform: "小红书", title: "上海这么好逛的 vintage 店咋没人说！", likes: "290", stars: "290", comments: "15", rotate: "1.8deg" },
     { src: xhs3, platform: "小红书", title: "中信泰富复古 OFF 中古杂货店", likes: "535", stars: "563", comments: "55", rotate: "-1.2deg" },
     { src: xhs4, platform: "小红书", title: "不在东京在上海！宝藏中古玩具店", likes: "167", stars: "98", comments: "8", rotate: "2.2deg" },
-    { src: xhs5, platform: "小红书", title: "新店！Boomer Off 中古手办店", likes: "35", stars: "5", comments: "—", rotate: "-1.8deg" },
-    { src: xhs6, platform: "小红书", title: "不是在日本到感觉已经到了", likes: "1053", stars: "176", comments: "41", rotate: "1.5deg" },
-    { src: xhs7, platform: "小红书", title: "如果全世界都指责你 那姐姐就抱抱你", likes: "590", stars: "8", comments: "12", rotate: "-2deg" },
-    { src: dy1, platform: "抖音", title: "Boomer off 中古店是我见过最有趣的", likes: "432", stars: "279", comments: "22", rotate: "1.2deg" },
     { src: dy2, platform: "抖音", title: "BOOMER·OFF Vintage · 中信泰富", likes: "37", stars: "10", comments: "4", rotate: "-1.5deg" },
   ];
 
   return (
     <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="01 · 中信泰富首店实绩">
-      <div className="absolute inset-0 px-20 pt-32 pb-20">
+      <div className="absolute inset-0 px-20 pt-36 pb-28 flex flex-col">
         {/* 顶部标题 + 数据胶囊 */}
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between">
           <div>
             <div className="font-handwrite text-4xl text-boomer-red mb-2">— UGC · 素人自发种草 —</div>
             <h1 className="font-display text-7xl font-black leading-tight">
@@ -328,8 +324,9 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
           </div>
         </div>
 
-        {/* 9 张截图拼贴墙 */}
-        <div className="grid grid-cols-5 gap-5">
+        {/* 5 张截图拼贴墙 — 居中分布 */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="grid grid-cols-5 gap-8 w-full max-w-[1700px]">
           {posts.map((p, i) => {
             const isXHS = p.platform === "小红书";
             return (
@@ -366,6 +363,7 @@ export function Slide05bUGC({ pageNumber, totalPages }: { pageNumber: number; to
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </SlideShell>
