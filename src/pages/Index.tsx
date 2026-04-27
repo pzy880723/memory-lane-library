@@ -24,6 +24,7 @@ const IndexInner = () => {
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
+  const [downloading, setDownloading] = useState<"pdf" | "pptx" | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
   // 编辑器入口：5 击 logo
@@ -252,11 +253,33 @@ const IndexInner = () => {
     }
   }, []);
 
-  const handleExport = (type: "pdf" | "pptx") => {
+  const handleExport = async (type: "pdf" | "pptx") => {
+    if (downloading) return; // 防止重复点击
     const label = type.toUpperCase();
-    if (type === "pdf") downloadPDF();
-    else downloadPPTX();
-    toast({ title: `${label} 下载已开始`, description: "正在保存到本地..." });
+    setDownloading(type);
+    const t = toast({
+      title: `正在准备 ${label}`,
+      description: "已开始拉取文件，下载条会自动出现…",
+    });
+    try {
+      if (type === "pdf") await downloadPDF();
+      else await downloadPPTX();
+      t.update({
+        id: t.id,
+        title: `✓ ${label} 下载已开始`,
+        description: "文件正在保存到本地",
+      });
+    } catch (err) {
+      console.error("下载失败：", err);
+      t.update({
+        id: t.id,
+        title: "下载失败",
+        description: "请稍后重试，或检查网络后再试一次",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(null);
+    }
   };
 
   return (
@@ -324,14 +347,18 @@ const IndexInner = () => {
                 <Button
                   size="sm"
                   className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+                  disabled={!!downloading}
                 >
                   <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">下载</span>
+                  <span className="hidden sm:inline">
+                    {downloading ? "准备中…" : "下载"}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={() => handleExport("pdf")}
+                  disabled={!!downloading}
                   className="gap-3 cursor-pointer"
                 >
                   <FileDown className="w-4 h-4 text-boomer-red" />
@@ -342,6 +369,7 @@ const IndexInner = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleExport("pptx")}
+                  disabled={!!downloading}
                   className="gap-3 cursor-pointer"
                 >
                   <Presentation className="w-4 h-4 text-boomer-red" />
