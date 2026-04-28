@@ -27,7 +27,13 @@ interface EditorContextValue {
   updateImage: (slideIndex: number, key: string, patch: ImageOverride) => void;
   resetAll: () => void;
   reload: (next: AllOverrides) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
+
+const HISTORY_LIMIT = 50;
 
 const EditorContext = createContext<EditorContextValue | null>(null);
 
