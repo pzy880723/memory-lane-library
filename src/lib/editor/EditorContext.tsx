@@ -8,6 +8,7 @@ import {
   setText, setImage, clearOverridesLocal,
   type AllOverrides, type TextOverride, type ImageOverride,
 } from "./storage";
+import { precacheAll } from "@/lib/export";
 
 const PASSWORDS = new Set(["880723", "pzy5565283", "boomer2016"]);
 const SESSION_KEY = "boomer_off_editor_unlocked";
@@ -95,6 +96,15 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         setSaving(false);
       }
     }, 600);
+    return () => clearTimeout(t);
+  }, [data, loaded]);
+
+  /* ─── 2b. 数据变更 → 后台静默预生成 PDF/PPTX(更长 debounce) ─── */
+  useEffect(() => {
+    if (!loaded || !dirtyRef.current) return;
+    const t = setTimeout(() => {
+      void precacheAll({ force: true });
+    }, 5000);
     return () => clearTimeout(t);
   }, [data, loaded]);
 
