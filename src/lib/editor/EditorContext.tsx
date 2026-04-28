@@ -99,6 +99,15 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [data, loaded]);
 
+  /* ─── 2b. 数据变更 → 后台静默预生成 PDF/PPTX(更长 debounce) ─── */
+  useEffect(() => {
+    if (!loaded || !dirtyRef.current) return;
+    const t = setTimeout(() => {
+      void precacheAll({ force: true });
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [data, loaded]);
+
   // ─── 撤销/重做历史栈 ───
   const [historyVersion, setHistoryVersion] = useState(0); // 仅用于触发 canUndo/canRedo 重算
   const historyRef = useRef<AllOverrides[]>([]);   // 过去栈
