@@ -8,6 +8,7 @@ import {
   setText, setImage, clearOverridesLocal,
   type AllOverrides, type TextOverride, type ImageOverride,
 } from "./storage";
+import { precacheAll } from "@/lib/export";
 
 const PASSWORDS = new Set(["880723", "pzy5565283", "boomer2016"]);
 const SESSION_KEY = "boomer_off_editor_unlocked";
