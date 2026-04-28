@@ -1,55 +1,91 @@
 ## 目标
 
-把编辑模式下底部那一长条固定工具栏，换成一个**圆形小浮标**（约 44×44px），**默认贴在右侧居中**位置，**可拖动**到任意位置，避开翻页按钮。
+对编辑模式工具栏做三处改造:
 
-## 交互设计
+1. **删除**: 工具浮标里的「导入」「导出」「重置全部」三个功能
+2. **新增**: 撤销 (Undo) / 重做 (Redo) 功能
+3. **改进文字编辑**: 不再在页面里直接 contenteditable,改为在右侧编辑面板里用文本框编辑(放在「字号」输入框上方)
 
-```text
-┌─────────────────────────────────┐
-│                                 │
-│       [PPT 内容区域]            │
-│                              ●  │ ← 圆形浮标（铅笔图标）
-│                                 │
-│         ◀  3/12  ▶              │ ← 翻页（不再被遮挡）
-└─────────────────────────────────┘
-```
+## 交互改造
 
-**浮标默认状态（收起）**：
-- 一个 44×44 圆形按钮，铅笔图标
-- 默认位置：`right: 16px, top: 50%`（屏幕右侧居中）
-- 保存中显示 spinner，已保存显示对勾小角标
-- **按住拖动**可以移到任何位置；位置记到 localStorage，下次还原
-- **单击**展开为小卡片菜单
-
-**浮标展开状态（卡片）**：
-仅保留 4 个图标按钮 + 当前页码，去掉冗长文字：
+### 浮标展开卡片 (改造后)
 
 ```
 ┌──────────────────┐
 │ 第 3 页 · 已保存  │
-│ ⚙ 工具  ↗ 退出   │
+│ ↶ 撤销  ↷ 重做   │
+│ ↗ 退出           │
 └──────────────────┘
 ```
 
-点击 ⚙ 工具 → 打开现有的工具面板（导出/导入/重置/退出），位置也跟随浮标。
+- 去掉「⚙ 工具」按钮(因为里面只剩退出了,直接放到卡片里)
+- 撤销/重做按钮:无可用历史时禁用(灰色)
 
-**选中文字/图片时**：弹出的属性编辑面板维持现有 `computeAutoPos` 智能避让逻辑，不变。
+### 选中文字时的编辑面板 (改造后)
+
+```
+┌─────────────────────┐
+│ ✎ 编辑文字       ✕  │
+├─────────────────────┤
+│ 文字内容             │
+│ ┌─────────────────┐ │  ← 新增多行文本框
+│ │ 这里是当前文字...│ │
+│ └─────────────────┘ │
+│                     │
+│ 字号                │
+│ [32px] [↻]         │
+│ [20] [28] [36]...  │
+│                     │
+│ 颜色                │
+│ [■] [#000000] [↻]  │
+│                     │
+│ [↻ 重置此处文字]    │
+└─────────────────────┘
+```
+
+页面上选中的文字节点不再变成可编辑状态(去掉 contenteditable 和虚线框的"可输入"感),只保留「点击选中 → 在面板编辑」的模式。仍保留选中高亮(实线描边)。
 
 ## 技术改动
 
-仅修改 **`src/components/editor/EditorPanel.tsx`**：
+### 1. `src/lib/editor/EditorContext.tsx` - 新增撤销/重做
 
-1. 新增 `floatPos` state，初始从 `localStorage.getItem("editor.floatPos")` 读取，默认 `{ right: 16, top: window.innerHeight/2 }`（用 left/top 内部存储以便拖拽）。
-2. 新增 `floatExpanded` state（点击浮标展开/收起小卡片）。
-3. 把当前 `showFloatingBar` 分支整体替换为：
-   - 收起：圆形 `Button`（44px，rounded-full，铅笔图标 + 保存状态小圆点角标）
-   - 展开：紧凑卡片（页码 + 工具按钮 + 退出按钮）
-   - 共用一套 `onMouseDown` 拖拽逻辑（复用现有 `dragStateRef` 模式），拖拽结束写 localStorage。
-4. 工具面板（`showTools` 分支）的定位也改成跟随浮标位置（基于 `floatPos` 计算 left/top，并避免溢出视口）。
-5. 保留所有现有功能（导出/导入/重置/退出/选中编辑），不改业务逻辑。
+- 新增 `historyRef`(过去栈)和 `futureRef`(未来栈),都是 `AllOverrides` 数组
+- 改造 `markDirtyAndSet`:每次用户操作前,把当前 `data` push 到 `historyRef`,清空 `futureRef`,设上限 50 条
+- 暴露:
+  - `canUndo: boolean`、`canRedo: boolean`
+  - `undo()`、`redo()`:互相搬运栈顶,设置 dirty=true 触发云端写入
+- `resetAll` 也走 history(可被撤销)
+
+### 2. `src/lib/editor/useApplyOverrides.ts` - 文字不再页面内编辑
+
+- 移除 contenteditable 相关:`setAttribute("contenteditable")`、`input` 事件、`focus/blur` 描边切换
+- 编辑模式下文字节点只:
+  - 加一个虚线 outline (hover 时变实线提示可点)
+  - 绑定 `click` 事件 → 调用 `onSelectText(key, el)`
+  - 鼠标样式 `cursor: pointer`(不再是 `text`)
+- 应用 overrides 的逻辑(text/fontSize/color)保持不变
+
+### 3. `src/components/editor/EditorPanel.tsx` - 三处改动
+
+**a) 浮标展开卡片**:
+- 删除「工具」按钮和整个 `showTools` 分支(连带 `showTools` state、`importJsonRef`、`exportJSON`/`importJSON`/`resetAll`/`reload` 的引用)
+- 加 2 个图标按钮:撤销 (`Undo2` 图标)、重做 (`Redo2` 图标),disabled 状态根据 `canUndo`/`canRedo`
+- 退出按钮单独一行
+
+**b) 文字编辑面板**:
+- 在「字号」上方新增「文字内容」区块:`<Textarea>`,`value = currentTextOv?.text ?? selected.initialText ?? ""`,`onChange` → `updateText(currentSlide, selected.key, { text: e.target.value })`
+- `Selected` 接口加 `initialText?: string`,在 `__editorSelectText` 回调里从 `el.dataset.origText ?? el.textContent` 取初值
+- 实时把 textarea 的值同步回页面节点(`useApplyOverrides` 已经在监听 data 变化时重新 setText,所以会自动同步,无需额外处理)
+
+**c) 清理 imports**:
+- 删除 `Download`、`Upload`、`RotateCcw`(只用于工具面板的部分)、`Settings`、`importJSON`、`exportJSON`、`reload`、`resetAll`
+- 保留 `RotateCcw` (字号/颜色/重置此处文字 仍在用)
+- 新增 `Undo2`、`Redo2` 图标
+- 新增 `Textarea` 引入
 
 ## 不改动
 
-- 翻页控件、键盘快捷键、保存/上传逻辑、Supabase 存储均不动。
-- 选中元素后的属性面板 (`computeAutoPos` 智能定位) 不动。
-- 其他文件均不动。
+- 浮标拖拽、位置持久化、保存中/已保存状态
+- 图片编辑流程
+- 翻页、键盘快捷键、Supabase 存储
+- 选中后的属性面板智能定位 (`computeAutoPos`)
