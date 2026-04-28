@@ -249,38 +249,118 @@ export async function exportPPTX(onProgress?: ProgressCallback): Promise<void> {
 export const downloadPDF = exportPDF;
 export const downloadPPTX = exportPPTX;
 
-async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
-  const filename = `${FILENAME_BASE}.${type}`;
+/* ─────────────── 后台静默预生成 ─────────────── */
+
+// 模块级并发锁,防止同一 type 重复跑;以及最近一次成功时间戳用于节流
+const inflight: Record<"pdf" | "pptx", Promise<string | null> | null> = { pdf: null, pptx: null };
+let lastPrecacheAt = 0;
+const PRECACHE_MIN_INTERVAL_MS = 30_000; // 同一会话至少间隔 30s 才允许再跑一次
+
+interface GenerateResult { url: string | null; hash: string; fromCache: boolean; }
+
+/**
+ * 渲染 + 上传一个 type,但不触发下载。返回 CDN URL(失败为 null)。
+ * - force=false:命中缓存直接返回
+ * - force=true:跳过缓存查询,但同 hash 上传仍是 upsert(覆盖同 path)
+ */
+async function generateAndCache(
+  type: "pdf" | "pptx",
+  opts: { force?: boolean; onProgress?: ProgressCallback } = {},
+): Promise<GenerateResult> {
+  const { force = false, onProgress } = opts;
   const total = SLIDES.length;
 
   onProgress?.({ phase: "checking", message: "检查云端缓存…" });
   const hash = await computeContentHash();
-  const cachedUrl = await findCached(type, hash);
-  if (cachedUrl) {
-    onProgress?.({ phase: "downloading", message: "命中缓存，准备下载…" });
-    await triggerDownload(cachedUrl, filename);
-    return;
+
+  if (!force) {
+    const cachedUrl = await findCached(type, hash);
+    if (cachedUrl) return { url: cachedUrl, hash, fromCache: true };
   }
 
-  // 渲染所有页
   const jpegs: Blob[] = [];
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: "rendering", current: i + 1, total });
     jpegs.push(await renderSlideToJpeg(i));
   }
 
-  // 打包
   onProgress?.({ phase: "packing", message: type === "pdf" ? "正在生成 PDF…" : "正在生成 PPT…" });
   const fileBlob = type === "pdf" ? await buildPdf(jpegs) : await buildPptx(jpegs);
 
-  // 上传到云端缓存（失败不阻断本次下载）
   onProgress?.({ phase: "uploading", message: "上传到云端缓存…" });
   let cdnUrl: string | null = null;
   try {
     cdnUrl = await uploadAndRecord(type, hash, fileBlob);
   } catch (err) {
-    console.warn("[export] 上传缓存失败（不影响本次下载）:", err);
+    console.warn("[export] 上传缓存失败:", err);
   }
+
+  // 给打包好的 blob 一个本地 URL 作为兜底,让调用方仍能下载
+  if (!cdnUrl) {
+    cdnUrl = URL.createObjectURL(fileBlob);
+  }
+  return { url: cdnUrl, hash, fromCache: false };
+}
+
+/**
+ * 后台静默预生成 PDF + PPTX。错误不抛出,只 console.warn。
+ * - 同 type 已有任务在跑则复用
+ * - 页面隐藏时跳过
+ * - 距上次成功 < 30s 时跳过
+ */
+export async function precacheAll(opts: { force?: boolean } = {}): Promise<void> {
+  if (typeof document !== "undefined" && document.hidden) {
+    console.info("[precache] 页面隐藏,跳过");
+    return;
+  }
+  const now = Date.now();
+  if (now - lastPrecacheAt < PRECACHE_MIN_INTERVAL_MS) {
+    console.info("[precache] 距上次 < 30s,跳过");
+    return;
+  }
+
+  const run = async (type: "pdf" | "pptx") => {
+    if (inflight[type]) return inflight[type];
+    const p = generateAndCache(type, { force: opts.force })
+      .then((r) => r.url)
+      .catch((err) => {
+        console.warn(`[precache] ${type} 失败:`, err);
+        return null;
+      })
+      .finally(() => { inflight[type] = null; });
+    inflight[type] = p;
+    return p;
+  };
+
+  console.info("[precache] 开始静默生成 PDF + PPTX…");
+  await Promise.all([run("pdf"), run("pptx")]);
+  lastPrecacheAt = Date.now();
+  console.info("[precache] 完成");
+}
+
+async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
+  const filename = `${FILENAME_BASE}.${type}`;
+
+  // 如果后台预生成正在跑,等它完成再下载,避免重复渲染
+  if (inflight[type]) {
+    onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
+    try {
+      const url = await inflight[type];
+      if (url) {
+        onProgress?.({ phase: "downloading", message: "准备下载…" });
+        await triggerDownload(url, filename);
+        return;
+      }
+    } catch { /* 落入下面正常流程 */ }
+  }
+
+  const { url, fromCache } = await generateAndCache(type, { onProgress });
+  if (fromCache) {
+    onProgress?.({ phase: "downloading", message: "命中缓存,准备下载…" });
+  } else {
+    onProgress?.({ phase: "downloading", message: "保存到本地…" });
+  }
+  if (!url) throw new Error("生成失败");
 
   // 下载
   onProgress?.({ phase: "downloading", message: "保存到本地…" });
