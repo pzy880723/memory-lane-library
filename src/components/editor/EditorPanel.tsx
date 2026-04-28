@@ -2,17 +2,19 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Pencil, Download, Upload, RotateCcw, LogOut, X, Image as ImageIcon,
-  Settings, Move, Loader2, Check, GripVertical,
+  Pencil, RotateCcw, LogOut, X, Image as ImageIcon,
+  Move, Loader2, Check, GripVertical, Upload, Undo2, Redo2,
 } from "lucide-react";
 import { useEditor } from "@/lib/editor/EditorContext";
-import { exportJSON, importJSON, uploadImageToCloud } from "@/lib/editor/storage";
+import { uploadImageToCloud } from "@/lib/editor/storage";
 import { toast } from "@/hooks/use-toast";
 
 interface Selected {
   kind: "text" | "image" | null;
   key: string;
+  initialText?: string;
   initialFontSize?: string;
   initialColor?: string;
   imageSrc?: string;
@@ -26,12 +28,12 @@ const MARGIN = 16;
 export function EditorPanel() {
   const {
     editing, lock, data, currentSlide, saving,
-    updateText, updateImage, resetAll, reload,
+    updateText, updateImage,
+    undo, redo, canUndo, canRedo,
   } = useEditor();
 
   const [selected, setSelected] = useState<Selected>({ kind: null, key: "" });
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
-  const [showTools, setShowTools] = useState(false); // 设置面板(导出/重置/退出)
   const [uploading, setUploading] = useState(false);
   const [floatPos, setFloatPos] = useState<{ left: number; top: number }>(() => {
     if (typeof window === "undefined") return { left: 0, top: 0 };
@@ -47,7 +49,6 @@ export function EditorPanel() {
   const [floatExpanded, setFloatExpanded] = useState(false);
   const [floatDragged, setFloatDragged] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const importJsonRef = useRef<HTMLInputElement>(null);
   const dragStateRef = useRef<{ dx: number; dy: number } | null>(null);
   const floatDragRef = useRef<{ dx: number; dy: number; moved: boolean } | null>(null);
 
@@ -82,7 +83,6 @@ export function EditorPanel() {
     try { localStorage.setItem("editor.floatPos", JSON.stringify(floatPos)); } catch { /* ignore */ }
   }, [floatPos]);
 
-
   // 计算自动避让位置
   const computeAutoPos = useCallback((rect?: Selected["rect"]) => {
     const vw = window.innerWidth;
@@ -90,7 +90,6 @@ export function EditorPanel() {
     if (!rect) {
       return { left: vw - PANEL_W - MARGIN, top: 80 };
     }
-    // 优先放右侧，其次左侧，再次下方
     const spaceRight = vw - rect.right;
     const spaceLeft = rect.left;
     let left: number;
@@ -100,7 +99,6 @@ export function EditorPanel() {
     } else if (spaceLeft >= PANEL_W + MARGIN * 2) {
       left = rect.left - PANEL_W - MARGIN;
     } else {
-      // 上方或下方
       left = Math.max(MARGIN, Math.min(rect.left, vw - PANEL_W - MARGIN));
       const spaceBelow = vh - rect.bottom;
       if (spaceBelow >= PANEL_H_EST + MARGIN) {
@@ -125,8 +123,10 @@ export function EditorPanel() {
       const cs = window.getComputedStyle(el);
       const r = el.getBoundingClientRect();
       const rect = { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+      const initialText = el.dataset.origText ?? el.textContent ?? "";
       setSelected({
         kind: "text", key,
+        initialText,
         initialFontSize: cs.fontSize,
         initialColor: rgbToHex(cs.color),
         rect,
@@ -140,9 +140,9 @@ export function EditorPanel() {
   }, [computeAutoPos]);
 
   // 切换 slide 时清空选中
-  useEffect(() => { setSelected({ kind: null, key: "" }); setPos(null); setShowTools(false); }, [currentSlide]);
+  useEffect(() => { setSelected({ kind: null, key: "" }); setPos(null); }, [currentSlide]);
 
-  // 拖拽
+  // 拖拽属性面板
   const onDragStart = (e: React.MouseEvent) => {
     if (!pos) return;
     dragStateRef.current = { dx: e.clientX - pos.left, dy: e.clientY - pos.top };
@@ -191,8 +191,8 @@ export function EditorPanel() {
     }
   };
 
-  // 浮动小浮标（无选中时显示）
-  const showFloatingBar = selected.kind === null && !showTools;
+  // 浮动小浮标(无选中时显示)
+  const showFloatingBar = selected.kind === null;
 
   if (showFloatingBar) {
     // 收起：圆形小浮标
@@ -206,7 +206,6 @@ export function EditorPanel() {
             type="button"
             onMouseDown={onFloatDragStart}
             onClick={(e) => {
-              // 拖动后不触发展开
               if (floatDragged) { e.preventDefault(); setFloatDragged(false); return; }
               setFloatExpanded(true);
             }}
@@ -230,9 +229,9 @@ export function EditorPanel() {
     }
 
     // 展开：紧凑卡片
-    const cardW = 200;
+    const cardW = 220;
     const cardLeft = Math.max(4, Math.min(window.innerWidth - cardW - 4, floatPos.left - cardW + 44));
-    const cardTop = Math.max(4, Math.min(window.innerHeight - 120, floatPos.top));
+    const cardTop = Math.max(4, Math.min(window.innerHeight - 140, floatPos.top));
     return (
       <div
         className="fixed z-[60] bg-background border-2 border-primary/40 rounded-lg shadow-2xl select-none"
@@ -258,72 +257,28 @@ export function EditorPanel() {
             <X className="w-3 h-3" />
           </button>
         </div>
-        <div className="flex items-center justify-around p-1.5">
-          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => { setShowTools(true); setFloatExpanded(false); }}>
-            <Settings className="w-3.5 h-3.5 mr-1" /> 工具
+        <div className="grid grid-cols-2 gap-1 p-1.5">
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2 text-xs"
+            onClick={undo} disabled={!canUndo}
+            title="撤销"
+          >
+            <Undo2 className="w-3.5 h-3.5 mr-1" /> 撤销
           </Button>
-          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={lock}>
-            <LogOut className="w-3.5 h-3.5 mr-1" /> 退出
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2 text-xs"
+            onClick={redo} disabled={!canRedo}
+            title="重做"
+          >
+            <Redo2 className="w-3.5 h-3.5 mr-1" /> 重做
+          </Button>
+        </div>
+        <div className="p-1.5 pt-0">
+          <Button size="sm" variant="ghost" className="h-8 w-full text-xs" onClick={lock}>
+            <LogOut className="w-3.5 h-3.5 mr-1" /> 退出编辑
           </Button>
         </div>
       </div>
-    );
-  }
-
-  // 工具面板（导出/重置）—— 跟随浮标位置
-  if (showTools && selected.kind === null) {
-    const toolsW = 320;
-    const toolsH = 240;
-    const toolsLeft = Math.max(4, Math.min(window.innerWidth - toolsW - 4, floatPos.left - toolsW + 44));
-    const toolsTop = Math.max(4, Math.min(window.innerHeight - toolsH - 4, floatPos.top));
-    return (
-      <aside
-        className="fixed z-[60] bg-background border-2 border-primary/30 rounded-lg shadow-2xl text-foreground"
-        style={{ left: toolsLeft, top: toolsTop, width: toolsW }}
-      >
-        <header className="flex items-center justify-between px-4 py-3 border-b bg-primary/5">
-          <div className="flex items-center gap-2">
-            <Settings className="w-4 h-4 text-primary" />
-            <span className="font-bold text-sm">编辑工具</span>
-          </div>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowTools(false)}>
-            <X className="w-4 h-4" />
-          </Button>
-        </header>
-        <div className="p-4 space-y-3">
-          <div className="text-xs text-muted-foreground">点击页面任意文字/图片即可编辑</div>
-          <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="outline" onClick={() => exportJSON(data)}>
-              <Download className="w-3 h-3 mr-1" /> 导出
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => importJsonRef.current?.click()}>
-              <Upload className="w-3 h-3 mr-1" /> 导入
-            </Button>
-            <input ref={importJsonRef} type="file" accept="application/json" hidden
-              onChange={async (e) => {
-                const f = e.target.files?.[0];
-                if (!f) return;
-                try {
-                  const next = await importJSON(f);
-                  reload(next);
-                  toast({ title: "✓ 内容已导入" });
-                } catch {
-                  toast({ title: "导入失败", description: "文件格式不正确", variant: "destructive" });
-                }
-                e.target.value = "";
-              }} />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="outline" className="text-destructive"
-              onClick={() => { if (confirm("确定要清空全部修改？")) resetAll(); }}>
-              <RotateCcw className="w-3 h-3 mr-1" /> 重置全部
-            </Button>
-            <Button size="sm" variant="outline" onClick={lock}>
-              <LogOut className="w-3 h-3 mr-1" /> 退出
-            </Button>
-          </div>
-        </div>
-      </aside>
     );
   }
 
@@ -358,7 +313,25 @@ export function EditorPanel() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {selected.kind === "text" && (
           <div className="space-y-3">
-            <div className="text-xs text-muted-foreground">在页面上直接点击修改文字内容</div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">文字内容</Label>
+              <Textarea
+                rows={4}
+                placeholder={selected.initialText}
+                value={currentTextOv?.text ?? selected.initialText ?? ""}
+                onChange={(e) => updateText(currentSlide, selected.key, { text: e.target.value })}
+                className="text-sm"
+              />
+              <div className="flex justify-end">
+                <Button
+                  variant="ghost" size="sm" className="h-6 px-2 text-xs text-muted-foreground"
+                  onClick={() => updateText(currentSlide, selected.key, { text: undefined })}
+                  title="恢复原文"
+                >
+                  <RotateCcw className="w-3 h-3 mr-1" /> 恢复原文
+                </Button>
+              </div>
+            </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs">字号</Label>
