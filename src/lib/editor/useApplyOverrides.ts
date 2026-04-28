@@ -81,8 +81,6 @@ export function useApplyOverrides(
         });
       }
     });
-      }
-    });
 
     // ===== 应用图片 overrides =====
     const imgs = findEditableImages(root);
