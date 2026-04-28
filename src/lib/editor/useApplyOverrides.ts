@@ -25,6 +25,8 @@ export function useApplyOverrides(
   const { data, editing, updateText } = useEditor();
   const dataRef = useRef(data);
   dataRef.current = data;
+  // updateText 当前未被本 hook 直接使用(改在面板里编辑),保留依赖以便未来扩展
+  void updateText;
 
   useEffect(() => {
     const root = containerRef.current;
@@ -55,33 +57,30 @@ export function useApplyOverrides(
       el.dataset.editKey = key;
 
       if (editing) {
-        el.setAttribute("contenteditable", "true");
         el.style.outline = "1px dashed hsl(var(--primary) / 0.45)";
         el.style.outlineOffset = "2px";
-        el.style.cursor = "text";
+        el.style.cursor = "pointer";
 
-        const handleInput = () => {
-          updateText(slideIndex, key, { text: el.textContent ?? "" });
-        };
-        const handleFocus = () => {
+        const handleClick = (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
           onSelectText(key, el);
           el.style.outline = "2px solid hsl(var(--primary))";
         };
-        const handleBlur = () => {
+        const handleMouseLeave = () => {
           el.style.outline = "1px dashed hsl(var(--primary) / 0.45)";
         };
-        el.addEventListener("input", handleInput);
-        el.addEventListener("focus", handleFocus);
-        el.addEventListener("blur", handleBlur);
+        el.addEventListener("click", handleClick);
+        el.addEventListener("mouseleave", handleMouseLeave);
         textCleanup.push(() => {
-          el.removeEventListener("input", handleInput);
-          el.removeEventListener("focus", handleFocus);
-          el.removeEventListener("blur", handleBlur);
-          el.removeAttribute("contenteditable");
+          el.removeEventListener("click", handleClick);
+          el.removeEventListener("mouseleave", handleMouseLeave);
           el.style.outline = "";
           el.style.outlineOffset = "";
           el.style.cursor = "";
         });
+      }
+    });
       }
     });
 
