@@ -27,7 +27,13 @@ interface EditorContextValue {
   updateImage: (slideIndex: number, key: string, patch: ImageOverride) => void;
   resetAll: () => void;
   reload: (next: AllOverrides) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
+
+const HISTORY_LIMIT = 50;
 
 const EditorContext = createContext<EditorContextValue | null>(null);
 
@@ -92,10 +98,26 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, [data, loaded]);
 
+  // ─── 撤销/重做历史栈 ───
+  const [historyVersion, setHistoryVersion] = useState(0); // 仅用于触发 canUndo/canRedo 重算
+  const historyRef = useRef<AllOverrides[]>([]);   // 过去栈
+  const futureRef = useRef<AllOverrides[]>([]);    // 未来栈
+  const bumpHistory = () => setHistoryVersion((v) => v + 1);
+
+  const pushHistory = useCallback((snapshot: AllOverrides) => {
+    historyRef.current.push(snapshot);
+    if (historyRef.current.length > HISTORY_LIMIT) historyRef.current.shift();
+    futureRef.current = [];
+    bumpHistory();
+  }, []);
+
   const markDirtyAndSet = useCallback((updater: (prev: AllOverrides) => AllOverrides) => {
     dirtyRef.current = true;
-    setData(updater);
-  }, []);
+    setData((prev) => {
+      pushHistory(prev);
+      return updater(prev);
+    });
+  }, [pushHistory]);
 
   const tryUnlock = useCallback((password: string) => {
     if (PASSWORDS.has(password.trim())) {
@@ -129,22 +151,59 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     dirtyRef.current = true;
     clearOverridesLocal();
     void clearOverridesRemote();
-    setData({ version: 1, updatedAt: new Date().toISOString(), slides: {} });
-  }, []);
+    setData((prev) => {
+      pushHistory(prev);
+      return { version: 1, updatedAt: new Date().toISOString(), slides: {} };
+    });
+  }, [pushHistory]);
 
   const reload = useCallback((next: AllOverrides) => {
     dirtyRef.current = true;
-    setData(next);
+    setData((prev) => {
+      pushHistory(prev);
+      return next;
+    });
+  }, [pushHistory]);
+
+  const undo = useCallback(() => {
+    const past = historyRef.current.pop();
+    if (!past) return;
+    dirtyRef.current = true;
+    setData((curr) => {
+      futureRef.current.push(curr);
+      if (futureRef.current.length > HISTORY_LIMIT) futureRef.current.shift();
+      return past;
+    });
+    bumpHistory();
   }, []);
+
+  const redo = useCallback(() => {
+    const next = futureRef.current.pop();
+    if (!next) return;
+    dirtyRef.current = true;
+    setData((curr) => {
+      historyRef.current.push(curr);
+      if (historyRef.current.length > HISTORY_LIMIT) historyRef.current.shift();
+      return next;
+    });
+    bumpHistory();
+  }, []);
+
+  const canUndo = historyRef.current.length > 0;
+  const canRedo = futureRef.current.length > 0;
+  // 引用 historyVersion 让 memo 重算
+  void historyVersion;
 
   const value = useMemo<EditorContextValue>(() => ({
     unlocked, editing, data, loaded, saving, currentSlide, setCurrentSlide,
     tryUnlock, lock, toggleEditing,
     updateText, updateImage, resetAll, reload,
+    undo, redo, canUndo, canRedo,
   }), [
     unlocked, editing, data, loaded, saving, currentSlide,
     tryUnlock, lock, toggleEditing,
     updateText, updateImage, resetAll, reload,
+    undo, redo, canUndo, canRedo,
   ]);
 
   return <EditorContext.Provider value={value}>{children}</EditorContext.Provider>;
