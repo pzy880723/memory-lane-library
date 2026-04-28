@@ -362,7 +362,5 @@ async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): P
   }
   if (!url) throw new Error("生成失败");
 
-  // 下载
-  onProgress?.({ phase: "downloading", message: "保存到本地…" });
-  await triggerDownload(cdnUrl ?? fileBlob, filename);
+  await triggerDownload(url, filename);
 }
