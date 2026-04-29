@@ -16,6 +16,17 @@ import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
 import { PasswordDialog } from "@/components/editor/PasswordDialog";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 
+function formatRelativeTime(ts: number): string {
+  const diff = Date.now() - ts;
+  const sec = Math.floor(diff / 1000);
+  if (sec < 60) return "刚刚";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} 分钟前`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} 小时前`;
+  return `${Math.floor(hr / 24)} 天前`;
+}
+
 const IndexInner = () => {
   const [current, setCurrent] = useState(0);
   const [showThumbs, setShowThumbs] = useState(false);
