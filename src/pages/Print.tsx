@@ -2,15 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { SLIDES } from "@/components/slides/registry";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
-import { EditorProvider } from "@/lib/editor/EditorContext";
+import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
 
 /**
- * 纯净的单页 1920×1080 渲染路由,供导出截图使用。
+ * 1920×1080 单页渲染路由,供导出截图使用。
  * URL: /print/1, /print/2 ... /print/N
  *
- * - 无导航 / 无缩放,1:1 渲染
- * - 应用云端 overrides(文字 / 图片 / 字号 / 颜色)
- * - 等字体 + 图片就绪后给 body 加 data-ready="1"
+ * - 应用云端 overrides
+ * - 等 EditorProvider 拉到云端数据 + 字体 + 图片就绪后,给 body 加 data-ready="1"
  */
 function PrintInner() {
   const { n } = useParams<{ n: string }>();
@@ -18,13 +17,14 @@ function PrintInner() {
   const slide = SLIDES[index];
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState<HTMLDivElement | null>(null);
+  const editor = useEditor();
 
-  // 应用 overrides(和正式播放页保持一致)
+  // 应用 overrides(和正式播放页一致)
   useApplyOverrides(
     index,
     containerRef,
-    () => { /* 截图模式不允许选中图片 */ },
-    () => { /* 截图模式不允许选中文字 */ },
+    () => { /* 截图模式不允许选中 */ },
+    () => { /* 截图模式不允许选中 */ },
     mounted,
   );
 
@@ -34,10 +34,17 @@ function PrintInner() {
     document.body.style.margin = "0";
     document.body.style.background = "transparent";
     document.body.style.overflow = "hidden";
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    // 等编辑器数据就绪
+    if (!editor.loaded) return;
 
     let cancelled = false;
+    document.body.setAttribute("data-ready", "0");
+
     const ready = async () => {
-      // 字体加载
       try { await document.fonts?.ready; } catch { /* noop */ }
       const fontProbes = [
         '700 48px "Noto Serif SC"',
@@ -49,7 +56,7 @@ function PrintInner() {
         await Promise.all(fontProbes.map((f) => document.fonts.load(f, "测试中文 Test")));
       } catch { /* noop */ }
       try { await document.fonts?.ready; } catch { /* noop */ }
-      // 等图片
+
       const imgs = Array.from(document.querySelectorAll("img"));
       await Promise.all(imgs.map((img) =>
         img.complete && img.naturalWidth > 0
@@ -59,7 +66,6 @@ function PrintInner() {
               img.addEventListener("error", () => res(), { once: true });
             })
       ));
-      // 多 wait 几帧让布局稳定
       await new Promise((r) => requestAnimationFrame(() => r(null)));
       await new Promise((r) => requestAnimationFrame(() => r(null)));
       await new Promise((r) => setTimeout(r, 250));
@@ -68,7 +74,7 @@ function PrintInner() {
     ready();
 
     return () => { cancelled = true; };
-  }, [index, mounted]);
+  }, [index, mounted, editor.loaded, editor.data]);
 
   if (!slide) return null;
 
