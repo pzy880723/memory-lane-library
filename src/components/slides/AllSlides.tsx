@@ -1393,10 +1393,8 @@ export function Slide19FlipperFun({ pageNumber, totalPages }: { pageNumber: numb
           </div>
         </div>
 
-        <div className="col-span-5 flex flex-col gap-4 justify-center">
-          <img decoding="async" loading="eager" src={photoCups} alt="翻筐乐" className="w-full h-[260px] object-cover photo-vintage rotate-[2deg]" />
-          <img decoding="async" loading="eager" src={photoPikachu} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[-2deg]" />
-          <img decoding="async" loading="eager" src={photoUltraman} alt="翻筐乐" className="w-full h-[220px] object-cover photo-vintage rotate-[1deg]" />
+        <div className="col-span-5 flex flex-col justify-center">
+          <img decoding="async" loading="eager" src={photoCups} alt="翻筐乐" className="w-full h-full max-h-[720px] object-cover photo-vintage rotate-[2deg]" />
         </div>
       </div>
     </SlideShell>
