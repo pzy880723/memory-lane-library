@@ -402,13 +402,13 @@ const IndexInner = () => {
                 {precache.phase === "running" && (
                   <div className="px-3 py-2 text-xs text-muted-foreground flex items-center gap-2 border-b">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
-                    <span>正在后台更新最新版文档…</span>
+                    <span>正在后台高清截图生成最新版 PDF / PPT…</span>
                   </div>
                 )}
                 {precache.phase === "success" && (
                   <div className="px-3 py-2 text-xs text-emerald-600 flex items-center gap-2 border-b">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>文档已更新到最新版本</span>
+                    <span>PDF / PPT 已更新到最新版本</span>
                   </div>
                 )}
                 {precache.phase === "error" && (
