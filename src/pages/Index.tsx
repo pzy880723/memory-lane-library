@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronLeft, ChevronRight, Download, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation, Loader2, CheckCircle2,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
