@@ -366,16 +366,50 @@ const IndexInner = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
+                  className="relative bg-boomer-red text-paper-cream hover:bg-boomer-red-deep gap-2"
                   disabled={!!downloading}
                 >
                   <Download className="w-4 h-4" />
                   <span className="hidden sm:inline">
                     {downloading ? "准备中…" : "下载"}
                   </span>
+                  {precache.phase === "running" && (
+                    <span
+                      title="正在后台更新文档…"
+                      className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 animate-pulse ring-2 ring-paper-cream/50"
+                    />
+                  )}
+                  {precache.phase === "success" && (
+                    <span
+                      title="文档已是最新版本"
+                      className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-paper-cream/50"
+                    />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-60">
+                {precache.phase === "running" && (
+                  <div className="px-3 py-2 text-xs text-muted-foreground flex items-center gap-2 border-b">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                    <span>正在后台更新最新版文档…</span>
+                  </div>
+                )}
+                {precache.phase === "success" && (
+                  <div className="px-3 py-2 text-xs text-emerald-600 flex items-center gap-2 border-b">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>文档已更新到最新版本</span>
+                  </div>
+                )}
+                {precache.phase === "error" && (
+                  <div className="px-3 py-2 text-xs text-destructive border-b">
+                    后台生成失败,点击下载将重新生成
+                  </div>
+                )}
+                {precache.phase === "idle" && precache.lastSuccessAt && (
+                  <div className="px-3 py-2 text-xs text-muted-foreground border-b">
+                    上次更新: {formatRelativeTime(precache.lastSuccessAt)}
+                  </div>
+                )}
                 <DropdownMenuItem
                   onClick={() => handleExport("pdf")}
                   disabled={!!downloading}
