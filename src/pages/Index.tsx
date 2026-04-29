@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { decodeForSlide } from "@/lib/preloadImages";
-import { downloadPDF, downloadPPTX } from "@/lib/export";
+import { downloadPDF, downloadPPTX, subscribePrecache, getPrecacheStatus, type PrecacheStatus } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
