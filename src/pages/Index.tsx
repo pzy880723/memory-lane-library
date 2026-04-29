@@ -25,7 +25,11 @@ const IndexInner = () => {
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
   const [downloading, setDownloading] = useState<"pdf" | "pptx" | null>(null);
+  const [precache, setPrecache] = useState<PrecacheStatus>(() => getPrecacheStatus());
   const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => subscribePrecache(setPrecache), []);
+
 
   // 编辑器入口：5 击 logo
   const [showPwd, setShowPwd] = useState(false);
