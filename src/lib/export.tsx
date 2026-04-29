@@ -256,6 +256,32 @@ const inflight: Record<"pdf" | "pptx", Promise<string | null> | null> = { pdf: n
 let lastPrecacheAt = 0;
 const PRECACHE_MIN_INTERVAL_MS = 30_000; // 同一会话至少间隔 30s 才允许再跑一次
 
+/* ─── 静默生成状态:供 UI 订阅 ─── */
+export type PrecacheStatus =
+  | { phase: "idle"; lastSuccessAt: number | null }
+  | { phase: "running"; startedAt: number; lastSuccessAt: number | null }
+  | { phase: "success"; lastSuccessAt: number }
+  | { phase: "error"; lastSuccessAt: number | null; message?: string };
+
+let precacheStatus: PrecacheStatus = { phase: "idle", lastSuccessAt: null };
+const precacheListeners = new Set<(s: PrecacheStatus) => void>();
+let successResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+function setPrecacheStatus(s: PrecacheStatus) {
+  precacheStatus = s;
+  precacheListeners.forEach((fn) => { try { fn(s); } catch { /* noop */ } });
+}
+
+export function getPrecacheStatus(): PrecacheStatus {
+  return precacheStatus;
+}
+
+export function subscribePrecache(fn: (s: PrecacheStatus) => void): () => void {
+  precacheListeners.add(fn);
+  return () => { precacheListeners.delete(fn); };
+}
+
+
 interface GenerateResult { url: string | null; hash: string; fromCache: boolean; }
 
 /**
@@ -319,6 +345,12 @@ export async function precacheAll(opts: { force?: boolean } = {}): Promise<void>
     return;
   }
 
+  const prevSuccess = precacheStatus.phase === "success" || precacheStatus.phase === "idle"
+    ? precacheStatus.lastSuccessAt
+    : precacheStatus.lastSuccessAt;
+  setPrecacheStatus({ phase: "running", startedAt: now, lastSuccessAt: prevSuccess });
+  if (successResetTimer) { clearTimeout(successResetTimer); successResetTimer = null; }
+
   const run = async (type: "pdf" | "pptx") => {
     if (inflight[type]) return inflight[type];
     const p = generateAndCache(type, { force: opts.force })
@@ -333,9 +365,28 @@ export async function precacheAll(opts: { force?: boolean } = {}): Promise<void>
   };
 
   console.info("[precache] 开始静默生成 PDF + PPTX…");
-  await Promise.all([run("pdf"), run("pptx")]);
-  lastPrecacheAt = Date.now();
-  console.info("[precache] 完成");
+  try {
+    const results = await Promise.all([run("pdf"), run("pptx")]);
+    lastPrecacheAt = Date.now();
+    const allOk = results.every((u) => !!u);
+    if (allOk) {
+      setPrecacheStatus({ phase: "success", lastSuccessAt: lastPrecacheAt });
+      successResetTimer = setTimeout(() => {
+        setPrecacheStatus({ phase: "idle", lastSuccessAt: lastPrecacheAt });
+      }, 5000);
+    } else {
+      setPrecacheStatus({ phase: "error", lastSuccessAt: prevSuccess, message: "部分文档生成失败" });
+      successResetTimer = setTimeout(() => {
+        setPrecacheStatus({ phase: "idle", lastSuccessAt: prevSuccess });
+      }, 5000);
+    }
+    console.info("[precache] 完成");
+  } catch (err) {
+    setPrecacheStatus({ phase: "error", lastSuccessAt: prevSuccess, message: String(err) });
+    successResetTimer = setTimeout(() => {
+      setPrecacheStatus({ phase: "idle", lastSuccessAt: prevSuccess });
+    }, 5000);
+  }
 }
 
 async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
