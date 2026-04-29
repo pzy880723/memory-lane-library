@@ -256,6 +256,32 @@ const inflight: Record<"pdf" | "pptx", Promise<string | null> | null> = { pdf: n
 let lastPrecacheAt = 0;
 const PRECACHE_MIN_INTERVAL_MS = 30_000; // 同一会话至少间隔 30s 才允许再跑一次
 
+/* ─── 静默生成状态:供 UI 订阅 ─── */
+export type PrecacheStatus =
+  | { phase: "idle"; lastSuccessAt: number | null }
+  | { phase: "running"; startedAt: number; lastSuccessAt: number | null }
+  | { phase: "success"; lastSuccessAt: number }
+  | { phase: "error"; lastSuccessAt: number | null; message?: string };
+
+let precacheStatus: PrecacheStatus = { phase: "idle", lastSuccessAt: null };
+const precacheListeners = new Set<(s: PrecacheStatus) => void>();
+let successResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+function setPrecacheStatus(s: PrecacheStatus) {
+  precacheStatus = s;
+  precacheListeners.forEach((fn) => { try { fn(s); } catch { /* noop */ } });
+}
+
+export function getPrecacheStatus(): PrecacheStatus {
+  return precacheStatus;
+}
+
+export function subscribePrecache(fn: (s: PrecacheStatus) => void): () => void {
+  precacheListeners.add(fn);
+  return () => { precacheListeners.delete(fn); };
+}
+
+
 interface GenerateResult { url: string | null; hash: string; fromCache: boolean; }
 
 /**
