@@ -1,60 +1,82 @@
 ## 目标
 
-让用户在「下载」按钮区域看到后台静默生成 PDF/PPT 的状态，知道云端文档是否已是最新。
+彻底解决 PPT 再次出现的乱码、错位、拉伸问题，并避免“明明刚调好，后来又回到旧版本”的情况。导出逻辑改成以网页真实渲染结果为唯一来源，不再依赖当前这套容易失真的前端离屏栅格化方式。
 
-## 实现思路
+## 计划
 
-### 1. `src/lib/export.tsx` — 暴露后台生成状态
+### 1. 找出并移除当前回退源头
 
-新增一个简单的发布订阅(模块级):
+先修正当前导出链路里导致“旧版本反复出现”的两个核心问题：
 
-```ts
-export type PrecacheStatus =
-  | { phase: "idle"; lastSuccessAt: number | null }
-  | { phase: "running"; startedAt: number }
-  | { phase: "success"; lastSuccessAt: number }
-  | { phase: "error"; message?: string };
+- `src/lib/export.tsx` 里的内容哈希目前只稳定到了最外层 slide key，嵌套的文字/图片改动没有完整进入哈希，导致不同内容可能复用同一个导出版本。
+- 现在上传到云端时复用了同一路径并开启长期缓存，哪怕后台重新生成，下载时也可能继续拿到旧文件。
 
-export function getPrecacheStatus(): PrecacheStatus
-export function subscribePrecache(fn: (s) => void): () => void  // 返回 unsubscribe
-```
+这一步会把导出版本号、完整内容快照、页数等一起纳入新的稳定哈希，并改成“新内容新文件路径”，从根上切断旧缓存回流。
 
-在 `precacheAll` 内部:
-- 开始时 `setStatus({ phase: "running", startedAt: now })`
-- 全部完成后 `setStatus({ phase: "success", lastSuccessAt: now })`
-- 失败时 `setStatus({ phase: "error", ... })`
-- 5 秒后自动回到 `idle`(避免一直停在 success 提示上)
+### 2. 把导出图片改成“真实网页高清截图”
 
-### 2. `src/pages/Index.tsx` — 在下载按钮上显示状态
+放弃当前 `html2canvas + React 离屏节点` 的图片生成方式，改为基于现有 `/print/:n` 导出页直接做 1920×1080 高清截图：
 
-新增一个 `usePrecacheStatus()` 自定义 hook(或直接 useState + useEffect 订阅)。
+- `src/pages/Print.tsx` 继续作为导出专用页面
+- 增强它的“导出就绪”逻辑，确保字体、图片、覆盖内容、布局全部稳定后才允许截图
+- 每一页先得到一张真实截图图片，再用这批图片去拼 PDF 和 PPT
 
-下载按钮文案/视觉变化:
+这样 PDF 和 PPT 的视觉来源完全一致，页面上看到什么，导出就是什么，不会再出现字体替换、层级错乱、比例拉伸这类 html2canvas 常见问题。
 
-| 状态 | 按钮文案 | 副文案/角标 |
-|------|---------|------------|
-| `idle` (从未生成) | 下载 | (无) |
-| `running` | 下载 | 旋转图标 + 「正在更新文档…」 |
-| `success` (5s 内) | 下载 | 绿色 ✓ 「已是最新版本」 |
-| 用户点击下载中 (`downloading`) | 准备中… | (现有逻辑保持) |
+### 3. 恢复为截图优先的导出总线
 
-具体改动:
-- 在 `<DropdownMenuTrigger>` 的 Button 旁边或下方加一个小角标(absolute 定位的圆点)。
-- 在 `<DropdownMenuContent>` 顶部加一行小字状态条:
-  - running: `🔄 正在后台更新 PDF/PPT…(约 30 秒)`
-  - success: `✓ 文档已更新到最新版本`
-  - idle 且 `lastSuccessAt` 存在: `上次更新: X 分钟前`
-  - idle 且 `lastSuccessAt` 为 null: 不显示
+重构 `src/lib/export.tsx`：
 
-### 3. 视觉细节
+- 保留下载按钮、后台静默预生成、状态提示这些现有交互
+- 但底层生成改成“先逐页截图，再打包 PDF/PPT”
+- PDF 和 PPT 都共用同一批截图资源，避免两套逻辑各自出错
+- 失败时不给旧缓存兜底冒充最新版，而是明确提示本次生成失败
 
-- 使用现有 `Loader2` 图标(已 import 过) + `animate-spin` 类
-- 颜色用语义 token:成功用 `text-green-600`(若没有就加到 tailwind config)、运行中用 `text-muted-foreground`
-- 角标:右上角 `w-2 h-2 rounded-full bg-amber-500 animate-pulse`(运行中时显示)
+### 4. 保证编辑后的后台预生成一定对应最新内容
+
+同步修正静默预生成逻辑：
+
+- 编辑后的后台任务必须基于最新 overrides 重新计算版本
+- 新版本生成完成后，直接替换为新的缓存记录
+- 下载时优先拿“当前版本对应的生成结果”，不再误命中过去的文件
+
+同时会把下载区域状态文案改得更明确，例如：
+
+- 正在后台高清截图生成文档
+- 正在更新最新版 PDF/PPT
+- 文档已更新到最新版本
+
+### 5. 验证重点
+
+实施后会重点验证这几类场景：
+
+- 修改文字后，PPT 不再出现乱码/换行错乱
+- 修改图片后，PPT 不再出现拉伸、比例异常
+- 连续多次编辑后，下载到的一定是最新版本，不会回到旧文件
+- 后台静默生成完成后，下载几乎立即可用
+- PDF 与 PPT 页面视觉保持一致
 
 ## 涉及文件
 
-- `src/lib/export.tsx` — 新增订阅 API + 在 `precacheAll` 内更新状态
-- `src/pages/Index.tsx` — 订阅状态 + 在下载按钮区显示
+- `src/lib/export.tsx` — 导出链路、哈希、缓存、后台预生成
+- `src/pages/Print.tsx` — 导出页就绪时机、截图专用渲染
+- 可能补充一个导出专用截图辅助模块，用于统一每页截图和打包逻辑
+- `src/pages/Index.tsx` — 只做必要的状态文案微调
 
-不涉及数据库、edge function 或其他文件。
+## 技术说明
+
+### 已确认的根因
+
+当前回退并不只是“截图质量问题”，还有缓存版本问题：
+
+1. 现有内容哈希没有完整覆盖嵌套编辑内容
+2. 同一路径反复覆盖配合长期缓存，容易把旧文件继续发回来
+3. `html2canvas` 对复杂字体、描边字、旋转卡片、滤镜、绝对定位内容本来就更容易失真
+
+所以这次不是只调参数，而是直接把导出来源切到“网页真实截图”，并同时修掉版本缓存策略。
+
+### 不涉及
+
+- 不需要改数据库表结构
+- 不需要新增编辑器页面
+- 不改你当前的编辑交互，只改导出生成方式和缓存策略
