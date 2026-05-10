@@ -171,32 +171,38 @@ async function loadPrintPage(iframe: HTMLIFrameElement, index: number, hashBust:
   return doc;
 }
 
-async function captureIframe(iframe: HTMLIFrameElement, quality = 0.92): Promise<Blob> {
+async function captureIframe(iframe: HTMLIFrameElement, quality = 0.95): Promise<Blob> {
   const doc = iframe.contentDocument;
   if (!doc) throw new Error("无法访问 iframe 文档");
-  const target = doc.body;
-  const html2canvas = await loadHtml2Canvas();
-  const canvas = await html2canvas(target, {
-    width: 1920,
-    height: 1080,
-    windowWidth: 1920,
-    windowHeight: 1080,
-    scale: 1.5,
-    useCORS: true,
-    allowTaint: false,
-    backgroundColor: null,
-    logging: false,
-    imageTimeout: 20000,
-    foreignObjectRendering: false,
+  // 优先抓 .slide-content,它是固定 1920×1080 的真实舞台
+  const target =
+    (doc.querySelector(".slide-content") as HTMLElement | null) ?? doc.body;
+
+  // 复制父文档已加载好的 webfont,确保 iframe SVG foreignObject 也能用
+  // (iframe 自己也加载了 index.css,但 html-to-image 内部会内联字体,这里冗余保险)
+  const htmlToImage = await loadHtmlToImage();
+
+  const dataUrl = await htmlToImage.toJpeg(target, {
+    width: CAPTURE_W,
+    height: CAPTURE_H,
+    canvasWidth: CAPTURE_W * CAPTURE_PIXEL_RATIO,
+    canvasHeight: CAPTURE_H * CAPTURE_PIXEL_RATIO,
+    pixelRatio: CAPTURE_PIXEL_RATIO,
+    quality,
+    backgroundColor: "#F5EFE0",
+    cacheBust: false,
+    skipFonts: false,
+    style: {
+      transform: "none",
+      transformOrigin: "top left",
+      width: `${CAPTURE_W}px`,
+      height: `${CAPTURE_H}px`,
+    },
   });
 
-  const blob: Blob = await new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("canvas.toBlob 返回 null"))),
-      "image/jpeg",
-      quality,
-    );
-  });
+  // dataUrl → Blob
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
   return blob;
 }
 
