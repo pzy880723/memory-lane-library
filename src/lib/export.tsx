@@ -7,7 +7,7 @@
  *  3. 否则:
  *     - 在隐藏 iframe 里以 1920×1080 加载 /print/N 路由
  *       (Print 路由会自动应用最新 overrides + 等字体/图片就绪)
- *     - iframe 就绪后用 html2canvas 截取整个 iframe 文档为 JPEG
+ *     - iframe 就绪后用 html-to-image (foreignObject SVG) 截取真实页面为 JPEG
  *     - PDF: pdf-lib 拼接;PPTX: pptxgenjs 拼接
  *  4. 上传到 Storage 的 exports 桶(每个 hash 一个独立文件,绝不复用)
  *  5. 触发 blob 下载
