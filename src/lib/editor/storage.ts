@@ -106,28 +106,81 @@ export async function clearOverridesRemote(): Promise<void> {
 
 /* ─────────────── 图片上传到 Storage ─────────────── */
 
+const MAX_DIMENSION = 1920;
+const COMPRESS_QUALITY = 0.85;
+const COMPRESS_MIN_BYTES = 200 * 1024; // < 200KB 的图就不再压
+
+/**
+ * 客户端缩放 + 重编码:把手机大图(几 MB)压成 ≤ MAX_DIMENSION 边的 webp。
+ * 解码失败、SVG / GIF 等保留原文件。
+ */
+async function compressImageFile(file: File): Promise<{ data: Blob; ext: string }> {
+  const isRaster = /^image\/(jpeg|jpg|png|webp)$/i.test(file.type);
+  const ext0 = (/\.([a-z0-9]{1,5})$/i.exec(file.name)?.[1] ?? file.type.split("/")[1] ?? "bin").toLowerCase();
+  if (!isRaster || file.size < COMPRESS_MIN_BYTES) {
+    return { data: file, ext: ext0 };
+  }
+  try {
+    const bitmap = await createImageBitmap(file);
+    const { width, height } = bitmap;
+    const longest = Math.max(width, height);
+    const scale = longest > MAX_DIMENSION ? MAX_DIMENSION / longest : 1;
+    const w = Math.round(width * scale);
+    const h = Math.round(height * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { bitmap.close(); return { data: file, ext: ext0 }; }
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+
+    // 优先 webp,Safari 老版本兜底 jpeg
+    const tryEncode = (mime: string): Promise<Blob | null> =>
+      new Promise((resolve) => canvas.toBlob((b) => resolve(b), mime, COMPRESS_QUALITY));
+    let blob = await tryEncode("image/webp");
+    let outExt = "webp";
+    if (!blob) {
+      blob = await tryEncode("image/jpeg");
+      outExt = "jpg";
+    }
+    if (!blob || blob.size >= file.size) {
+      // 压缩反而更大 → 用原图
+      return { data: file, ext: ext0 };
+    }
+    return { data: blob, ext: outExt };
+  } catch (err) {
+    console.warn("[storage] image compress failed, upload original:", err);
+    return { data: file, ext: ext0 };
+  }
+}
+
 /**
  * 上传一张图片到 editor-images bucket,返回公开 URL。
- * 路径形如 slide-12/abc123-1738000000.jpg
+ * 上传前在浏览器里做缩放 + webp 编码,大图也能秒传。
  */
 export async function uploadImageToCloud(
   file: File,
   slideIndex: number,
   key: string,
 ): Promise<string> {
-  // 文件名清理,只保留扩展名
-  const m = /\.([a-z0-9]{1,5})$/i.exec(file.name);
-  const ext = (m ? m[1] : (file.type.split("/")[1] ?? "bin")).toLowerCase();
-  // key 可能包含 / 等,做安全替换
+  const { data: blob, ext } = await compressImageFile(file);
   const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 60);
   const path = `slide-${slideIndex}/${safeKey}-${Date.now()}.${ext}`;
 
+  const contentType =
+    ext === "webp" ? "image/webp" :
+    ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
+    ext === "png" ? "image/png" :
+    (file.type || undefined);
+
   const { error } = await supabase.storage
     .from(IMAGE_BUCKET)
-    .upload(path, file, {
+    .upload(path, blob, {
       cacheControl: "31536000",
       upsert: false,
-      contentType: file.type || undefined,
+      contentType,
     });
   if (error) throw error;
 
