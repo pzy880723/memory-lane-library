@@ -57,6 +57,15 @@ export const ASSETS = {
 
 const ALL_SRCS: string[] = Object.values(ASSETS);
 
+// 高优先组:封面、Logo、二维码、首屏 1-3 页大图 → 启动立刻 high
+const HIGH_PRIORITY_SRCS: string[] = [
+  ASSETS.logo,
+  ASSETS.photoSatoDetail,
+  ASSETS.photoVinyl,
+  ASSETS.photoCeramics,
+  ASSETS.wechatQR,
+];
+
 /* ───────────── 1. 下载阶段：把所有图塞进 HTTP 缓存 ───────────── */
 
 let downloadStarted = false;
@@ -66,17 +75,29 @@ export function preloadAllImages() {
   if (downloadStarted || typeof window === "undefined") return;
   downloadStarted = true;
 
-  // 用 fetch 而不是 new Image()，避免触发自动 decode
-  // priority: "low" 让首屏关键资源（JS/CSS）先走
-  // priority 在 RequestInit 上还不是标准类型，但 Chrome 已支持
-  const init: RequestInit & { priority?: "high" | "low" | "auto" } = {
-    priority: "low",
-    cache: "force-cache",
-  };
-  for (const src of ALL_SRCS) {
+  const fetchWith = (src: string, priority: "high" | "low") => {
+    const init: RequestInit & { priority?: "high" | "low" | "auto" } = {
+      priority,
+      cache: "force-cache",
+    };
     fetch(src, init)
       .then(() => downloadedSrcs.add(src))
       .catch(() => { /* ignore */ });
+  };
+
+  // 首屏关键图先 high
+  for (const src of HIGH_PRIORITY_SRCS) fetchWith(src, "high");
+
+  // 其余空闲再拉,不挤首屏带宽
+  const rest = ALL_SRCS.filter((s) => !HIGH_PRIORITY_SRCS.includes(s));
+  const startRest = () => { for (const src of rest) fetchWith(src, "low"); };
+  const w = window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+  };
+  if (typeof w.requestIdleCallback === "function") {
+    w.requestIdleCallback(startRest, { timeout: 1500 });
+  } else {
+    setTimeout(startRest, 600);
   }
 }
 
