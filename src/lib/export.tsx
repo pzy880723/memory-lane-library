@@ -7,7 +7,7 @@
  *  3. 否则:
  *     - 在隐藏 iframe 里以 1920×1080 加载 /print/N 路由
  *       (Print 路由会自动应用最新 overrides + 等字体/图片就绪)
- *     - iframe 就绪后用 html2canvas 截取整个 iframe 文档为 JPEG
+ *     - iframe 就绪后用 html-to-image (foreignObject SVG) 截取真实页面为 JPEG
  *     - PDF: pdf-lib 拼接;PPTX: pptxgenjs 拼接
  *  4. 上传到 Storage 的 exports 桶(每个 hash 一个独立文件,绝不复用)
  *  5. 触发 blob 下载
@@ -21,12 +21,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { SLIDES } from "@/components/slides/registry";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
 
-const loadHtml2Canvas = () => import("html2canvas").then((m) => m.default);
+const loadHtmlToImage = () => import("html-to-image");
 const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
 const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
-const EXPORT_VERSION = "v3-screenshot";
+const EXPORT_VERSION = "v4-foreignobject";
+const CAPTURE_W = 1920;
+const CAPTURE_H = 1080;
+const CAPTURE_PIXEL_RATIO = 2;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
 export interface ExportProgress {
@@ -168,32 +171,38 @@ async function loadPrintPage(iframe: HTMLIFrameElement, index: number, hashBust:
   return doc;
 }
 
-async function captureIframe(iframe: HTMLIFrameElement, quality = 0.92): Promise<Blob> {
+async function captureIframe(iframe: HTMLIFrameElement, quality = 0.95): Promise<Blob> {
   const doc = iframe.contentDocument;
   if (!doc) throw new Error("无法访问 iframe 文档");
-  const target = doc.body;
-  const html2canvas = await loadHtml2Canvas();
-  const canvas = await html2canvas(target, {
-    width: 1920,
-    height: 1080,
-    windowWidth: 1920,
-    windowHeight: 1080,
-    scale: 1.5,
-    useCORS: true,
-    allowTaint: false,
-    backgroundColor: null,
-    logging: false,
-    imageTimeout: 20000,
-    foreignObjectRendering: false,
+  // 优先抓 .slide-content,它是固定 1920×1080 的真实舞台
+  const target =
+    (doc.querySelector(".slide-content") as HTMLElement | null) ?? doc.body;
+
+  // 复制父文档已加载好的 webfont,确保 iframe SVG foreignObject 也能用
+  // (iframe 自己也加载了 index.css,但 html-to-image 内部会内联字体,这里冗余保险)
+  const htmlToImage = await loadHtmlToImage();
+
+  const dataUrl = await htmlToImage.toJpeg(target, {
+    width: CAPTURE_W,
+    height: CAPTURE_H,
+    canvasWidth: CAPTURE_W * CAPTURE_PIXEL_RATIO,
+    canvasHeight: CAPTURE_H * CAPTURE_PIXEL_RATIO,
+    pixelRatio: CAPTURE_PIXEL_RATIO,
+    quality,
+    backgroundColor: "#F5EFE0",
+    cacheBust: false,
+    skipFonts: false,
+    style: {
+      transform: "none",
+      transformOrigin: "top left",
+      width: `${CAPTURE_W}px`,
+      height: `${CAPTURE_H}px`,
+    },
   });
 
-  const blob: Blob = await new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("canvas.toBlob 返回 null"))),
-      "image/jpeg",
-      quality,
-    );
-  });
+  // dataUrl → Blob
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
   return blob;
 }
 
