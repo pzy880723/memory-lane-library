@@ -21,12 +21,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { SLIDES } from "@/components/slides/registry";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
 
-const loadHtml2Canvas = () => import("html2canvas").then((m) => m.default);
+const loadHtmlToImage = () => import("html-to-image");
 const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
 const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
-const EXPORT_VERSION = "v3-screenshot";
+const EXPORT_VERSION = "v4-foreignobject";
+const CAPTURE_W = 1920;
+const CAPTURE_H = 1080;
+const CAPTURE_PIXEL_RATIO = 2;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
 export interface ExportProgress {
