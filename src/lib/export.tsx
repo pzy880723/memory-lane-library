@@ -116,94 +116,40 @@ async function uploadAndRecord(
 
 /* ─────────────── 隐藏 iframe 截屏 ─────────────── */
 
-interface IframeHandle {
-  iframe: HTMLIFrameElement;
-  cleanup: () => void;
+/* ─────────────── 服务端截图 (Browserless via Edge Function) ─────────────── */
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const RENDER_FN_URL = `${SUPABASE_URL}/functions/v1/render-slide`;
+
+function publicPrintUrl(index: number, hashBust: string): string {
+  // Browserless 必须能访问到这个 URL —— 用当前部署 origin
+  return `${window.location.origin}/print/${index + 1}?v=${encodeURIComponent(hashBust)}`;
 }
 
-function createCaptureIframe(): IframeHandle {
-  const iframe = document.createElement("iframe");
-  iframe.setAttribute("aria-hidden", "true");
-  iframe.style.position = "fixed";
-  iframe.style.top = "0";
-  iframe.style.left = "0";
-  iframe.style.width = "1920px";
-  iframe.style.height = "1080px";
-  iframe.style.border = "0";
-  iframe.style.background = "transparent";
-  iframe.style.pointerEvents = "none";
-  iframe.style.opacity = "0";
-  iframe.style.zIndex = "-1";
-  // 关键:让 iframe 视口本身就是 1920×1080,媒体查询 / 像素布局都和正常播放一致
-  document.body.appendChild(iframe);
-  return {
-    iframe,
-    cleanup: () => {
-      try { document.body.removeChild(iframe); } catch { /* noop */ }
+async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
+  const url = publicPrintUrl(index, hashBust);
+  const resp = await fetch(RENDER_FN_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
     },
-  };
-}
-
-async function loadPrintPage(iframe: HTMLIFrameElement, index: number, hashBust: string): Promise<Document> {
-  const url = `${window.location.origin}/print/${index + 1}?v=${encodeURIComponent(hashBust)}`;
-  await new Promise<void>((resolve, reject) => {
-    const onLoad = () => { iframe.removeEventListener("load", onLoad); resolve(); };
-    const onErr = () => { iframe.removeEventListener("error", onErr); reject(new Error("iframe 加载失败")); };
-    iframe.addEventListener("load", onLoad);
-    iframe.addEventListener("error", onErr);
-    iframe.src = url;
+    body: JSON.stringify({
+      url,
+      width: CAPTURE_W,
+      height: CAPTURE_H,
+      pixelRatio: CAPTURE_PIXEL_RATIO,
+      quality: 92,
+    }),
   });
-
-  const doc = iframe.contentDocument;
-  if (!doc) throw new Error("无法访问 iframe 文档");
-
-  // 等 Print 页就绪标记
-  const startedAt = Date.now();
-  while (Date.now() - startedAt < 30000) {
-    if (doc.body?.getAttribute("data-ready") === "1") break;
-    await new Promise((r) => setTimeout(r, 120));
+  if (!resp.ok) {
+    let detail = "";
+    try { detail = await resp.text(); } catch { /* noop */ }
+    throw new Error(`第 ${index + 1} 页截图失败 (${resp.status}): ${detail.slice(0, 200)}`);
   }
-
-  // 再多等一帧 + 字体二次确认
-  try { await doc.fonts?.ready; } catch { /* noop */ }
-  await new Promise((r) => setTimeout(r, 120));
-
-  return doc;
-}
-
-async function captureIframe(iframe: HTMLIFrameElement, quality = 0.95): Promise<Blob> {
-  const doc = iframe.contentDocument;
-  if (!doc) throw new Error("无法访问 iframe 文档");
-  // 优先抓 .slide-content,它是固定 1920×1080 的真实舞台
-  const target =
-    (doc.querySelector(".slide-content") as HTMLElement | null) ?? doc.body;
-
-  // 复制父文档已加载好的 webfont,确保 iframe SVG foreignObject 也能用
-  // (iframe 自己也加载了 index.css,但 html-to-image 内部会内联字体,这里冗余保险)
-  const htmlToImage = await loadHtmlToImage();
-
-  const dataUrl = await htmlToImage.toJpeg(target, {
-    width: CAPTURE_W,
-    height: CAPTURE_H,
-    canvasWidth: CAPTURE_W * CAPTURE_PIXEL_RATIO,
-    canvasHeight: CAPTURE_H * CAPTURE_PIXEL_RATIO,
-    pixelRatio: CAPTURE_PIXEL_RATIO,
-    quality,
-    backgroundColor: "#F5EFE0",
-    cacheBust: false,
-    skipFonts: false,
-    style: {
-      transform: "none",
-      transformOrigin: "top left",
-      width: `${CAPTURE_W}px`,
-      height: `${CAPTURE_H}px`,
-    },
-  });
-
-  // dataUrl → Blob
-  const res = await fetch(dataUrl);
-  const blob = await res.blob();
-  return blob;
+  return await resp.blob();
 }
 
 async function renderAllSlidesToJpegs(
@@ -211,19 +157,29 @@ async function renderAllSlidesToJpegs(
   onProgress?: ProgressCallback,
 ): Promise<Blob[]> {
   const total = SLIDES.length;
-  const handle = createCaptureIframe();
-  const out: Blob[] = [];
-  try {
-    for (let i = 0; i < total; i++) {
-      onProgress?.({ phase: "rendering", current: i + 1, total });
-      await loadPrintPage(handle.iframe, i, hashBust);
-      out.push(await captureIframe(handle.iframe));
+  const out: Blob[] = new Array(total);
+  let done = 0;
+  let next = 0;
+
+  async function worker() {
+    while (true) {
+      const i = next++;
+      if (i >= total) return;
+      out[i] = await renderOneSlide(i, hashBust);
+      done++;
+      onProgress?.({ phase: "rendering", current: done, total });
     }
-  } finally {
-    handle.cleanup();
   }
+
+  onProgress?.({ phase: "rendering", current: 0, total });
+  const workers = Array.from(
+    { length: Math.min(RENDER_CONCURRENCY, total) },
+    () => worker(),
+  );
+  await Promise.all(workers);
   return out;
 }
+
 
 /* ─────────────── PDF / PPTX 打包 ─────────────── */
 
