@@ -21,7 +21,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { SLIDES } from "@/components/slides/registry";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
 
-const loadHtmlToImage = () => import("html-to-image");
 const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
