@@ -29,7 +29,7 @@ const EXPORT_VERSION = "v5-browserless";
 const CAPTURE_W = 1920;
 const CAPTURE_H = 1080;
 const CAPTURE_PIXEL_RATIO = 2;
-const RENDER_CONCURRENCY = 3;
+const RENDER_CONCURRENCY = 1;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
 export interface ExportProgress {
