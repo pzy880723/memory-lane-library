@@ -433,25 +433,33 @@ export async function precacheAll(opts: { force?: boolean } = {}): Promise<void>
 
 async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
   const filename = `${FILENAME_BASE}.${type}`;
+  const label = type.toUpperCase();
 
-  // 等任何在跑的同 type 后台任务完成
-  if (inflight[type]) {
-    onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
-    try {
-      const r = await inflight[type];
-      if (r?.url) {
-        onProgress?.({ phase: "downloading", message: "准备下载…" });
-        await triggerDownload(r.url, filename);
-        return;
-      }
-    } catch { /* fall through to fresh run */ }
+  try {
+    // 等任何在跑的同 type 后台任务完成
+    if (inflight[type]) {
+      onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
+      try {
+        const r = await inflight[type];
+        if (r?.url) {
+          onProgress?.({ phase: "downloading", message: "准备下载…" });
+          await triggerDownload(r.url, filename);
+          return;
+        }
+      } catch { /* fall through to fresh run */ }
+    }
+
+    const { url, fromCache } = await generateAndCache(type, { onProgress });
+    onProgress?.({
+      phase: "downloading",
+      message: fromCache ? "命中缓存,准备下载…" : "保存到本地…",
+    });
+    if (!url) throw new Error("生成失败");
+    await triggerDownload(url, filename);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[export] ${label} 导出失败:`, err);
+    toast.error(`${label} 导出失败`, { description: message.slice(0, 300) });
+    throw err;
   }
-
-  const { url, fromCache } = await generateAndCache(type, { onProgress });
-  onProgress?.({
-    phase: "downloading",
-    message: fromCache ? "命中缓存,准备下载…" : "保存到本地…",
-  });
-  if (!url) throw new Error("生成失败");
-  await triggerDownload(url, filename);
 }
