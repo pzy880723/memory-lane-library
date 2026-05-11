@@ -25,10 +25,12 @@ const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
 const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
-const EXPORT_VERSION = "v4-foreignobject";
+const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
+const EXPORT_VERSION = "v5-browserless";
 const CAPTURE_W = 1920;
 const CAPTURE_H = 1080;
 const CAPTURE_PIXEL_RATIO = 2;
+const RENDER_CONCURRENCY = 3;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
 export interface ExportProgress {
