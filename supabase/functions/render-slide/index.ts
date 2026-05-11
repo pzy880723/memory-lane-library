@@ -1,6 +1,11 @@
 // Server-side slide screenshot via Browserless.io
 // Renders /print/N at 1920x1080 @2x and returns JPEG bytes.
-import { corsHeaders } from "@supabase/supabase-js/cors";
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const BROWSERLESS_TOKEN = Deno.env.get("BROWSERLESS_TOKEN");
 const BROWSERLESS_BASE =
