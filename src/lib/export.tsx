@@ -127,7 +127,7 @@ function publicPrintUrl(index: number, hashBust: string): string {
   return `${window.location.origin}/print/${index + 1}?v=${encodeURIComponent(hashBust)}`;
 }
 
-async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
+async function renderOneSlideOnce(index: number, hashBust: string): Promise<Blob> {
   const url = publicPrintUrl(index, hashBust);
   const resp = await fetch(RENDER_FN_URL, {
     method: "POST",
@@ -150,6 +150,16 @@ async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
     throw new Error(`第 ${index + 1} 页截图失败 (${resp.status}): ${detail.slice(0, 200)}`);
   }
   return await resp.blob();
+}
+
+async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
+  try {
+    return await renderOneSlideOnce(index, hashBust);
+  } catch (err) {
+    console.warn(`[export] 第 ${index + 1} 页失败,2s 后重试:`, err);
+    await new Promise((r) => setTimeout(r, 2000));
+    return await renderOneSlideOnce(index, hashBust);
+  }
 }
 
 async function renderAllSlidesToJpegs(
