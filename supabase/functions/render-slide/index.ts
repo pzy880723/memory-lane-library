@@ -56,15 +56,20 @@ Deno.serve(async (req) => {
   const quality = body.quality ?? 92;
   const waitMs = body.waitMs ?? 300;
 
-  const payload = {
+  const basePayload = {
     url,
     options: { type: "jpeg", quality, fullPage: false, omitBackground: false },
     viewport: { width, height, deviceScaleFactor: pixelRatio },
-    gotoOptions: { waitUntil: "networkidle0", timeout: 60000 },
-    // Print 路由就绪后会把 body[data-ready] 置 1
-    waitForSelector: { selector: "body[data-ready='1']", timeout: 45000 },
+    gotoOptions: { waitUntil: "networkidle0", timeout: 90000 },
     waitForTimeout: waitMs,
   };
+  // 首选:等 Print 页 data-ready=1
+  const strictPayload = {
+    ...basePayload,
+    waitForSelector: { selector: "body[data-ready='1']", timeout: 90000 },
+  };
+  // 兜底:仅靠 networkidle0 + 多等 2.5s 让字体/图片落地
+  const lenientPayload = { ...basePayload, waitForTimeout: 2500 };
 
   const endpoint = `${BROWSERLESS_BASE}/screenshot?token=${encodeURIComponent(BROWSERLESS_TOKEN)}`;
   const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000];
@@ -73,6 +78,8 @@ Deno.serve(async (req) => {
     let lastStatus = 0;
     let lastText = "";
     for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+      // 最后一次重试改用宽松模式,避免 data-ready 卡死
+      const payload = attempt === RETRY_DELAYS_MS.length ? lenientPayload : strictPayload;
       const resp = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,12 +100,19 @@ Deno.serve(async (req) => {
 
       lastStatus = resp.status;
       lastText = await resp.text();
-      const retriable = resp.status === 429 || resp.status === 503;
+      const isTimeout = lastText.includes("TimeoutError");
+      const retriable = resp.status === 429 || resp.status === 503 || resp.status === 500 || isTimeout;
       if (!retriable || attempt === RETRY_DELAYS_MS.length) break;
       const delay = RETRY_DELAYS_MS[attempt];
       console.warn(`Browserless ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1})`);
       await new Promise((r) => setTimeout(r, delay));
     }
+
+    console.error("Browserless error", lastStatus, lastText);
+    return new Response(
+      JSON.stringify({ error: `Browserless ${lastStatus}: ${lastText.slice(0, 500)}` }),
+      { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
 
     console.error("Browserless error", lastStatus, lastText);
     return new Response(
