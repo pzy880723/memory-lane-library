@@ -20,6 +20,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SLIDES } from "@/components/slides/registry";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
+import { toast } from "sonner";
 
 const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
@@ -29,7 +30,7 @@ const EXPORT_VERSION = "v5-browserless";
 const CAPTURE_W = 1920;
 const CAPTURE_H = 1080;
 const CAPTURE_PIXEL_RATIO = 2;
-const RENDER_CONCURRENCY = 3;
+const RENDER_CONCURRENCY = 1;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
 export interface ExportProgress {
@@ -127,7 +128,7 @@ function publicPrintUrl(index: number, hashBust: string): string {
   return `${window.location.origin}/print/${index + 1}?v=${encodeURIComponent(hashBust)}`;
 }
 
-async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
+async function renderOneSlideOnce(index: number, hashBust: string): Promise<Blob> {
   const url = publicPrintUrl(index, hashBust);
   const resp = await fetch(RENDER_FN_URL, {
     method: "POST",
@@ -150,6 +151,16 @@ async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
     throw new Error(`第 ${index + 1} 页截图失败 (${resp.status}): ${detail.slice(0, 200)}`);
   }
   return await resp.blob();
+}
+
+async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
+  try {
+    return await renderOneSlideOnce(index, hashBust);
+  } catch (err) {
+    console.warn(`[export] 第 ${index + 1} 页失败,2s 后重试:`, err);
+    await new Promise((r) => setTimeout(r, 2000));
+    return await renderOneSlideOnce(index, hashBust);
+  }
 }
 
 async function renderAllSlidesToJpegs(
@@ -422,25 +433,33 @@ export async function precacheAll(opts: { force?: boolean } = {}): Promise<void>
 
 async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
   const filename = `${FILENAME_BASE}.${type}`;
+  const label = type.toUpperCase();
 
-  // 等任何在跑的同 type 后台任务完成
-  if (inflight[type]) {
-    onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
-    try {
-      const r = await inflight[type];
-      if (r?.url) {
-        onProgress?.({ phase: "downloading", message: "准备下载…" });
-        await triggerDownload(r.url, filename);
-        return;
-      }
-    } catch { /* fall through to fresh run */ }
+  try {
+    // 等任何在跑的同 type 后台任务完成
+    if (inflight[type]) {
+      onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
+      try {
+        const r = await inflight[type];
+        if (r?.url) {
+          onProgress?.({ phase: "downloading", message: "准备下载…" });
+          await triggerDownload(r.url, filename);
+          return;
+        }
+      } catch { /* fall through to fresh run */ }
+    }
+
+    const { url, fromCache } = await generateAndCache(type, { onProgress });
+    onProgress?.({
+      phase: "downloading",
+      message: fromCache ? "命中缓存,准备下载…" : "保存到本地…",
+    });
+    if (!url) throw new Error("生成失败");
+    await triggerDownload(url, filename);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[export] ${label} 导出失败:`, err);
+    toast.error(`${label} 导出失败`, { description: message.slice(0, 300) });
+    throw err;
   }
-
-  const { url, fromCache } = await generateAndCache(type, { onProgress });
-  onProgress?.({
-    phase: "downloading",
-    message: fromCache ? "命中缓存,准备下载…" : "保存到本地…",
-  });
-  if (!url) throw new Error("生成失败");
-  await triggerDownload(url, filename);
 }

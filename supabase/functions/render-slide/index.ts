@@ -66,34 +66,45 @@ Deno.serve(async (req) => {
     waitForTimeout: waitMs,
   };
 
+  const endpoint = `${BROWSERLESS_BASE}/screenshot?token=${encodeURIComponent(BROWSERLESS_TOKEN)}`;
+  const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000];
+
   try {
-    const resp = await fetch(
-      `${BROWSERLESS_BASE}/screenshot?token=${encodeURIComponent(BROWSERLESS_TOKEN)}`,
-      {
+    let lastStatus = 0;
+    let lastText = "";
+    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+      const resp = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      },
-    );
+      });
 
-    if (!resp.ok) {
-      const text = await resp.text();
-      console.error("Browserless error", resp.status, text);
-      return new Response(
-        JSON.stringify({ error: `Browserless ${resp.status}: ${text.slice(0, 500)}` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      if (resp.ok) {
+        const buf = await resp.arrayBuffer();
+        return new Response(buf, {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "no-store",
+          },
+        });
+      }
+
+      lastStatus = resp.status;
+      lastText = await resp.text();
+      const retriable = resp.status === 429 || resp.status === 503;
+      if (!retriable || attempt === RETRY_DELAYS_MS.length) break;
+      const delay = RETRY_DELAYS_MS[attempt];
+      console.warn(`Browserless ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1})`);
+      await new Promise((r) => setTimeout(r, delay));
     }
 
-    const buf = await resp.arrayBuffer();
-    return new Response(buf, {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "image/jpeg",
-        "Cache-Control": "no-store",
-      },
-    });
+    console.error("Browserless error", lastStatus, lastText);
+    return new Response(
+      JSON.stringify({ error: `Browserless ${lastStatus}: ${lastText.slice(0, 500)}` }),
+      { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (err) {
     console.error("render-slide failed", err);
     return new Response(
