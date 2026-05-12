@@ -124,8 +124,16 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as strin
 const RENDER_FN_URL = `${SUPABASE_URL}/functions/v1/render-slide`;
 
 function publicPrintUrl(index: number, hashBust: string): string {
-  // Browserless 必须能访问到这个 URL —— 用当前部署 origin
-  return `${window.location.origin}/print/${index + 1}?v=${encodeURIComponent(hashBust)}`;
+  const url = new URL(window.location.href);
+  const previewToken = url.searchParams.get("__lovable_token");
+
+  url.pathname = `/print/${index + 1}`;
+  url.hash = "";
+  url.search = "";
+  url.searchParams.set("v", hashBust);
+  if (previewToken) url.searchParams.set("__lovable_token", previewToken);
+
+  return url.toString();
 }
 
 async function renderOneSlideOnce(index: number, hashBust: string): Promise<Blob> {
