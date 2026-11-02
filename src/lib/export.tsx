@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SLIDES } from "@/components/slides/registry";
 import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
 import { toast } from "sonner";
+import { renderWithRetry } from "@/lib/renderRetry";
 
 const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
@@ -37,9 +38,19 @@ export interface ExportProgress {
   phase: ExportPhase;
   current?: number;
   total?: number;
+  completed?: number;
+  retryCount?: number;
+  maxRetries?: number;
   message?: string;
 }
 export type ProgressCallback = (p: ExportProgress) => void;
+
+const renderProgressListeners = new Set<ProgressCallback>();
+let latestRenderProgress: ExportProgress | null = null;
+function reportRenderProgress(progress: ExportProgress) {
+  latestRenderProgress = progress;
+  renderProgressListeners.forEach((listener) => listener(progress));
+}
 
 /* ─────────────── 内容指纹 ─────────────── */
 
@@ -161,14 +172,8 @@ async function renderOneSlideOnce(index: number, hashBust: string): Promise<Blob
   return await resp.blob();
 }
 
-async function renderOneSlide(index: number, hashBust: string): Promise<Blob> {
-  try {
-    return await renderOneSlideOnce(index, hashBust);
-  } catch (err) {
-    console.warn(`[export] 第 ${index + 1} 页失败,2s 后重试:`, err);
-    await new Promise((r) => setTimeout(r, 2000));
-    return await renderOneSlideOnce(index, hashBust);
-  }
+async function renderOneSlide(index: number, hashBust: string, onRetry: (retryCount: number, maxRetries: number) => void): Promise<Blob> {
+  return renderWithRetry(() => renderOneSlideOnce(index, hashBust), onRetry);
 }
 
 async function renderAllSlidesToJpegs(
@@ -184,13 +189,16 @@ async function renderAllSlidesToJpegs(
     while (true) {
       const i = next++;
       if (i >= total) return;
-      out[i] = await renderOneSlide(i, hashBust);
+      reportRenderProgress({ phase: "rendering", current: i + 1, completed: done, total, retryCount: 0, maxRetries: 1 });
+      out[i] = await renderOneSlide(i, hashBust, (retryCount, maxRetries) => {
+        reportRenderProgress({ phase: "rendering", current: i + 1, completed: done, total, retryCount, maxRetries });
+      });
       done++;
-      onProgress?.({ phase: "rendering", current: done, total });
+      reportRenderProgress({ phase: "rendering", current: i + 1, completed: done, total, retryCount: 0, maxRetries: 1 });
     }
   }
 
-  onProgress?.({ phase: "rendering", current: 0, total });
+  reportRenderProgress({ phase: "rendering", current: 1, completed: 0, total, retryCount: 0, maxRetries: 1 });
   const workers = Array.from(
     { length: Math.min(RENDER_CONCURRENCY, total) },
     () => worker(),
@@ -442,11 +450,13 @@ export async function precacheAll(opts: { force?: boolean } = {}): Promise<void>
 async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): Promise<void> {
   const filename = `${FILENAME_BASE}.${type}`;
   const label = type.toUpperCase();
+  if (onProgress) renderProgressListeners.add(onProgress);
 
   try {
     // 等任何在跑的同 type 后台任务完成
     if (inflight[type]) {
       onProgress?.({ phase: "checking", message: "正在等待后台生成完成…" });
+      if (latestRenderProgress && sharedRenderInflight) onProgress?.(latestRenderProgress);
       try {
         const r = await inflight[type];
         if (r?.url) {
@@ -469,5 +479,7 @@ async function runExport(type: "pdf" | "pptx", onProgress?: ProgressCallback): P
     console.error(`[export] ${label} 导出失败:`, err);
     toast.error(`${label} 导出失败`, { description: message.slice(0, 300) });
     throw err;
+  } finally {
+    if (onProgress) renderProgressListeners.delete(onProgress);
   }
 }

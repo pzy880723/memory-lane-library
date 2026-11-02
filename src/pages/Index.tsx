@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { SLIDES, SlideRenderer } from "@/components/slides/registry";
 import { decodeForSlide } from "@/lib/preloadImages";
-import { downloadPDF, downloadPPTX, subscribePrecache, getPrecacheStatus, type PrecacheStatus } from "@/lib/export";
+import { downloadPDF, downloadPPTX, subscribePrecache, getPrecacheStatus, type PrecacheStatus, type ExportProgress } from "@/lib/export";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -36,6 +37,8 @@ const IndexInner = () => {
   const [isPhonePortrait, setIsPhonePortrait] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(false);
   const [downloading, setDownloading] = useState<"pdf" | "pptx" | null>(null);
+  const [exportProgress, setExportProgress] = useState<ExportProgress | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [precache, setPrecache] = useState<PrecacheStatus>(() => getPrecacheStatus());
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -272,6 +275,8 @@ const IndexInner = () => {
     if (downloading) return; // 防止重复点击
     const label = type.toUpperCase();
     setDownloading(type);
+    setExportError(null);
+    setExportProgress({ phase: "checking", message: "正在检查云端缓存…" });
     const t = toast({
       title: `正在准备 ${label}`,
       description: "正在检查云端缓存…",
@@ -279,13 +284,14 @@ const IndexInner = () => {
     try {
       const fn = type === "pdf" ? downloadPDF : downloadPPTX;
       await fn((p) => {
+        setExportProgress(p);
         if (p.phase === "checking") {
-          t.update({ id: t.id, title: `准备 ${label}`, description: "正在检查云端缓存…" });
+          t.update({ id: t.id, title: `准备 ${label}`, description: p.message ?? "正在检查云端缓存…" });
         } else if (p.phase === "rendering") {
           t.update({
             id: t.id,
-            title: `首次生成 ${label}（约 30-60 秒）`,
-            description: `正在渲染第 ${p.current}/${p.total} 页…`,
+            title: `正在生成 ${label}`,
+            description: `正在渲染第 ${p.current}/${p.total} 页…${p.retryCount ? ` 本页自动重试 ${p.retryCount}/${p.maxRetries} 次` : ""}`,
           });
         } else if (p.phase === "packing") {
           t.update({ id: t.id, title: `打包 ${label}`, description: p.message });
@@ -300,8 +306,10 @@ const IndexInner = () => {
         title: `✓ ${label} 下载已开始`,
         description: "文件正在保存到本地",
       });
+      setExportProgress(null);
     } catch (err) {
       console.error("下载失败：", err);
+      setExportError(err instanceof Error ? err.message : "请稍后重试");
       t.update({
         id: t.id,
         title: "下载失败",
@@ -445,6 +453,21 @@ const IndexInner = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {exportProgress && (
+              <div className="fixed right-4 top-20 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-lg border bg-popover p-3 text-popover-foreground" role="status" aria-live="polite">
+                <div className="flex items-center justify-between gap-2 text-sm font-medium">
+                  <span>{exportError ? "下载失败" : exportProgress.phase === "rendering" ? `正在渲染 ${downloading?.toUpperCase() ?? ""}` : "准备下载"}</span>
+                  {exportProgress.total && <span className="shrink-0 tabular-nums">{exportProgress.current}/{exportProgress.total} 页</span>}
+                </div>
+                {exportProgress.total && (
+                  <Progress className="mt-2 h-2" value={((exportProgress.completed ?? 0) / exportProgress.total) * 100} aria-label="逐页渲染进度" />
+                )}
+                {exportProgress.retryCount ? <p className="mt-2 text-xs text-destructive">本页截图失败，自动重试 {exportProgress.retryCount}/{exportProgress.maxRetries} 次</p> : null}
+                {!exportError && exportProgress.phase !== "rendering" && <p className="mt-2 text-xs text-muted-foreground">{exportProgress.message}</p>}
+                {exportError && <p className="mt-2 break-words text-xs text-destructive">{exportError}</p>}
+                {exportError && <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setExportProgress(null); setExportError(null); }}>关闭</Button>}
+              </div>
+            )}
             <Button
               variant="ghost"
               size="icon"
