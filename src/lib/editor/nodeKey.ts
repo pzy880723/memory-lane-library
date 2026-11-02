@@ -4,6 +4,7 @@
  */
 
 export function makeNodeKey(root: HTMLElement, node: HTMLElement, kind: "text" | "image"): string {
+  if (node.dataset.editId) return `${kind}:id:${node.dataset.editId}`;
   const path: number[] = [];
   let cur: HTMLElement | null = node;
   while (cur && cur !== root) {
@@ -15,7 +16,7 @@ export function makeNodeKey(root: HTMLElement, node: HTMLElement, kind: "text" |
   }
   const seed =
     kind === "text"
-      ? (node.textContent ?? "").trim().slice(0, 12)
+      ? (node.dataset.origText ?? node.textContent ?? "").trim().slice(0, 12)
       : (node as HTMLImageElement).getAttribute("alt") ?? "";
   return `${kind}:${path.join("-")}:${hashStr(seed)}`;
 }

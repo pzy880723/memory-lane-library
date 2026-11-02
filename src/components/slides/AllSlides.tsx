@@ -1841,56 +1841,6 @@ export function Slide29Contact({ pageNumber, totalPages }: { pageNumber: number;
 }
 
 /* ============================================================
- * 第 30 页 — 门店地址（去黑色）
- * ============================================================ */
-export function Slide30Stores({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
-  return (
-    <SlideShell pageNumber={pageNumber} totalPages={totalPages} variant="cream" chapter="09 · 联系我们">
-      <div className="absolute inset-0 px-28 pt-36 pb-24">
-        <span className="font-handwrite text-4xl text-boomer-red">Our Stores</span>
-        <h1 className="font-display text-7xl font-black mt-1 mb-10">门 店 地 址</h1>
-
-        <div className="space-y-6">
-          <div className="bg-paper-cream vintage-border p-10 flex items-center gap-10 rotate-[-0.5deg]">
-            <MapPin className="w-24 h-24 text-boomer-red flex-shrink-0" strokeWidth={2} />
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3 flex-wrap">
-                <div className="font-display text-4xl font-black">BOOMER OFF · 中信泰富店</div>
-                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold rounded-lg">营 业 中</span>
-              </div>
-              <div className="font-body text-2xl text-ink/80 font-bold">上海市静安区南京西路 1168 号 · 中信泰富广场 B1 层</div>
-              <div className="mt-3 flex gap-6 font-handwrite text-3xl text-boomer-red flex-wrap">
-                <span>★ 南京西路商圈 No.1</span>
-                <span>★ 静安区 No.1</span>
-                <span>★ 全上海 No.5</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-vintage-gold vintage-border-red p-10 flex items-center gap-10 rotate-[0.5deg]">
-            <MapPin className="w-24 h-24 text-boomer-red flex-shrink-0" strokeWidth={2} />
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3 flex-wrap">
-                <div className="font-display text-4xl font-black">更 多 门 店</div>
-                <span className="bg-boomer-red text-paper-cream px-5 py-2 font-display text-2xl font-bold rounded-lg">筹 备 中</span>
-              </div>
-              <div className="font-body text-2xl text-ink/80 font-bold">敬请期待 · 期待与您共同将首店成功复制到更多城市</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-10 bg-boomer-red text-paper-cream p-8 vintage-border text-center">
-          <p className="font-display text-3xl">
-            正在寻找<span className="font-handwrite text-4xl text-vintage-gold mx-2">志同道合</span>的合作伙伴
-            — 商业地产 · 投资机构 · 加盟商
-          </p>
-        </div>
-      </div>
-    </SlideShell>
-  );
-}
-
-/* ============================================================
  * 第 31 页 — 金句
  * ============================================================ */
 export function Slide31Slogan({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {

@@ -1,25 +1,6 @@
-/**
- * 客户端导出 PDF / PPTX —— 真·网页高清截图版
- * ─────────────────────────────────────────────────────────────────
- * 原理:
- *  1. 计算当前内容指纹(版本 + 完整 overrides JSON + 页数)
- *  2. 查询 export_cache 表;命中则直接拿 file_url 下载
- *  3. 否则:
- *     - 在隐藏 iframe 里以 1920×1080 加载 /print/N 路由
- *       (Print 路由会自动应用最新 overrides + 等字体/图片就绪)
- *     - iframe 就绪后用 html-to-image (foreignObject SVG) 截取真实页面为 JPEG
- *     - PDF: pdf-lib 拼接;PPTX: pptxgenjs 拼接
- *  4. 上传到 Storage 的 exports 桶(每个 hash 一个独立文件,绝不复用)
- *  5. 触发 blob 下载
- *
- * 与上一版相比:
- *  - 截图来源是「真实网页」而非离屏 React 节点,杜绝字体/层级/拉伸失真
- *  - PDF 与 PPTX 使用同一批截图,视觉绝对一致
- *  - 缓存路径包含完整内容 hash,旧文件不会再回流
- */
-import { supabase } from "@/integrations/supabase/client";
+/** PDF/PPTX share versioned screenshots rendered and cached on our own server. */
+import { bookRequest } from "@/lib/bookApi";
 import { SLIDES } from "@/components/slides/registry";
-import { loadOverridesRemote, type AllOverrides } from "@/lib/editor/storage";
 import { toast } from "sonner";
 import { renderWithRetry } from "@/lib/renderRetry";
 
@@ -27,10 +8,6 @@ const loadPdfLib = () => import("pdf-lib");
 const loadPptxgen = () => import("pptxgenjs").then((m) => m.default);
 
 const FILENAME_BASE = "BOOMER-OFF-Vintage-品牌手册";
-const EXPORT_VERSION = "v5-browserless";
-const CAPTURE_W = 1920;
-const CAPTURE_H = 1080;
-const CAPTURE_PIXEL_RATIO = 2;
 const RENDER_CONCURRENCY = 1;
 
 export type ExportPhase = "checking" | "rendering" | "packing" | "uploading" | "downloading";
@@ -54,122 +31,22 @@ function reportRenderProgress(progress: ExportProgress) {
 
 /* ─────────────── 内容指纹 ─────────────── */
 
-async function sha256(text: string): Promise<string> {
-  const buf = new TextEncoder().encode(text);
-  const hashBuf = await crypto.subtle.digest("SHA-256", buf);
-  return Array.from(new Uint8Array(hashBuf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function stableStringify(obj: unknown): string {
-  if (obj === null || typeof obj !== "object") return JSON.stringify(obj);
-  if (Array.isArray(obj)) return `[${obj.map(stableStringify).join(",")}]`;
-  const keys = Object.keys(obj as Record<string, unknown>).sort();
-  return `{${keys
-    .map((k) => `${JSON.stringify(k)}:${stableStringify((obj as Record<string, unknown>)[k])}`)
-    .join(",")}}`;
-}
-
 async function computeContentHash(): Promise<string> {
-  const overrides = (await loadOverridesRemote()) ?? ({ slides: {} } as AllOverrides);
-  const stable = stableStringify(overrides.slides ?? {});
-  return await sha256(`${EXPORT_VERSION}|n=${SLIDES.length}|${stable}`);
+  return (await (await bookRequest("/exports/version")).json()).hash;
 }
-
-/* ─────────────── 缓存查询 / 写入 ─────────────── */
 
 async function findCached(type: "pdf" | "pptx", hash: string): Promise<string | null> {
-  const { data, error } = await supabase
-    .from("export_cache")
-    .select("file_url")
-    .eq("type", type)
-    .eq("content_hash", hash)
-    .maybeSingle();
-  if (error) {
-    console.warn("[export] cache lookup failed:", error.message);
-    return null;
-  }
-  return data?.file_url ?? null;
+  return (await (await bookRequest(`/exports/cache?type=${type}&hash=${hash}`)).json()).url;
 }
 
-async function uploadAndRecord(
-  type: "pdf" | "pptx",
-  hash: string,
-  blob: Blob,
-): Promise<string> {
-  const ext = type;
-  // 路径包含完整 hash → 内容变了一定是新文件,不会被旧文件污染
-  const path = `${type}/${EXPORT_VERSION}/${hash}.${ext}`;
-  const { error: uploadErr } = await supabase.storage
-    .from("exports")
-    .upload(path, blob, {
-      contentType:
-        type === "pdf"
-          ? "application/pdf"
-          : "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      cacheControl: "31536000",
-      upsert: true,
-    });
-  if (uploadErr) throw new Error(`上传失败: ${uploadErr.message}`);
-
-  const { data: urlData } = supabase.storage.from("exports").getPublicUrl(path);
-  const fileUrl = urlData.publicUrl;
-
-  await supabase.from("export_cache").insert({
-    type,
-    content_hash: hash,
-    file_path: path,
-    file_url: fileUrl,
-  });
-
-  return fileUrl;
+async function uploadAndRecord(type: "pdf" | "pptx", hash: string, blob: Blob): Promise<string> {
+  const response = await bookRequest(`/exports/${type}/${hash}`, { method: "PUT", headers: { "Content-Type": blob.type }, body: blob });
+  return (await response.json()).url;
 }
 
-/* ─────────────── 隐藏 iframe 截屏 ─────────────── */
-
-/* ─────────────── 服务端截图 (Browserless via Edge Function) ─────────────── */
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-const RENDER_FN_URL = `${SUPABASE_URL}/functions/v1/render-slide`;
-
-function publicPrintUrl(index: number, hashBust: string): string {
-  const url = new URL(window.location.href);
-  const previewToken = url.searchParams.get("__lovable_token");
-
-  url.pathname = `/print/${index + 1}`;
-  url.hash = "";
-  url.search = "";
-  url.searchParams.set("v", hashBust);
-  if (previewToken) url.searchParams.set("__lovable_token", previewToken);
-
-  return url.toString();
-}
-
-async function renderOneSlideOnce(index: number, hashBust: string): Promise<Blob> {
-  const url = publicPrintUrl(index, hashBust);
-  const resp = await fetch(RENDER_FN_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      apikey: SUPABASE_ANON_KEY,
-    },
-    body: JSON.stringify({
-      url,
-      width: CAPTURE_W,
-      height: CAPTURE_H,
-      pixelRatio: CAPTURE_PIXEL_RATIO,
-      quality: 92,
-    }),
-  });
-  if (!resp.ok) {
-    let detail = "";
-    try { detail = await resp.text(); } catch { /* noop */ }
-    throw new Error(`第 ${index + 1} 页截图失败 (${resp.status}): ${detail.slice(0, 200)}`);
-  }
-  return await resp.blob();
+async function renderOneSlideOnce(index: number, hash: string): Promise<Blob> {
+  const response = await bookRequest("/render", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ index: index + 1, hash }) });
+  return response.blob();
 }
 
 async function renderOneSlide(index: number, hashBust: string, onRetry: (retryCount: number, maxRetries: number) => void): Promise<Blob> {

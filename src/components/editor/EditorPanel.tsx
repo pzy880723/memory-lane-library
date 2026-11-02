@@ -178,7 +178,7 @@ export function EditorPanel() {
       const url = await uploadImageToCloud(file, currentSlide, selected.key);
       updateImage(currentSlide, selected.key, { src: url });
       setSelected((s) => ({ ...s, imageSrc: url }));
-      toast({ title: "✓ 图片已上传", description: "已保存到云端,刷新也不会丢失" });
+      toast({ title: "图片已上传", description: "正在保存页面，请留意保存状态。" });
     } catch (err) {
       console.error("上传失败:", err);
       toast({

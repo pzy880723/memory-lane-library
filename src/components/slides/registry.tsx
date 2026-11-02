@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { ScaledSlide } from "./ScaledSlide";
 import { useApplyOverrides } from "@/lib/editor/useApplyOverrides";
 import { ASSETS } from "@/lib/preloadImages";
+import { STORE_PROFILES, SlideStoreOverview, SlideStoreProfile } from "./StoreSlides";
 import {
   Slide01Cover, Slide02TOC, Slide03Executive, SlideChapter,
   Slide05Traffic, Slide05bUGC, Slide05cKOL, Slide06Media, Slide07Keywords, Slide07bDianping, Slide08Engine,
@@ -12,7 +13,7 @@ import {
   Slide22Value, Slide23Wall,
   Slide24Cooperation,
   Slide26Matrix1, Slide27Matrix2, Slide28Flywheel,
-  Slide29Contact, Slide30Stores, Slide31Slogan, Slide32Thanks,
+  Slide29Contact, Slide31Slogan, Slide32Thanks,
 } from "./AllSlides";
 
 export interface SlideMeta {
@@ -111,7 +112,14 @@ export const SLIDES: SlideMeta[] = [
   { id: "matrix2", title: "七大店型 [下]", chapter: "08", render: (p) => <Slide27Matrix2 {...p} /> },
   { id: "flywheel", title: "增长飞轮", chapter: "08", render: (p) => <Slide28Flywheel {...p} /> },
 
-  { id: "stores", title: "门店地址", chapter: "09", render: (p) => <Slide30Stores {...p} /> },
+  { id: "stores", title: "门店一览", chapter: "09",
+    images: [A.citicExterior, A.wenzhouSide],
+    render: (p) => <SlideStoreOverview {...p} /> },
+  ...STORE_PROFILES.map((store): SlideMeta => ({
+    id: `store-${store.id}`, title: `${store.city} · ${store.name}`, chapter: "09",
+    images: [store.photo, store.detail],
+    render: (p) => <SlideStoreProfile {...p} store={store} />,
+  })),
   { id: "contact", title: "联系我们", chapter: "09",
     images: [A.wechatQR],
     render: (p) => <Slide29Contact {...p} /> },

@@ -22,6 +22,10 @@ import photoUltraman from "@/assets/store/ultraman-toys.webp";
 import photoTeapot from "@/assets/store/iron-teapot.webp";
 import photoPikachu from "@/assets/store/pikachu-mug.webp";
 import photoDiatone from "@/assets/store/diatone-spinning.webp";
+import citicExterior from "@/assets/stores/citic-exterior.jpg";
+import wenzhouExterior from "@/assets/stores/wenzhou-exterior.jpg";
+import wenzhouInterior from "@/assets/stores/wenzhou-interior.jpg";
+import wenzhouSide from "@/assets/stores/wenzhou-side.jpg";
 
 import celebWenqi from "@/assets/ugc/celeb-wenqi.webp";
 import celebHuye from "@/assets/ugc/celeb-huye.webp";
@@ -49,6 +53,7 @@ export const ASSETS = {
   logo, wechatQR,
   photoVinyl, photoCeramics, photoDIY, photoSato, photoSatoDetail,
   photoCups, photoUltraman, photoTeapot, photoPikachu, photoDiatone,
+  citicExterior, wenzhouExterior, wenzhouInterior, wenzhouSide,
   celebWenqi, celebHuye,
   xhs1, xhs2, xhs3, xhs4, xhs5, xhs6, xhs7,
   dy1, dy2,

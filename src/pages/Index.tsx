@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronLeft, ChevronRight, Download, Share2,
-  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation, Loader2, CheckCircle2,
+  Maximize2, Minimize2, LayoutGrid, X, Menu, FileDown, Presentation, Loader2, CheckCircle2, Pencil,
 } from "lucide-react";
 import logo from "@/assets/boomer-off-logo.png";
 import { EditorProvider, useEditor } from "@/lib/editor/EditorContext";
@@ -367,6 +367,17 @@ const IndexInner = () => {
               variant="ghost"
               size="sm"
               className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
+              aria-label={editor.editing ? "退出编辑" : "内容编辑"}
+              title={editor.editing ? "退出编辑" : "内容编辑 · 可替换图片"}
+              onClick={() => editor.unlocked ? editor.toggleEditing() : setShowPwd(true)}
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="hidden sm:inline">{editor.editing ? "退出编辑" : "内容编辑"}</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-paper-cream hover:bg-paper-cream/10 hover:text-paper-cream gap-2"
               onClick={() => setShowThumbs((s) => !s)}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -595,6 +606,21 @@ const IndexInner = () => {
             </>
           )}
         </div>
+
+        {editor.editing && (
+          <div role="status" aria-live="polite" className="fixed bottom-4 left-4 z-[70] max-w-[calc(100vw-2rem)] rounded-lg border bg-background px-4 py-2 text-sm text-foreground shadow-lg">
+            {editor.saveError ? (
+              <div className="flex flex-wrap items-center gap-2 text-destructive">
+                <span>{editor.saveError}</span>
+                <Button variant="outline" size="sm" onClick={editor.retrySave}>重试保存</Button>
+              </div>
+            ) : !editor.loaded || editor.saving ? (
+              <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{editor.loaded ? "正在保存到云端…" : "正在读取内容…"}</span>
+            ) : (
+              <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" />已保存到云端 · 点击图片可替换</span>
+            )}
+          </div>
+        )}
 
         {/* 缩略图抽屉 */}
         {showThumbs && (

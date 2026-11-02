@@ -13,21 +13,27 @@ interface Props {
 export function PasswordDialog({ open, onOpenChange }: Props) {
   const { tryUnlock } = useEditor();
   const [pwd, setPwd] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
 
-  const submit = () => {
-    if (tryUnlock(pwd)) {
+  const submit = async () => {
+    if (pending || !pwd) return;
+    setPending(true);
+    try {
+      await tryUnlock(pwd);
       setPwd("");
-      setError(false);
+      setError("");
       onOpenChange(false);
-    } else {
-      setError(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "暂时无法进入编辑，请重试");
       setPwd("");
+    } finally {
+      setPending(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPwd(""); setError(false); } onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPwd(""); setError(""); } onOpenChange(v); }}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -40,12 +46,12 @@ export function PasswordDialog({ open, onOpenChange }: Props) {
           placeholder="密码"
           value={pwd}
           autoFocus
-          onChange={(e) => { setPwd(e.target.value); setError(false); }}
+          onChange={(e) => { setPwd(e.target.value); setError(""); }}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           className={error ? "border-destructive" : ""}
         />
-        {error && <p className="text-xs text-destructive">密码不正确，请重试</p>}
-        <Button onClick={submit} disabled={!pwd}>进入编辑</Button>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        <Button onClick={submit} disabled={!pwd || pending}>{pending ? "验证中…" : "进入编辑"}</Button>
       </DialogContent>
     </Dialog>
   );

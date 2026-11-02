@@ -1,10 +1,10 @@
 /**
  * 编辑数据持久化层
- * - 主存储:Lovable Cloud 数据库 `content_overrides` 表(单条 scope='default')
+ * - 主存储:自有服务器内容接口
  * - 本地缓存:localStorage(离线兜底 + 启动加速)
- * - 图片:Lovable Cloud Storage `editor-images` bucket
+ * - 图片:自有服务器图片目录
  */
-import { supabase } from "@/integrations/supabase/client";
+import { bookRequest, readContent, writeContent } from "@/lib/bookApi";
 
 export interface TextOverride {
   text?: string;
@@ -28,8 +28,6 @@ export interface AllOverrides {
 }
 
 const STORAGE_KEY = "boomer_off_editor_overrides_v1";
-const SCOPE = "default";
-const IMAGE_BUCKET = "editor-images";
 
 const empty = (): AllOverrides => ({
   version: 1,
@@ -67,41 +65,16 @@ export function clearOverridesLocal() {
 /* ─────────────── 云端读写(异步,真源)─────────────── */
 
 export async function loadOverridesRemote(): Promise<AllOverrides | null> {
-  const { data, error } = await supabase
-    .from("content_overrides")
-    .select("data")
-    .eq("scope", SCOPE)
-    .maybeSingle();
-  if (error) {
-    console.warn("[storage] load remote failed:", error.message);
-    return null;
-  }
-  if (!data) return null;
-  const parsed = data.data as unknown;
-  if (parsed && typeof parsed === "object" && (parsed as AllOverrides).version === 1) {
-    return parsed as AllOverrides;
-  }
-  return null;
+  const data = await readContent();
+  return data?.version === 1 ? data as AllOverrides : null;
 }
 
 export async function saveOverridesRemote(data: AllOverrides): Promise<void> {
-  data.updatedAt = new Date().toISOString();
-  const row = { scope: SCOPE, data: data as unknown as never };
-  const { error } = await supabase
-    .from("content_overrides")
-    .upsert(row, { onConflict: "scope" });
-  if (error) {
-    console.warn("[storage] save remote failed:", error.message);
-    throw error;
-  }
+  await writeContent(data);
 }
 
 export async function clearOverridesRemote(): Promise<void> {
-  const row = { scope: SCOPE, data: empty() as unknown as never };
-  const { error } = await supabase
-    .from("content_overrides")
-    .upsert(row, { onConflict: "scope" });
-  if (error) console.warn("[storage] clear remote failed:", error.message);
+  await writeContent(empty());
 }
 
 /* ─────────────── 图片上传到 Storage ─────────────── */
@@ -166,26 +139,11 @@ export async function uploadImageToCloud(
   key: string,
 ): Promise<string> {
   const { data: blob, ext } = await compressImageFile(file);
-  const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 60);
-  const path = `slide-${slideIndex}/${safeKey}-${Date.now()}.${ext}`;
-
-  const contentType =
-    ext === "webp" ? "image/webp" :
-    ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-    ext === "png" ? "image/png" :
-    (file.type || undefined);
-
-  const { error } = await supabase.storage
-    .from(IMAGE_BUCKET)
-    .upload(path, blob, {
-      cacheControl: "31536000",
-      upsert: false,
-      contentType,
-    });
-  if (error) throw error;
-
-  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
-  return data.publicUrl;
+  void slideIndex;
+  void key;
+  const contentType = ext === "webp" ? "image/webp" : ext === "jpg" || ext === "jpeg" ? "image/jpeg" : ext === "png" ? "image/png" : file.type;
+  const response = await bookRequest("/images", { method: "POST", headers: { "Content-Type": contentType }, body: blob });
+  return (await response.json()).url;
 }
 
 /* ─────────────── 兼容旧 API(部分组件还在用)─────────────── */

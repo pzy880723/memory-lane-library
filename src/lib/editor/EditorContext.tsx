@@ -9,9 +9,7 @@ import {
   type AllOverrides, type TextOverride, type ImageOverride,
 } from "./storage";
 import { precacheAll } from "@/lib/export";
-
-const PASSWORDS = new Set(["880723", "pzy5565283", "boomer2016"]);
-const SESSION_KEY = "boomer_off_editor_unlocked";
+import { editorLogin, editorLogout, editorSession } from "@/lib/bookApi";
 
 interface EditorContextValue {
   unlocked: boolean;
@@ -19,9 +17,11 @@ interface EditorContextValue {
   data: AllOverrides;
   loaded: boolean;          // 云端已拉取一次
   saving: boolean;          // 正在写云端
+  saveError: string | null;
+  retrySave: () => void;
   currentSlide: number;
   setCurrentSlide: (i: number) => void;
-  tryUnlock: (password: string) => boolean;
+  tryUnlock: (password: string) => Promise<boolean>;
   lock: () => void;
   toggleEditing: () => void;
   updateText: (slideIndex: number, key: string, patch: TextOverride) => void;
@@ -43,9 +43,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AllOverrides>(() => loadOverridesLocal());
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [unlocked, setUnlocked] = useState<boolean>(
-    () => sessionStorage.getItem(SESSION_KEY) === "1",
-  );
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveAttempt, setSaveAttempt] = useState(0);
+  const retrySave = useCallback(() => setSaveAttempt((attempt) => attempt + 1), []);
+  const [unlocked, setUnlocked] = useState(false);
   const [editing, setEditing] = useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const dataRef = useRef(data);
@@ -57,27 +58,18 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const remote = await loadOverridesRemote();
-      if (cancelled) return;
-      if (remote && Object.keys(remote.slides ?? {}).length > 0) {
-        // 云端有内容 → 用云端
+      try {
+        const remote = await loadOverridesRemote();
+        if (cancelled) return;
+        if (!remote) throw new Error("服务器内容暂时不可用");
         setData(remote);
         saveOverridesLocal(remote);
-      } else {
-        // 云端没内容 + 本地有内容 → 一次性迁移到云端
-        const local = loadOverridesLocal();
-        const hasLocal = Object.keys(local.slides ?? {}).length > 0;
-        if (hasLocal) {
-          try {
-            await saveOverridesRemote(local);
-            console.info("[editor] migrated local overrides to cloud");
-          } catch (e) {
-            console.warn("[editor] migrate failed:", e);
-          }
-        }
+        setLoaded(true);
+      } catch {
+        if (!cancelled) setSaveError("读取服务器内容失败，请刷新后再试。");
       }
-      setLoaded(true);
     })();
+    void editorSession().then((active) => { if (!cancelled) setUnlocked(active); }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
 
@@ -87,17 +79,19 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     if (!loaded || !dirtyRef.current) return;
     saveOverridesLocal(data);
     setSaving(true);
+    setSaveError(null);
+    let cancelled = false;
     const t = setTimeout(async () => {
       try {
         await saveOverridesRemote(data);
       } catch {
-        // 错误已 console.warn,本地仍有兜底
+        if (!cancelled) setSaveError("云端保存失败，更改暂存于本机。请重试保存。");
       } finally {
-        setSaving(false);
+        if (!cancelled) setSaving(false);
       }
     }, 600);
-    return () => clearTimeout(t);
-  }, [data, loaded]);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [data, loaded, saveAttempt]);
 
   /* ─── 2b. 数据变更 → 后台静默预生成 PDF/PPTX(更长 debounce) ─── */
   useEffect(() => {
@@ -129,18 +123,15 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     });
   }, [pushHistory]);
 
-  const tryUnlock = useCallback((password: string) => {
-    if (PASSWORDS.has(password.trim())) {
-      sessionStorage.setItem(SESSION_KEY, "1");
-      setUnlocked(true);
-      setEditing(true);
-      return true;
-    }
-    return false;
+  const tryUnlock = useCallback(async (password: string) => {
+    await editorLogin(password.trim());
+    setUnlocked(true);
+    setEditing(true);
+    return true;
   }, []);
 
   const lock = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY);
+    void editorLogout().catch(console.warn);
     setUnlocked(false);
     setEditing(false);
   }, []);
@@ -205,12 +196,12 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   void historyVersion;
 
   const value = useMemo<EditorContextValue>(() => ({
-    unlocked, editing, data, loaded, saving, currentSlide, setCurrentSlide,
+    unlocked, editing, data, loaded, saving, saveError, retrySave, currentSlide, setCurrentSlide,
     tryUnlock, lock, toggleEditing,
     updateText, updateImage, resetAll, reload,
     undo, redo, canUndo, canRedo,
   }), [
-    unlocked, editing, data, loaded, saving, currentSlide,
+    unlocked, editing, data, loaded, saving, saveError, retrySave, currentSlide,
     tryUnlock, lock, toggleEditing,
     updateText, updateImage, resetAll, reload,
     undo, redo, canUndo, canRedo,
